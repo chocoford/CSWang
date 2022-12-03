@@ -9,26 +9,36 @@ import SwiftUI
 import Combine
 
 struct LoginSheet: ViewModifier {
-    @Binding var show: Bool
-    
-    init(show: Binding<Bool>) {
-        self._show = show
-    }
-    
+    @EnvironmentObject var store: AppStore
+    @State private var show: Bool = false
+
     func body(content: Content) -> some View {
         content
             .sheet(isPresented: $show) {
                 LoginView()
             }
-            .onAppear {
-                show = true
+            .task {
+                await checkAuth()
             }
+            .onReceive(store.state.user.hasLogin) { hasLogin in
+                if !hasLogin {
+                    show = true
+                }
+            }
+    }
+    
+    private func checkAuth() async {
+        guard let userInfo = AuthMiddleware.shared.getTokenFromKeychain() else {
+            show = true
+            return
+        }
+        await store.send(.user(action: .setUserInfo(userInfo: userInfo)))
     }
 }
 
 extension View {
-    func loginSheet(show: Binding<Bool>) -> some View {
-        modifier(LoginSheet(show: show))
+    func loginSheet() -> some View {
+        modifier(LoginSheet())
     }
 }
 
@@ -51,22 +61,16 @@ struct LoginView: View {
     }
     
     func getAuth() {
-//        signInModel.signIn(to: "http://devapp.trickle.so/app/authorization?third_party=CSWang", scheme: "CSWang")
-//            .sink { completion in
-//
-//            } receiveValue: { token in
-//                print(token)
-//                Task {
-//                    await store.send(.getUserInfo(token: token))
-//                }
-//            }
-//            .store(in: &cancellables)
+        signInModel.signIn(to: "https://devapp.trickle.so/app/authorization?third_party=CSWang", scheme: "CSWang")
+            .sink { completion in
 
-
-        Task {
-            let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1MTU5NzA5MDg0Mzk5Njk3OTMiLCJpYXQiOjE2NjgwNjQwMjAsImV4cCI6MTY5OTYyMDk3Miwic2NvcGUiOiJicm93c2VyIn0.I9VuwQnOwLG0NnlQTyhNalLYX_WaxHmI2DSsdnkR3Vk"
-            await store.send(.user(action: .getUserInfo(token: token)))
-        }
+            } receiveValue: { token in
+                print(token)
+                Task {
+                    await store.send(.user(action: .getUserInfo(token: token)))
+                }
+            }
+            .store(in: &cancellables)
     }
 }
 

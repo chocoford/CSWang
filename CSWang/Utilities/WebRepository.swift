@@ -47,6 +47,16 @@ extension WebRepository {
             return Fail<Value, Error>(error: error).eraseToAnyPublisher()
         }
     }
+    
+    static func makeBody<T: Encodable>(payload: T) throws -> Data {
+        let dic = payload.dictionary
+        if JSONSerialization.isValidJSONObject(dic) {
+            return try JSONSerialization.data(withJSONObject: dic,
+                                                          options: [.prettyPrinted, .fragmentsAllowed])
+        } else {
+            throw APIError.parameterInvalid
+        }
+    }
 }
 
 // MARK: - Helpers

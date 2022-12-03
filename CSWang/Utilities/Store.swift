@@ -13,7 +13,7 @@ typealias Reducer<State, Action, Environment> = (inout State, Action, Environmen
 
 @MainActor
 final class Store<State, Action, Environment>: ObservableObject {
-    @Published private(set) var state: State
+    @Published var state: State
     
     private let environment: Environment
     private let reducer: Reducer<State, Action, Environment>

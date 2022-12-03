@@ -6,33 +6,45 @@
 //
 
 import Foundation
+import OSLog
 
 final class AuthMiddleware {
     static let shared = AuthMiddleware()
     static let service = "devapp.trickle.so"
     static let account = "com.chocoford.CSWang"
     
+    let logger = Logger(subsystem: "CSWang", category: "AuthMiddleware")
+    
     var token: String? = nil
     
-    init() {
-        getTokenFromKeychain()
+    init() {}
+    
+    public func getTokenFromKeychain() -> UserInfo? {
+        guard let userInfo: UserInfo = KeychainHelper.standard.read(service: Self.service, account: Self.account) else {
+            logger.info("no auth info.")
+            return nil
+        }
+        
+        self.token = userInfo.token
+        
+        return userInfo
     }
     
-    private func getTokenFromKeychain() {
-        guard let userInfo: UserInfo = KeychainHelper.standard.read(service: Self.service, account: Self.account) else {
+    public func saveTokenToKeychain(userInfo: UserInfo) {
+        guard userInfo.token != nil else {
             return
         }
-        self.token = userInfo.token
+        logger.info("saving user info to keychain: \(userInfo.token ?? "")")
+        KeychainHelper.standard.save(userInfo, service: Self.service, account: Self.account)
+        updateToken(token: userInfo.token!)
     }
     
-//    private func saveTokenToKeychain() {
-//        guard let userInfo: UserInfo = KeychainHelper.standard.save(, service: Self.service, account: Self.account) else {
-//            return
-//        }
-//        self.token = userInfo.token
-//    }
-//    
     public func updateToken(token: String) {
         self.token = token
+    }
+    
+    public func removeToken() {
+        KeychainHelper.standard.delete(service: Self.service, account: Self.account)
+        self.token = nil
     }
 }

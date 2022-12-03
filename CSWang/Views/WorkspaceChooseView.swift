@@ -8,24 +8,100 @@
 import SwiftUI
 
 struct WorkspaceChooseSheet: ViewModifier {
-    @Binding var show: Bool
+    @EnvironmentObject var store: AppStore
+    @State private var show: Bool = false
+    
     
     func body(content: Content) -> some View {
-        return content
+        content
+            .sheet(isPresented: $show) {
+                ScrollView {
+                    WorkspaceChooseView()
+                }
+                .padding(20)
+                .frame(width: 300, height: 400, alignment: .center)
+//                .background(.ultraThickMaterial,
+//                            in: RoundedRectangle(cornerRadius: 12))
+            }
+
+            .onAppear {
+                if store.state.user.userInfo != nil && store.state.workspace.currentWorkspaceID == nil {
+                    show = true
+                }
+            }
+            .onChange(of: store.state.user.userInfo) { newValue in
+                if newValue != nil && store.state.workspace.currentWorkspaceID == nil {
+                    show = true
+                }
+            }
+            .onChange(of: store.state.workspace.currentWorkspaceID) { newValue in
+                if newValue != nil {
+                    show = false
+                }
+            }
     }
-    
 }
 
+extension View {
+    func workspaceChooseSheet() -> some View {
+        modifier(WorkspaceChooseSheet())
+    }
+}
+
+
 struct WorkspaceChooseView: View {
+    @EnvironmentObject var store: AppStore
     var body: some View {
-        VStack {
-            
+        VStack(alignment: .leading) {
+            ForEach(Array(store.state.workspace.allWorkspaces),
+                    id: \.workspaceID) { workspace in
+                WorkspaceCellView(workspace: workspace)
+            }
+        }
+        .onAppear {
+            Task {
+                let userID = store.state.user.userInfo?.user.id ?? ""
+                await store.send(.workspace(action: .listWorkspaces(userID: userID)))
+            }
         }
     }
 }
 
-struct WorkspaceChooseView_Previews: PreviewProvider {
-    static var previews: some View {
-        WorkspaceChooseView()
+struct WorkspaceCellView: View {
+    var workspace: WorkspaceData
+    var selected: Bool = false
+    
+    var body: some View {
+//        NavigationLink(value: workspace.workspaceID) {
+        Label {
+            HStack {
+                AvatarView(url: URL(string: workspace.logo),
+                           fallbackText: String(workspace.name.prefix(1)),
+                           shape: .rounded)
+                Text(workspace.name)
+                    .font(.title2)
+                    .lineLimit(1)
+                Spacer()
+            }
+        } icon: {
+
+        }
+        .labelStyle(ListLabelStyle(active: selected))
+//        .buttonStyle(ListButtonStyle())
     }
 }
+
+
+#if DEBUG
+struct WorkspaceChooseView_Previews: PreviewProvider {
+    static var previews: some View {
+        ScrollView {
+            WorkspaceChooseView()
+                .environmentObject(AppStore.preview)
+        }
+        .padding(20)
+        .frame(width: 300, height: 500, alignment: .center)
+        .background(.ultraThickMaterial, in: RoundedRectangle(cornerRadius: 12))
+    }
+}
+#endif

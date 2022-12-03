@@ -1,0 +1,197 @@
+{
+  "items": [
+    {
+      "workspaceId": "284981783550771203",
+      "generalChannel": {},
+      "generalChannelSpace": {},
+      "ownerId": "284981783550754821",
+      "name": "Editor Toolbar Testground",
+      "memberNum": 1,
+      "removedMemberNum": 0,
+      "logo": "",
+      "domain": "test.workspace.trickle.so",
+      "allowedEmailDomains": [],
+      "userId": "18555201329823745",
+      "createAt": 1657184778,
+      "updateAt": 1669277681,
+      "userMemberInfo": {
+        "memberId": "284981783550754821",
+        "name": "chocoford",
+        "avatarUrl": "https://devres.trickle.so/upload/users/18555201329823745/1669277677060_cat.png",
+        "role": "Admin",
+        "status": "Normal",
+        "email": "chocoford.zhang@visionwx.com"
+      }
+    },
+    {
+      "workspaceId": "424603960838455299",
+      "generalChannel": {},
+      "generalChannelSpace": {},
+      "ownerId": "0",
+      "name": "test 0823",
+      "memberNum": 2,
+      "removedMemberNum": 1,
+      "logo": "",
+      "domain": "test.workspace.trickle.so",
+      "allowedEmailDomains": [],
+      "userId": "18555201329823745",
+      "createAt": 1661248318,
+      "updateAt": 1669277681,
+      "userMemberInfo": {
+        "memberId": "424603960838471685",
+        "name": "chocoford",
+        "avatarUrl": "https://devres.trickle.so/upload/users/18555201329823745/1669277677060_cat.png",
+        "role": "Admin",
+        "status": "Normal",
+        "email": "chocoford.zhang@visionwx.com"
+      }
+    },
+    {
+      "workspaceId": "424991172407066627",
+      "generalChannel": {},
+      "generalChannelSpace": {},
+      "ownerId": "0",
+      "name": "ggg",
+      "memberNum": 4,
+      "removedMemberNum": 0,
+      "logo": "https://devres.trickle.so/upload/users/424991172407066627/1667373821118_\u622a\u5c4f2021-07-05 \u4e0a\u534811.19.45.png",
+      "domain": "test.workspace.trickle.so",
+      "allowedEmailDomains": [],
+      "userId": "18555201329823745",
+      "createAt": 1661261269,
+      "updateAt": 1669277681,
+      "userMemberInfo": {
+        "memberId": "425048931798351877",
+        "name": "chocoford",
+        "avatarUrl": "https://devres.trickle.so/upload/users/18555201329823745/1669277677060_cat.png",
+        "role": "Poster",
+        "status": "Normal",
+        "email": "chocoford.zhang@visionwx.com"
+      }
+    },
+    {
+      "workspaceId": "450905632829079555",
+      "generalChannel": {},
+      "generalChannelSpace": {},
+      "ownerId": "0",
+      "name": "Happy Thursday 123456",
+      "memberNum": 3,
+      "removedMemberNum": 0,
+      "logo": "",
+      "domain": "test.workspace.trickle.so",
+      "allowedEmailDomains": [],
+      "userId": "18555201329823745",
+      "createAt": 1662102134,
+      "updateAt": 1669277681,
+      "userMemberInfo": {
+        "memberId": "453940834811772933",
+        "name": "chocoford",
+        "avatarUrl": "https://devres.trickle.so/upload/users/18555201329823745/1669277677060_cat.png",
+        "role": "Poster",
+        "status": "Normal",
+        "email": "chocoford.zhang@visionwx.com"
+      }
+    },
+    {
+      "workspaceId": "263843635462684675",
+      "generalChannel": {},
+      "generalChannelSpace": {},
+      "ownerId": "263843635462668293",
+      "name": "test34",
+      "memberNum": 8,
+      "removedMemberNum": 1,
+      "logo": "",
+      "domain": "test.workspace.trickle.so",
+      "allowedEmailDomains": [],
+      "userId": "18555201329823745",
+      "createAt": 1662104189,
+      "updateAt": 1669277681,
+      "userMemberInfo": {
+        "memberId": "454011443000377349",
+        "name": "chocoford",
+        "avatarUrl": "https://devres.trickle.so/upload/users/18555201329823745/1669277677060_cat.png",
+        "role": "Poster",
+        "status": "Normal",
+        "email": "chocoford.zhang@visionwx.com"
+      }
+    },
+    {
+      "workspaceId": "463999609161646083",
+      "generalChannel": {},
+      "generalChannelSpace": {},
+      "ownerId": "0",
+      "name": "just do it",
+      "memberNum": 2,
+      "removedMemberNum": 0,
+      "logo": "",
+      "domain": "test.workspace.trickle.so",
+      "allowedEmailDomains": [],
+      "userId": "18555201329823745",
+      "createAt": 1662483183,
+      "updateAt": 1669277681,
+      "userMemberInfo": {
+        "memberId": "467033594863288325",
+        "name": "chocoford",
+        "avatarUrl": "https://devres.trickle.so/upload/users/18555201329823745/1669277677060_cat.png",
+        "role": "Poster",
+        "status": "Normal",
+        "email": "chocoford.zhang@visionwx.com"
+      }
+    },
+    {
+      "workspaceId": "76957788663709699",
+      "generalChannel": {
+        "logo": "https://devres.trickle.so/53506923630166019/53506923630166019/avatar.png?version=1650447991829",
+        "name": "General",
+        "isPublic": false
+      },
+      "generalChannelSpace": {
+        "bio": "General topics or themes of workspace",
+        "bgUrl": "https://images.unsplash.com/photo-1651608608286-f3f7aaced9ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzMjA0NjB8MHwxfGFsbHwxOHx8fHx8fDJ8fDE2NTE3MjkwNTM&ixlib=rb-1.2.1&q=80&w=1080",
+        "position": 29
+      },
+      "ownerId": "76957788663726085",
+      "name": "Dev makeTrickle",
+      "memberNum": 26,
+      "removedMemberNum": 1,
+      "logo": "https://devres.trickle.so/76957788663709699/avatar.png?version=1651130638957",
+      "domain": "test.workspace.trickle.so",
+      "allowedEmailDomains": [],
+      "userId": "18555201329823745",
+      "createAt": 1662633887,
+      "updateAt": 1669277681,
+      "userMemberInfo": {
+        "memberId": "472211729841913861",
+        "name": "chocoford",
+        "avatarUrl": "https://devres.trickle.so/upload/users/18555201329823745/1669277677060_cat.png",
+        "role": "Poster",
+        "status": "Normal",
+        "email": "chocoford.zhang@visionwx.com"
+      }
+    },
+    {
+      "workspaceId": "506892570970816515",
+      "generalChannel": {},
+      "generalChannelSpace": {},
+      "ownerId": "0",
+      "name": "1221",
+      "memberNum": 1,
+      "removedMemberNum": 0,
+      "logo": "",
+      "domain": "test.workspace.trickle.so",
+      "allowedEmailDomains": [],
+      "userId": "18555201329823745",
+      "createAt": 1663643232,
+      "updateAt": 1669277681,
+      "userMemberInfo": {
+        "memberId": "506892570970832901",
+        "name": "chocoford",
+        "avatarUrl": "https://devres.trickle.so/upload/users/18555201329823745/1669277677060_cat.png",
+        "role": "Admin",
+        "status": "Normal",
+        "email": "chocoford.zhang@visionwx.com"
+      }
+    }
+  ],
+  "nextTs": null
+}

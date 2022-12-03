@@ -9,23 +9,21 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var store: AppStore
-    
-    @State var showLoginView = false
-    
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
-        }
+        WorkspaceView()
         .padding()
-        .loginSheet(show: $showLoginView)
-        .onChange(of: store.state.user.userInfo) { newValue in
+        .loginSheet()
+        .onChange(of: store.state.workspace.currentWorkspaceID) { newValue in
             if newValue != nil {
-                showLoginView = false
+                checkChannel()
             }
         }
+    }
+    
+    
+    private func checkChannel() {
+//        store.state.workspace.currentWorkspace
     }
 }
 
@@ -33,6 +31,9 @@ struct ContentView: View {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
+            .environmentObject(AppStore(state: .preview,
+                                        reducer: appReducer,
+                                        environment: .init()))
     }
 }
 #endif

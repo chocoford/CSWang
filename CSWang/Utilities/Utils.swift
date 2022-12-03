@@ -17,6 +17,7 @@ func decodeToken(token: String) -> TokenInfo? {
               let scope = jwt["scope"].string else {
             return nil
         }
+//        print(TokenInfo(sub: sub, iat: iat, exp: exp, scope: scope, token: token))
         return TokenInfo(sub: sub, iat: iat, exp: exp, scope: scope, token: token)
     } catch {
         return nil
