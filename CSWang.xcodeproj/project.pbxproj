@@ -35,6 +35,9 @@
 		39A9B4AF293757B4002599FE /* workspaces.json in Resources */ = {isa = PBXBuildFile; fileRef = 39A9B4AE293757B4002599FE /* workspaces.json */; };
 		39A9B4B2293782CC002599FE /* ListButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A9B4B1293782CC002599FE /* ListButtonStyle.swift */; };
 		39D28998293E071000846BF6 /* LogoutButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D28997293E071000846BF6 /* LogoutButton.swift */; };
+		39D2899A293E44A600846BF6 /* publicGroups.json in Resources */ = {isa = PBXBuildFile; fileRef = 39D28999293E44A600846BF6 /* publicGroups.json */; };
+		39D2899E293E56A300846BF6 /* TrickleIntergratable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D2899D293E56A300846BF6 /* TrickleIntergratable.swift */; };
+		39D289A0293E5CC600846BF6 /* PostState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D2899F293E5CC600846BF6 /* PostState.swift */; };
 		39EF55F62937AB0B005F10F4 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F52937AB0B005F10F4 /* AvatarView.swift */; };
 		39EF55F82937C184005F10F4 /* MembersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F72937C184005F10F4 /* MembersView.swift */; };
 		39EF55FA2937C19F005F10F4 /* MemberCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F92937C19F005F10F4 /* MemberCardView.swift */; };
@@ -107,6 +110,9 @@
 		39A9B4AE293757B4002599FE /* workspaces.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = workspaces.json; sourceTree = "<group>"; };
 		39A9B4B1293782CC002599FE /* ListButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListButtonStyle.swift; sourceTree = "<group>"; };
 		39D28997293E071000846BF6 /* LogoutButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoutButton.swift; sourceTree = "<group>"; };
+		39D28999293E44A600846BF6 /* publicGroups.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = publicGroups.json; sourceTree = "<group>"; };
+		39D2899D293E56A300846BF6 /* TrickleIntergratable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrickleIntergratable.swift; sourceTree = "<group>"; };
+		39D2899F293E5CC600846BF6 /* PostState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostState.swift; sourceTree = "<group>"; };
 		39EF55F52937AB0B005F10F4 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 		39EF55F72937C184005F10F4 /* MembersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembersView.swift; sourceTree = "<group>"; };
 		39EF55F92937C19F005F10F4 /* MemberCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberCardView.swift; sourceTree = "<group>"; };
@@ -180,6 +186,7 @@
 			children = (
 				39A9B4AE293757B4002599FE /* workspaces.json */,
 				390B46952938A7C800E15DC3 /* members.json */,
+				39D28999293E44A600846BF6 /* publicGroups.json */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -294,6 +301,7 @@
 				39F12D642933D250005F5D48 /* APICall.swift */,
 				39F12D622933D235005F5D48 /* WebRepository.swift */,
 				39F12D6F2933DC69005F5D48 /* KeychainHelper.swift */,
+				39D2899D293E56A300846BF6 /* TrickleIntergratable.swift */,
 				39F12D812934C2BB005F5D48 /* WebAuth.swift */,
 				39F12D8729360069005F5D48 /* Utils.swift */,
 				390B46BA293CCA1900E15DC3 /* Loadable.swift */,
@@ -310,6 +318,7 @@
 				39A9B4A729372A49002599FE /* UserState.swift */,
 				39A9B4A929372B1A002599FE /* WorkspaceState.swift */,
 				390B46A72939DEAE00E15DC3 /* ChannelState.swift */,
+				39D2899F293E5CC600846BF6 /* PostState.swift */,
 			);
 			path = Store;
 			sourceTree = "<group>";
@@ -476,6 +485,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				39A9B4AF293757B4002599FE /* workspaces.json in Resources */,
+				39D2899A293E44A600846BF6 /* publicGroups.json in Resources */,
 				39F12D372933CF91005F5D48 /* Preview Assets.xcassets in Resources */,
 				39F12D332933CF91005F5D48 /* Assets.xcassets in Resources */,
 				390B46962938A7C800E15DC3 /* members.json in Resources */,
@@ -516,8 +526,10 @@
 				390B46A82939DEAE00E15DC3 /* ChannelState.swift in Sources */,
 				390B46A42939CBDA00E15DC3 /* CreateChannelView.swift in Sources */,
 				39F12D7929347B31005F5D48 /* PrimaryButtonStyle.swift in Sources */,
+				39D289A0293E5CC600846BF6 /* PostState.swift in Sources */,
 				39F12D702933DC69005F5D48 /* KeychainHelper.swift in Sources */,
 				39F12D682933D4F4005F5D48 /* AppEnviornment.swift in Sources */,
+				39D2899E293E56A300846BF6 /* TrickleIntergratable.swift in Sources */,
 				39F12D2F2933CF8F005F5D48 /* CSWangApp.swift in Sources */,
 				390B46A22939CB1900E15DC3 /* ShitInfoView.swift in Sources */,
 				39F12D822934C2BB005F5D48 /* WebAuth.swift in Sources */,

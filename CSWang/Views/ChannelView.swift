@@ -7,9 +7,31 @@
 
 import SwiftUI
 
+enum CSInfo: String, CaseIterable {
+    case immunityNum
+    case lastCleanDate
+    case nextCleanDate
+
+    var localized: String {
+        switch self {
+            case .immunityNum:
+                return "豁免权"
+            case .lastCleanDate:
+                return "上一次铲屎时间"
+            case .nextCleanDate:
+                return "下一次铲屎时间"
+        }
+    }
+}
+
+extension CSInfo: Identifiable {
+    var id: String {
+        return self.rawValue
+    }
+}
+
 struct ChannelView: View {
     @EnvironmentObject var store: AppStore
-//    @State private var workspace: WorkspaceData? = nil
     
     var workspace: WorkspaceData? {
         store.state.workspace.currentWorkspace
@@ -45,10 +67,19 @@ struct ChannelView: View {
                         Text(memberInfo?.name ?? "Unknown")
                             .font(.title)
                             .fontWeight(.bold)
-                        Text(workspace.name)
+                        List {
+                            ForEach(CSInfo.allCases) { info in
+                                HStack {
+                                    Text(info.localized)
+                                    Spacer()
+                                    Text("0")
+                                }
+                            }
+                        }
                         Spacer()
-                        ShitInfoView()
+                        
                     }
+                    .navigationTitle(workspace.name)
                 } else {
                     CreateChannelView()
                 }
@@ -80,7 +111,9 @@ private extension ChannelView {
 
 struct ChannelView_Previews: PreviewProvider {
     static var previews: some View {
-        ChannelView()
-            .environmentObject(AppStore.preview)
+        NavigationView {
+            ChannelView()
+                .environmentObject(AppStore.preview)
+        }
     }
 }

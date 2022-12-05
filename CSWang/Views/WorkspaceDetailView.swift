@@ -29,7 +29,8 @@ struct WorkspaceDetailView: View {
                 return
             }
             Task {
-                await store.send(.channel(action: .listPrivateChannels(workspaceID: workspace.workspaceID, memberID: workspace.userMemberInfo.memberID)))
+                await store.send(.channel(action: .listPublicChannels(workspaceID: workspace.workspaceID,
+                                                                      memberID: workspace.userMemberInfo.memberID)))
                 await store.send(.workspace(action: .listWorkspaceMembers(workspaceID: workspace.workspaceID)))
             }
         })
@@ -50,15 +51,6 @@ struct WorkspaceDetailView: View {
         } else {
             Text("Choose a workspace")
         }
-    }
-    
-    private func findShitChannel() async {
-        guard let workspace = workspace,
-              let memberInfo = memberInfo else {
-            return
-        }
-        await store.send(.channel(action: .listPrivateChannels(workspaceID: workspace.workspaceID,
-                                                                 memberID: memberInfo.memberID)))
     }
 }
 

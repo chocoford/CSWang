@@ -1,0 +1,261 @@
+{
+    "items": [
+        {
+            "icon": null,
+            "name": "🪐 Trickle Home",
+            "groupId": "264823540841447430",
+            "ownerId": "30788161542045701",
+            "isGeneral": true,
+            "isWorkspacePublic": true,
+            "createAt": 1656598096,
+            "updateAt": 1669625538,
+            "channelSpace": {
+                "bio": "Enjoy making Trickle",
+                "bgUrl": "https://resource.trickle.so/30788161542029315/bgi.jpg?version=1653037763221",
+                "position": 20
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "💡 Knowledge Sharing",
+            "groupId": "70440296051113990",
+            "ownerId": "30788161542045701",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1650940799,
+            "updateAt": 1660634094,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "https://images.unsplash.com/photo-1638913665258-ddd2bceafb30?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzMjA0NjB8MXwxfGFsbHwyNnx8fHx8fDJ8fDE2NTE2ODY2MDg&ixlib=rb-1.2.1&q=80&w=1080",
+                "position": 54
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "🖌 Release",
+            "groupId": "357289868939755526",
+            "ownerId": "30788161542045701",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1659289220,
+            "updateAt": 1660615555,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "📰  Trickle Daily",
+            "groupId": "362471057908563974",
+            "ownerId": "32547242707517445",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1659440013,
+            "updateAt": 1666790947,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "🚀 Launch Mission",
+            "groupId": "362474598840664070",
+            "ownerId": "32547242707517445",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1659440116,
+            "updateAt": 1660888512,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "🐞 Issues & Bugs ",
+            "groupId": "388679383079976966",
+            "ownerId": "30906771358875653",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1660202775,
+            "updateAt": 1665300735,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "⏳ EPW",
+            "groupId": "426925823782551558",
+            "ownerId": "30788161542045701",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1661315893,
+            "updateAt": 1666336442,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "🔮 Product Discovery",
+            "groupId": "433313163316822022",
+            "ownerId": "30906771358875653",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1661501789,
+            "updateAt": 1667743029,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "🎥 Boom",
+            "groupId": "453345106070601734",
+            "ownerId": "31728518861684741",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1662084796,
+            "updateAt": 1662084914,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "📘 Trickle2Notion",
+            "groupId": "599473286262292486",
+            "ownerId": "32181586371805189",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1666337685,
+            "updateAt": 1666582490,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "📈 Dashboard",
+            "groupId": "614087579146387462",
+            "ownerId": "30788161542045701",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1666763017,
+            "updateAt": 1666763122,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "🍫Spring Editor",
+            "groupId": "635366170114916358",
+            "ownerId": "30799568975167493",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1667382306,
+            "updateAt": 1667382395,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "👁‍🗨 Quality",
+            "groupId": "661409417815654406",
+            "ownerId": "32316276546207749",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1668140264,
+            "updateAt": 1668140264,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "🎨 Design",
+            "groupId": "691658198574170118",
+            "ownerId": "32547242707517445",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1669020619,
+            "updateAt": 1669020696,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "😸 每周铲铲赛",
+            "groupId": "703261294718877702",
+            "ownerId": "32181586371805189",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1669358314,
+            "updateAt": 1669367111,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        },
+        {
+            "icon": null,
+            "name": "📝 Release Notes",
+            "groupId": "712576476012085254",
+            "ownerId": "32216805103632389",
+            "isGeneral": false,
+            "isWorkspacePublic": true,
+            "createAt": 1669629421,
+            "updateAt": 1669629421,
+            "channelSpace": {
+                "bio": "Only invited members can access this channel.",
+                "bgUrl": "",
+                "position": 0
+            },
+            "aggregationInfo": null
+        }
+    ],
+    "nextTs": null
+}

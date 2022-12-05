@@ -8,9 +8,14 @@
 import SwiftUI
 
 struct CreateChannelView: View {
+    @EnvironmentObject var store: AppStore
+    
+    var workspace: WorkspaceData? {
+        store.state.workspace.currentWorkspace
+    }
     
     var body: some View {
-        NavigationStack {
+//        NavigationStack {
             VStack {
                 VStack{
                     Text("Initialize")
@@ -21,13 +26,29 @@ struct CreateChannelView: View {
                 }
                 .padding()
 
-                NavigationLink("Create the channel") {
-                   InviteMembersView()
+//                NavigationLink("Create the channel") {
+//                   InviteMembersView()
+//                }
+                Button {
+                    Task {
+                        await createChannel()
+                    }
+                } label: {
+                    Text("Create the channel")
                 }
                 .buttonStyle(PrimaryButtonStyle())
             }
             
+//        }
+    }
+    
+    func createChannel() async {
+        guard let workspace = workspace else {
+            return
         }
+        await store.send(.channel(action: .createChannel(workspaceID: workspace.workspaceID,
+                                                         memberID: workspace.userMemberInfo.memberID,
+                                                         invitedMemberIDs: [])))
     }
 }
 

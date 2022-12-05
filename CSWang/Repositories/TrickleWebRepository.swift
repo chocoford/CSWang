@@ -28,6 +28,10 @@ struct TrickleWebRepository: WebRepository {
         call(endpoint: API.listWorkspaces(userID: userID))
     }
     
+    func listWorkspacePublicChannels(workspaceID: String, memberID: String) -> AnyPublisher<AnyStreamable<GroupData>, Error> {
+        call(endpoint: API.listPublicChannels(workspaceID: workspaceID, memberID: memberID))
+    }
+    
     func listWorkspacePrivateChannels(workspaceID: String, memberID: String) -> AnyPublisher<AnyStreamable<GroupData>, Error> {
         call(endpoint: API.listPrivateChannels(workspaceID: workspaceID, memberID: memberID))
     }
@@ -38,22 +42,43 @@ struct TrickleWebRepository: WebRepository {
     
     func createChannel(workspaceID: String,
                        memberID: String,
-                       invitedMemberIDs: [String]) -> AnyPublisher<GroupData, Error> {
+                       invitedMemberIDs: [String]) -> AnyPublisher<GroupDataWrapper, Error> {
         call(endpoint: API.createChannel(workspaceID: workspaceID,
                                          memberID: memberID,
                                          invitedMemberIDs: invitedMemberIDs))
+    }
+    
+    func createPost(workspaceID: String,
+                     channelID: String,
+                     payload: TrickleWebRepository.API.CreatePostPayload) -> AnyPublisher<TrickleData, Error> {
+        call(endpoint: API.createPost(workspaceID: workspaceID, channelID: channelID, payload: payload))
     }
 }
 
 // MARK: - Endpoints
 
 extension TrickleWebRepository {
+    
     enum API {
         case getUserData(userID: String)
         case listWorkspaces(userID: String)
+        case listPublicChannels(workspaceID: String, memberID: String)
         case listPrivateChannels(workspaceID: String, memberID: String)
         case listChannelMembers(workspaceID: String, channelID: String?)
         case createChannel(workspaceID: String, memberID: String, invitedMemberIDs: [String])
+        
+        struct CreatePostPayload: Codable {
+            let authorMemberID: String
+            let blocks: [Block]
+            let mentionedMemberIDs: [String]
+            
+            enum CodingKeys: String, CodingKey {
+                case authorMemberID = "authorMemberId"
+                case blocks
+                case mentionedMemberIDs = "mentionedMemberIds"
+            }
+        }
+        case createPost(workspaceID: String, channelID: String, payload: CreatePostPayload)
     }
 }
 
@@ -66,6 +91,9 @@ extension TrickleWebRepository.API: APICall {
                 
             case .listWorkspaces(let userID):
                 return "/f2b/v1/workspaces?userId=\(userID)"
+
+            case let .listPublicChannels(workspaceID, memberID):
+                return "/f2b/v1/workspaces/\(workspaceID)/publicGroups?memberId=\(memberID)&version=\(Int(Date().timeIntervalSince1970))"
                 
             case let .listPrivateChannels(workspaceID, memberID):
                 return "/f2b/v1/workspaces/\(workspaceID)/privateGroups?memberId=\(memberID)&version=\(Int(Date().timeIntervalSince1970))"
@@ -79,6 +107,8 @@ extension TrickleWebRepository.API: APICall {
             case let .createChannel(workspaceID, _, _):
                 return "/f2b/v1/workspaces/\(workspaceID)/groups"
 
+            case .createPost(let workspaceID, let channelID, _):
+                return "/f2b/v1/workspaces/\(workspaceID)/groups/\(channelID)/trickles"
         }
     }
     var method: String {
@@ -118,8 +148,11 @@ extension TrickleWebRepository.API: APICall {
                 }
                 let payload = Payload(name: "Who's shit?",
                                       memberIds: invitedMemberIDs,
-                                      isWorkspacePublic: false,
+                                      isWorkspacePublic: true,
                                       ownerId: memberID)
+                return try makeBody(payload: payload)
+                
+            case .createPost(_, _, let payload):
                 return try makeBody(payload: payload)
             default:
                 return nil

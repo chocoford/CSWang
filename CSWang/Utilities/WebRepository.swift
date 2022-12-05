@@ -33,16 +33,16 @@ extension WebRepository {
             let request = try endpoint.urlRequest(baseURL: baseURL)
             return session
                 .dataTaskPublisher(for: request)
-//                .map({ (data, res) in
-//                    let json = try? JSONSerialization.jsonObject(with: data, options: [])
-//                    if let objJson = json as? [String: Any] {
-//                        logger.debug("json(object): \(objJson.debugDescription)")
-//                    } else if
-//                        let arrJson = json as? [[String: Any]] {
-//                        logger.debug("json(array): \(arrJson.debugDescription)")
-//                    }
-//                    return (data, res)
-//                })
+                .map({ (data, res) in
+                    let json = try? JSONSerialization.jsonObject(with: data, options: [])
+                    if let objJson = json as? [String: Any] {
+                        logger.debug("json(object): \(objJson.debugDescription)")
+                    } else if
+                        let arrJson = json as? [[String: Any]] {
+                        logger.debug("json(array): \(arrJson.debugDescription)")
+                    }
+                    return (data, res)
+                })
                 .eraseToAnyPublisher()
                 .requestJSON(httpCodes: httpCodes)
                 .mapError {

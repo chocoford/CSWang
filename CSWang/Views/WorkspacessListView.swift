@@ -16,7 +16,13 @@ import AppKit
 
 struct WorkspacessListView: View {
     @EnvironmentObject var store: AppStore
-    @State private var workspaces: Loadable<[WorkspaceData]> = .notRequested
+    var workspaces: Loadable<[WorkspaceData]> {
+        store.state.workspace.workspaces.map {
+            $0.values.sorted {
+                $0.createAt < $1.createAt
+            }
+        }
+    }
     @State private var selectedWorkspace: WorkspaceData?
     
     var body: some View {
@@ -35,13 +41,6 @@ struct WorkspacessListView: View {
             }
         } detail: {
             WorkspaceDetailView()
-        }
-        .onChange(of: store.state.workspace.workspaces) { workspaces in
-            self.workspaces = workspaces.map({ workspaces in
-                workspaces.values.sorted {
-                    $0.createAt < $1.createAt
-                }
-            })
         }
 //        .onReceive(store.state.workspace.workspaces) { workspaces in
 //            self.workspaces = workspaces.map({ workspaces in
@@ -108,23 +107,39 @@ private extension WorkspacessListView {
 // MARK: - Displaying Content
 extension WorkspacessListView {
     func loadedView(workspaces: [WorkspaceData]) -> some View {
-        List(workspaces, selection: $selectedWorkspace) { workspace in
-            NavigationCellView(value: workspace) {
-                WorkspaceCellView(workspace: workspace,
-                                  selected: selectedWorkspace?.workspaceID == workspace.workspaceID)
-            }
-            .listRowSeparator(.hidden)
-            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+        VStack {
+            List(workspaces, selection: $selectedWorkspace) { workspace in
+                NavigationCellView(value: workspace) {
+                    WorkspaceCellView(workspace: workspace,
+                                      selected: selectedWorkspace?.workspaceID == workspace.workspaceID)
+                }
+                .listRowSeparator(.hidden)
+                .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
 #if os(iOS)
-            .listRowBackground(Color.init(uiColor: .systemBackground))
+                .listRowBackground(Color.init(uiColor: .systemBackground))
 #elseif os(macOS)
-            .listRowBackground(Color.init(nsColor: .textBackgroundColor))
+                .listRowBackground(Color.init(nsColor: .textBackgroundColor))
 #endif
+            }
+            .listStyle(.plain)
+            .onChange(of: selectedWorkspace, perform: { newValue in
+                setCurrentWorkspace(workspaceID: newValue?.workspaceID)
+            })
+            Divider()
+            HStack {
+                AvatarView(url: store.state.user.userInfo?.user.avatarUrl,
+                           fallbackText: String((store.state.user.userInfo?.user.name ?? "?").prefix(2)))
+                Text(store.state.user.userInfo?.user.name ?? "Unknown")
+                Spacer()
+                Button {
+                     
+                } label: {
+                    Image(systemName: "gear")
+                }
+            }
+            .padding(.horizontal)
         }
-        .listStyle(.plain)
-        .onChange(of: selectedWorkspace, perform: { newValue in
-            setCurrentWorkspace(workspaceID: newValue?.workspaceID)
-        })
+       
     }
 }
 

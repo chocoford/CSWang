@@ -10,10 +10,10 @@ import SwiftUI
 struct InviteMembersView: View {
     @EnvironmentObject var store: AppStore
     
-//    var workspace: WorkspaceData? {
-//        store.state.workspace.currentWorkspace
-//    }
-    @State private var workspace: WorkspaceData?
+    var workspace: WorkspaceData? {
+        store.state.workspace.currentWorkspace
+    }
+//    @State private var workspace: WorkspaceData?
     @State private var searchText: String = ""
     @State private var invitedMemberIDs = Set<String>()
     @State private var preInvitedMemberIDs = Set<String>()
@@ -25,9 +25,9 @@ struct InviteMembersView: View {
         }
     }
     
-    init(worksapce: WorkspaceData? = nil) {
-        self.workspace = worksapce
-    }
+//    init(worksapce: WorkspaceData? = nil) {
+//        self.workspace = worksapce
+//    }
 
     var body: some View {
         List {
@@ -83,7 +83,7 @@ struct InviteMembersView: View {
                     $0.memberID != workspace?.userMemberInfo.memberID
                 },
                                 selectedMemberIDs: $preInvitedMemberIDs)
-                .frame(width: 400, height: 300)
+                .frame(minWidth: 400, minHeight: 300)
                 HStack {
                     Button {
                         showAddMembersSheet = false
@@ -119,7 +119,7 @@ struct InviteMembersView: View {
 
 struct InviteMembersView_Previews: PreviewProvider {
     static var previews: some View {
-        InviteMembersView(worksapce: nil)
+        InviteMembersView()
             .environmentObject(AppStore.preview)
     }
 }
