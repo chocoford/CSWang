@@ -12,7 +12,7 @@ enum Loadable<T> {
 
     case notRequested
     case isLoading(last: T?) //, cancelBag: CancelBag
-    case loaded(T)
+    case loaded(data: T)
     case failed(Error)
 
     var value: T? {
@@ -41,7 +41,7 @@ extension Loadable {
             case let .isLoading(last): //, cancelBag
 //                cancelBag.cancel()
                 if let last = last {
-                    self = .loaded(last)
+                    self = .loaded(data: last)
                 } else {
                     let error = NSError(
                         domain: NSCocoaErrorDomain, code: NSUserCancelledError,
@@ -56,12 +56,12 @@ extension Loadable {
     func map<V>(_ transform: (T) throws -> V) -> Loadable<V> {
         do {
             switch self {
-            case .notRequested: return .notRequested
-            case let .failed(error): return .failed(error)
-            case let .isLoading(value):
-                return .isLoading(last: try value.map { try transform($0) })
-            case let .loaded(value):
-                return .loaded(try transform(value))
+                case .notRequested: return .notRequested
+                case let .failed(error): return .failed(error)
+                case let .isLoading(value):
+                    return .isLoading(last: try value.map { try transform($0) })
+                case let .loaded(value):
+                    return .loaded(data: try transform(value))
             }
         } catch {
             return .failed(error)
@@ -69,6 +69,31 @@ extension Loadable {
     }
 }
 
+//protocol SomeOptional {
+//    associatedtype Wrapped
+//    func unwrap() throws -> Wrapped
+//}
+//
+//struct ValueIsMissingError: Error {
+//    var localizedDescription: String {
+//        NSLocalizedString("Data is missing", comment: "")
+//    }
+//}
+//
+//extension Optional: SomeOptional {
+//    func unwrap() throws -> Wrapped {
+//        switch self {
+//        case let .some(value): return value
+//        case .none: throw ValueIsMissingError()
+//        }
+//    }
+//}
+//
+//extension Loadable where T: SomeOptional {
+//    func unwrap() -> Loadable<T.Wrapped> {
+//        map { try $0.unwrap() }
+//    }
+//}
 
 extension Loadable: Equatable where T: Equatable {
     static func == (lhs: Loadable<T>, rhs: Loadable<T>) -> Bool {

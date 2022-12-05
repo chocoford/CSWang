@@ -9,22 +9,27 @@ import Foundation
 import Combine
 
 struct ChannelState {
-    var channels: [String: GroupData] = [:]
+    var channels: Loadable<[String: GroupData]> = .notRequested
     
     var allChannels: [GroupData] {
-        channels.values.sorted {
+        (channels.value ?? [:]).values.sorted {
             $0.createAt < $1.createAt
         }
     }
+    
     var currentChannelID: String?
-    var currentChannel: GroupData? {
-        channels[currentChannelID ?? ""]
-    }
-    
-    
-    private func getCSChannel(channels: [GroupData]) -> GroupData? {
-        return channels.first { channel in
-            channel.name == "Who's shit?"
+    var currentChannel: Loadable<GroupData?> {
+        switch channels {
+            case .notRequested:
+                return .notRequested
+            case .isLoading(let last):
+                return .isLoading(last: last?[currentChannelID ?? ""])
+            case .loaded(let data):
+                let current = data[currentChannelID ?? ""]
+                return .loaded(data: current)
+                
+            case .failed(let error):
+                return .failed(error)
         }
     }
 }
@@ -40,14 +45,11 @@ func channelReducer(state: inout ChannelState,
                     environment: AppEnvironment) -> AnyPublisher<ChannelAction, Never> {
     switch action {
         case .setChannels(let items):
-            state.channels = items.formDictionary(key: \.groupID)
-            
+            state.channels = .loaded(data: items.formDictionary(key: \.groupID))
             // get specific channel
-            state.currentChannelID = state.channels.values.first {
-                $0.name == "Who's shit?"
+            state.currentChannelID = state.channels.value!.values.first {
+               $0.name == "Who's shit?"
             }?.groupID
-            
-//            print(state.currentChannelID)
             
         case let .createChannel(workspaceID, memberID, invitedMemberIDs):
             return environment.trickleWebRepository
@@ -63,6 +65,7 @@ func channelReducer(state: inout ChannelState,
                 .eraseToAnyPublisher()
             
         case let .listPrivateChannels(workspaceID, memberID):
+            state.channels = .isLoading(last: nil)
             return environment.trickleWebRepository
                 .listWorkspacePrivateChannels(workspaceID: workspaceID, memberID: memberID)
                 .map({ streamable in
@@ -91,4 +94,9 @@ struct GroupData: Codable {
         case ownerID = "ownerId"
         case isGeneral, isWorkspacePublic, createAt, updateAt
     }
+}
+
+
+extension GroupData: Equatable {
+     
 }

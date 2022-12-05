@@ -22,6 +22,7 @@ struct WorkspaceState {
         willSet(val) {
 //            currentWorkspace.send(val != nil ? workspaces.value.value?[val!] : nil)
             members = nil
+            channel.currentChannelID = nil
 //            if let workspaceID = val {
 //                WorkspaceAction.listWorkspaceMembers(workspaceID: workspaceID)
 //            }
@@ -63,7 +64,7 @@ func workspaceReducer(state: inout WorkspaceState,
                      environment: AppEnvironment) -> AnyPublisher<WorkspaceAction, Never> {
     switch action {
         case .setWorkspaces(items: let items):
-            state.workspaces = .loaded(items.formDictionary(key: \.workspaceID))
+            state.workspaces = .loaded(data: items.formDictionary(key: \.workspaceID))
 //            state.workspaces.send(.loaded(items.formDictionary(key: \.workspaceID)))
             
         case .setWorkspaceMembers(let members):

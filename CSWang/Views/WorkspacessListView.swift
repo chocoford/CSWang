@@ -24,11 +24,7 @@ struct WorkspacessListView: View {
             content
             .navigationTitle("Workspaces")
             .toolbar {
-                Button {
-                    AuthMiddleware.shared.removeToken()
-                } label: {
-                    Image(systemName: "rectangle.portrait.and.arrow.right")
-                }
+                LogoutButton()
             }
             .onReceive(store.state.user.hasLogin) { hasLogin in
                 if hasLogin {
@@ -38,7 +34,6 @@ struct WorkspacessListView: View {
                 }
             }
         } detail: {
-//            Text(selectedWorkspace?.workspaceID ?? "no")
             WorkspaceDetailView()
         }
         .onChange(of: store.state.workspace.workspaces) { workspaces in
@@ -99,11 +94,6 @@ private extension WorkspacessListView {
     
     func loadingView(_ previouslyLoaded: [WorkspaceData]?) -> some View {
         Text("loading")
-//        if let countries = previouslyLoaded {
-//            return AnyView(loadedView(countries, showSearch: true, showLoading: true))
-//        } else {
-//            return AnyView(ActivityIndicatorView().padding())
-//        }
     }
     
     func failedView(_ error: Error) -> some View {

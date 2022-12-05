@@ -34,6 +34,7 @@
 		39A9B4AA29372B1A002599FE /* WorkspaceState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A9B4A929372B1A002599FE /* WorkspaceState.swift */; };
 		39A9B4AF293757B4002599FE /* workspaces.json in Resources */ = {isa = PBXBuildFile; fileRef = 39A9B4AE293757B4002599FE /* workspaces.json */; };
 		39A9B4B2293782CC002599FE /* ListButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A9B4B1293782CC002599FE /* ListButtonStyle.swift */; };
+		39D28998293E071000846BF6 /* LogoutButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D28997293E071000846BF6 /* LogoutButton.swift */; };
 		39EF55F62937AB0B005F10F4 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F52937AB0B005F10F4 /* AvatarView.swift */; };
 		39EF55F82937C184005F10F4 /* MembersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F72937C184005F10F4 /* MembersView.swift */; };
 		39EF55FA2937C19F005F10F4 /* MemberCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F92937C19F005F10F4 /* MemberCardView.swift */; };
@@ -105,6 +106,7 @@
 		39A9B4A929372B1A002599FE /* WorkspaceState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceState.swift; sourceTree = "<group>"; };
 		39A9B4AE293757B4002599FE /* workspaces.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = workspaces.json; sourceTree = "<group>"; };
 		39A9B4B1293782CC002599FE /* ListButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListButtonStyle.swift; sourceTree = "<group>"; };
+		39D28997293E071000846BF6 /* LogoutButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogoutButton.swift; sourceTree = "<group>"; };
 		39EF55F52937AB0B005F10F4 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 		39EF55F72937C184005F10F4 /* MembersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembersView.swift; sourceTree = "<group>"; };
 		39EF55F92937C19F005F10F4 /* MemberCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberCardView.swift; sourceTree = "<group>"; };
@@ -319,6 +321,7 @@
 				390B46AF293A08EA00E15DC3 /* LoadingView.swift */,
 				39EF55F92937C19F005F10F4 /* MemberCardView.swift */,
 				390B469F2939C72700E15DC3 /* NavigationCellView.swift */,
+				39D28997293E071000846BF6 /* LogoutButton.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -519,6 +522,7 @@
 				390B46A22939CB1900E15DC3 /* ShitInfoView.swift in Sources */,
 				39F12D822934C2BB005F5D48 /* WebAuth.swift in Sources */,
 				390B46B0293A08EA00E15DC3 /* LoadingView.swift in Sources */,
+				39D28998293E071000846BF6 /* LogoutButton.swift in Sources */,
 				390B469A2939013700E15DC3 /* NavigationModel.swift in Sources */,
 				39F12D612933D0AC005F5D48 /* App.swift in Sources */,
 				39A9B4A629371DFF002599FE /* WorkspaceChooseView.swift in Sources */,

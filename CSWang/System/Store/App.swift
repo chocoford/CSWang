@@ -84,7 +84,7 @@ extension AppState {
         
         
         // MARK: - workspaces
-        previewState.workspace.workspaces = .loaded(formDic(payload: load("workspaces.json"), id: \.workspaceID))
+        previewState.workspace.workspaces = .loaded(data: formDic(payload: load("workspaces.json"), id: \.workspaceID))
         previewState.workspace.currentWorkspaceID = previewState.workspace.allWorkspaces.first?.workspaceID
         previewState.workspace.members = formDic(payload: load("members.json"), id: \.memberID)
         

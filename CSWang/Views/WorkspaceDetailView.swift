@@ -23,18 +23,13 @@ struct WorkspaceDetailView: View {
 //    }
     
     var body: some View {
-        ZStack {
-            if let _ = workspace {
-                ChannelView()
-            } else {
-                Text("Choose a workspace")
-            }
-        }
-        .onChange(of: store.state.workspace.currentWorkspace, perform: {workspace in
+        content
+        .onChange(of: store.state.workspace.currentWorkspace, perform: { workspace in
             guard let workspace = workspace else {
                 return
             }
             Task {
+                await store.send(.channel(action: .listPrivateChannels(workspaceID: workspace.workspaceID, memberID: workspace.userMemberInfo.memberID)))
                 await store.send(.workspace(action: .listWorkspaceMembers(workspaceID: workspace.workspaceID)))
             }
         })
@@ -49,18 +44,13 @@ struct WorkspaceDetailView: View {
 //        })
     }
     
-//    @ViewBuilder private var content: some View {
-//        switch workspace {
-//            case .notRequested:
-//                <#code#>
-//            case .isLoading(let last):
-//                <#code#>
-//            case .loaded(let t):
-//                <#code#>
-//            case .failed(let error):
-//                <#code#>
-//        }
-//    }
+    @ViewBuilder private var content: some View {
+        if let _ = workspace {
+            ChannelView()
+        } else {
+            Text("Choose a workspace")
+        }
+    }
     
     private func findShitChannel() async {
         guard let workspace = workspace,
