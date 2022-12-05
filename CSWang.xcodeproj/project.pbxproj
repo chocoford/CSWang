@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		390B46962938A7C800E15DC3 /* members.json in Resources */ = {isa = PBXBuildFile; fileRef = 390B46952938A7C800E15DC3 /* members.json */; };
-		390B46982938F37400E15DC3 /* WorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46972938F37400E15DC3 /* WorkspaceView.swift */; };
+		390B46982938F37400E15DC3 /* WorkspacessListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46972938F37400E15DC3 /* WorkspacessListView.swift */; };
 		390B469A2939013700E15DC3 /* NavigationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46992939013700E15DC3 /* NavigationModel.swift */; };
 		390B469C293905A900E15DC3 /* WorkspaceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B469B293905A900E15DC3 /* WorkspaceDetailView.swift */; };
 		390B469E2939B6ED00E15DC3 /* CellListStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B469D2939B6ED00E15DC3 /* CellListStyle.swift */; };
@@ -22,6 +22,9 @@
 		390B46B0293A08EA00E15DC3 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46AF293A08EA00E15DC3 /* LoadingView.swift */; };
 		390B46B2293B2E2300E15DC3 /* CreateChannelDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46B1293B2E2300E15DC3 /* CreateChannelDetailView.swift */; };
 		390B46B5293B330700E15DC3 /* InviteMembersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46B4293B330700E15DC3 /* InviteMembersView.swift */; };
+		390B46B9293CA6C800E15DC3 /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46B8293CA6C800E15DC3 /* ErrorView.swift */; };
+		390B46BB293CCA1900E15DC3 /* Loadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46BA293CCA1900E15DC3 /* Loadable.swift */; };
+		390B46BD293CCA3C00E15DC3 /* CancelBag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46BC293CCA3C00E15DC3 /* CancelBag.swift */; };
 		39396B092937D3FB00EDD29F /* Encodable+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39396B082937D3FB00EDD29F /* Encodable+Extension.swift */; };
 		39A9B4A029361F32002599FE /* JWTDecode in Frameworks */ = {isa = PBXBuildFile; productRef = 39A9B49F29361F32002599FE /* JWTDecode */; };
 		39A9B4A229367D62002599FE /* AuthMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A9B4A129367D62002599FE /* AuthMiddleware.swift */; };
@@ -77,7 +80,7 @@
 
 /* Begin PBXFileReference section */
 		390B46952938A7C800E15DC3 /* members.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = members.json; sourceTree = "<group>"; };
-		390B46972938F37400E15DC3 /* WorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceView.swift; sourceTree = "<group>"; };
+		390B46972938F37400E15DC3 /* WorkspacessListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspacessListView.swift; sourceTree = "<group>"; };
 		390B46992939013700E15DC3 /* NavigationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationModel.swift; sourceTree = "<group>"; };
 		390B469B293905A900E15DC3 /* WorkspaceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceDetailView.swift; sourceTree = "<group>"; };
 		390B469D2939B6ED00E15DC3 /* CellListStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellListStyle.swift; sourceTree = "<group>"; };
@@ -91,6 +94,9 @@
 		390B46AF293A08EA00E15DC3 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		390B46B1293B2E2300E15DC3 /* CreateChannelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateChannelDetailView.swift; sourceTree = "<group>"; };
 		390B46B4293B330700E15DC3 /* InviteMembersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteMembersView.swift; sourceTree = "<group>"; };
+		390B46B8293CA6C800E15DC3 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		390B46BA293CCA1900E15DC3 /* Loadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loadable.swift; sourceTree = "<group>"; };
+		390B46BC293CCA3C00E15DC3 /* CancelBag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancelBag.swift; sourceTree = "<group>"; };
 		39396B082937D3FB00EDD29F /* Encodable+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Encodable+Extension.swift"; sourceTree = "<group>"; };
 		39A9B4A129367D62002599FE /* AuthMiddleware.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthMiddleware.swift; sourceTree = "<group>"; };
 		39A9B4A329371403002599FE /* AppDelegateMac.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateMac.swift; sourceTree = "<group>"; };
@@ -248,13 +254,14 @@
 				39F12D302933CF8F005F5D48 /* ContentView.swift */,
 				39F12D752934794F005F5D48 /* LoginView.swift */,
 				39A9B4A529371DFF002599FE /* WorkspaceChooseView.swift */,
-				390B46972938F37400E15DC3 /* WorkspaceView.swift */,
+				390B46972938F37400E15DC3 /* WorkspacessListView.swift */,
 				390B469B293905A900E15DC3 /* WorkspaceDetailView.swift */,
 				390B46A52939DBE900E15DC3 /* ChannelView.swift */,
 				390B46B3293B32DF00E15DC3 /* CreateChannel */,
 				390B46AB2939FD2000E15DC3 /* MembersListView.swift */,
 				390B46A12939CB1800E15DC3 /* ShitInfoView.swift */,
 				39EF55F72937C184005F10F4 /* MembersView.swift */,
+				390B46B8293CA6C800E15DC3 /* ErrorView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -287,6 +294,8 @@
 				39F12D6F2933DC69005F5D48 /* KeychainHelper.swift */,
 				39F12D812934C2BB005F5D48 /* WebAuth.swift */,
 				39F12D8729360069005F5D48 /* Utils.swift */,
+				390B46BA293CCA1900E15DC3 /* Loadable.swift */,
+				390B46BC293CCA3C00E15DC3 /* CancelBag.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -513,14 +522,17 @@
 				390B469A2939013700E15DC3 /* NavigationModel.swift in Sources */,
 				39F12D612933D0AC005F5D48 /* App.swift in Sources */,
 				39A9B4A629371DFF002599FE /* WorkspaceChooseView.swift in Sources */,
+				390B46BD293CCA3C00E15DC3 /* CancelBag.swift in Sources */,
+				390B46B9293CA6C800E15DC3 /* ErrorView.swift in Sources */,
 				39F12D762934794F005F5D48 /* LoginView.swift in Sources */,
 				390B46B5293B330700E15DC3 /* InviteMembersView.swift in Sources */,
 				39F12D6E2933D6FE005F5D48 /* TrickleWebRepository.swift in Sources */,
 				390B469C293905A900E15DC3 /* WorkspaceDetailView.swift in Sources */,
 				39396B092937D3FB00EDD29F /* Encodable+Extension.swift in Sources */,
 				390B46A62939DBE900E15DC3 /* ChannelView.swift in Sources */,
+				390B46BB293CCA1900E15DC3 /* Loadable.swift in Sources */,
 				390B46AA2939E0DF00E15DC3 /* Array+Extension.swift in Sources */,
-				390B46982938F37400E15DC3 /* WorkspaceView.swift in Sources */,
+				390B46982938F37400E15DC3 /* WorkspacessListView.swift in Sources */,
 				39F12D7D293494A4005F5D48 /* Color.swift in Sources */,
 				39A9B4A829372A49002599FE /* UserState.swift in Sources */,
 				390B46A02939C72700E15DC3 /* NavigationCellView.swift in Sources */,

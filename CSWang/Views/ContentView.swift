@@ -11,7 +11,7 @@ struct ContentView: View {
     @EnvironmentObject var store: AppStore
 
     var body: some View {
-        WorkspaceView()
+        WorkspacessListView()
         .padding()
         .loginSheet()
         .onChange(of: store.state.workspace.currentWorkspaceID) { newValue in

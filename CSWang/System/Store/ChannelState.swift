@@ -10,17 +10,28 @@ import Combine
 
 struct ChannelState {
     var channels: [String: GroupData] = [:]
+    
     var allChannels: [GroupData] {
         channels.values.sorted {
             $0.createAt < $1.createAt
         }
     }
     var currentChannelID: String?
-    var channelInfo: GroupData? = nil
+    var currentChannel: GroupData? {
+        channels[currentChannelID ?? ""]
+    }
+    
+    
+    private func getCSChannel(channels: [GroupData]) -> GroupData? {
+        return channels.first { channel in
+            channel.name == "Who's shit?"
+        }
+    }
 }
 
 enum ChannelAction {
     case setChannels(items: [GroupData])
+    case createChannel(workspaceID: String, memberID: String, invitedMemberIDs: [String])
     case listPrivateChannels(workspaceID: String, memberID: String)
 }
 
@@ -35,6 +46,21 @@ func channelReducer(state: inout ChannelState,
             state.currentChannelID = state.channels.values.first {
                 $0.name == "Who's shit?"
             }?.groupID
+            
+//            print(state.currentChannelID)
+            
+        case let .createChannel(workspaceID, memberID, invitedMemberIDs):
+            return environment.trickleWebRepository
+                .createChannel(workspaceID: workspaceID,
+                               memberID: memberID,
+                               invitedMemberIDs: invitedMemberIDs)
+                .map { [state] in
+                    ChannelAction.setChannels(items: state.allChannels + [$0])
+                }
+                .catch { _ in
+                    Empty()
+                }
+                .eraseToAnyPublisher()
             
         case let .listPrivateChannels(workspaceID, memberID):
             return environment.trickleWebRepository

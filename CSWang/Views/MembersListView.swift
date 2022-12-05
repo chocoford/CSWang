@@ -16,11 +16,6 @@ struct MembersListView: View {
     var body: some View {
         if let members = members {
             List {
-//                HStack {
-//                    TextField(text: <#T##Binding<String>#>) {
-//                        <#code#>
-//                    }
-//                }
                 ForEach(members, id: \.memberID) { member in
                     Button {
                         if selectedMemberIDs.contains(member.memberID) {

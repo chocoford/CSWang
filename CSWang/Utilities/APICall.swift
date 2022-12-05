@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import OSLog
 
 protocol APICall {
     var path: String { get }
@@ -17,7 +18,7 @@ protocol APICall {
 
 enum APIError: Swift.Error {
     case invalidURL
-    case httpCode(HTTPCode)
+    case httpCode(HTTPCode, reason: String, headers: [AnyHashable: Any]?)
     case unexpectedResponse
     case imageDeserialization
     case parameterInvalid
@@ -27,7 +28,7 @@ extension APIError: LocalizedError {
     var errorDescription: String? {
         switch self {
             case .invalidURL: return "Invalid URL"
-            case let .httpCode(code): return "Unexpected HTTP code: \(code)"
+            case let .httpCode(code, reason, headers): return "Unexpected HTTP code: \(code), reason: \(reason), response headers: \(headers ?? [:])"
             case .unexpectedResponse: return "Unexpected response from the server"
             case .imageDeserialization: return "Cannot deserialize image from Data"
             case .parameterInvalid: return "Parameter invalid"
@@ -45,6 +46,16 @@ extension APICall {
         request.allHTTPHeaderFields = headers
         request.httpBody = try body()
         return request
+    }
+    
+    func makeBody<T: Encodable>(payload: T) throws -> Data {
+        let dic = payload.dictionary
+        if JSONSerialization.isValidJSONObject(dic) {
+            return try JSONSerialization.data(withJSONObject: dic,
+                                              options: [.prettyPrinted, .fragmentsAllowed])
+        } else {
+            throw APIError.parameterInvalid
+        }
     }
 }
 

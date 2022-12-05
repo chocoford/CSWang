@@ -72,7 +72,6 @@ struct WorkspaceCellView: View {
     var selected: Bool = false
     
     var body: some View {
-//        NavigationLink(value: workspace.workspaceID) {
         Label {
             HStack {
                 AvatarView(url: URL(string: workspace.logo),
@@ -87,7 +86,6 @@ struct WorkspaceCellView: View {
 
         }
         .labelStyle(ListLabelStyle(active: selected))
-//        .buttonStyle(ListButtonStyle())
     }
 }
 

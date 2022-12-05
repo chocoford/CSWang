@@ -20,41 +20,39 @@ protocol WebRepository {
 extension WebRepository {
     func call<Value>(endpoint: APICall, httpCodes: HTTPCodes = .success) -> AnyPublisher<Value, Error>
         where Value: Decodable {
-            logger.log("calling \(endpoint.path) use \(endpoint.method) method.\nHeaders: \(endpoint.headers ?? [:])")
+            logger.log("calling \(endpoint.method) \(endpoint.path)") //; \nHeaders: \(endpoint.headers ?? [:])
+            if let body = try? endpoint.body() {
+                do {
+                    let payload = try JSONSerialization.jsonObject(with: body)
+                    logger.log("body: \(String(describing: payload))")
+                } catch {
+                    logger.error("can not serialize body")
+                }
+            }
         do {
             let request = try endpoint.urlRequest(baseURL: baseURL)
             return session
                 .dataTaskPublisher(for: request)
-                .map({ (data, res) in
-                    let json = try? JSONSerialization.jsonObject(with: data, options: [])
-                    if let objJson = json as? [String: Any] {
-                        logger.debug("json(object): \(objJson.debugDescription)")
-                    } else if
-                        let arrJson = json as? [[String: Any]] {
-                        logger.debug("json(array): \(arrJson.debugDescription)")
-                    }
-                    return (data, res)
-                })
+//                .map({ (data, res) in
+//                    let json = try? JSONSerialization.jsonObject(with: data, options: [])
+//                    if let objJson = json as? [String: Any] {
+//                        logger.debug("json(object): \(objJson.debugDescription)")
+//                    } else if
+//                        let arrJson = json as? [[String: Any]] {
+//                        logger.debug("json(array): \(arrJson.debugDescription)")
+//                    }
+//                    return (data, res)
+//                })
                 .eraseToAnyPublisher()
                 .requestJSON(httpCodes: httpCodes)
                 .mapError {
-                    logger.error("call error: \($0)")
+                    logger.error("\($0.localizedDescription)")
                     return $0
                 }
                 .eraseToAnyPublisher()
         } catch let error {
             logger.error("\(error.localizedDescription)")
             return Fail<Value, Error>(error: error).eraseToAnyPublisher()
-        }
-    }
-    
-    static func makeBody<T: Encodable>(payload: T) throws -> Data {
-        let dic = payload.dictionary
-        if JSONSerialization.isValidJSONObject(dic) {
-            return try JSONSerialization.data(withJSONObject: dic,
-                                                          options: [.prettyPrinted, .fragmentsAllowed])
-        } else {
-            throw APIError.parameterInvalid
         }
     }
 }
@@ -69,7 +67,9 @@ extension Publisher where Output == URLSession.DataTaskPublisher.Output {
                     throw APIError.unexpectedResponse
                 }
                 guard httpCodes.contains(code) else {
-                    throw APIError.httpCode(code)
+                    throw APIError.httpCode(code,
+                                            reason: "\(try? JSONSerialization.jsonObject(with: $0.data, options: []))",
+                                            headers: ($0.response as? HTTPURLResponse)?.allHeaderFields)
                 }
                 return $0.0
             }

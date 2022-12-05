@@ -10,16 +10,17 @@ import Combine
 
 
 struct WorkspaceState {
-    var workspaces: [String: WorkspaceData] = [:]
+//    var workspaces: CurrentValueSubject<Loadable<[String: WorkspaceData]>, Never> = .init(.notRequested)
+    var workspaces: Loadable<[String: WorkspaceData]> = .notRequested
     var allWorkspaces: [WorkspaceData] {
-        workspaces.values.sorted {
+        (workspaces.value ?? [:]).values.sorted {
             $0.createAt < $1.createAt
         }
     }
     var currentWorkspaceID: String?
     {
         willSet(val) {
-            currentWorkspace.send(val != nil ? workspaces[val!] : nil)
+//            currentWorkspace.send(val != nil ? workspaces.value.value?[val!] : nil)
             members = nil
 //            if let workspaceID = val {
 //                WorkspaceAction.listWorkspaceMembers(workspaceID: workspaceID)
@@ -28,10 +29,10 @@ struct WorkspaceState {
     }
     
     
-//    var currentWorkspace: WorkspaceData? {
-//        currentWorkspaceID != nil ? workspaces[currentWorkspaceID!] : nil
-//    }
-    var currentWorkspace: PassthroughSubject<WorkspaceData?, Never> = .init()
+    var currentWorkspace: WorkspaceData? {
+        currentWorkspaceID != nil ? workspaces.value?[currentWorkspaceID!] : nil
+    }
+//    var currentWorkspace: PassthroughSubject<WorkspaceData?, Never> = .init()
     
     var channel: ChannelState = .init()
     
@@ -44,8 +45,6 @@ struct WorkspaceState {
             $0.name.hashValue < $1.name.hashValue
         }
     }
-    
-    // MARK: - Publisher
 }
 
 
@@ -53,7 +52,7 @@ struct WorkspaceState {
 enum WorkspaceAction {
     case setWorkspaces(items: [WorkspaceData])
     case setWorkspaceMembers(members: [MemberData])
-    case setCurrentWorkspace(workspaceID: String)
+    case setCurrentWorkspace(workspaceID: String?)
     case listWorkspaces(userID: String)
     case listWorkspaceMembers(workspaceID: String)
 }
@@ -64,12 +63,8 @@ func workspaceReducer(state: inout WorkspaceState,
                      environment: AppEnvironment) -> AnyPublisher<WorkspaceAction, Never> {
     switch action {
         case .setWorkspaces(items: let items):
-            var workspaceDictionary: [String : WorkspaceData] = [:]
-            for item in items {
-                workspaceDictionary[item.workspaceID] = item
-            }
-            state.workspaces = workspaceDictionary
-            
+            state.workspaces = .loaded(items.formDictionary(key: \.workspaceID))
+//            state.workspaces.send(.loaded(items.formDictionary(key: \.workspaceID)))
             
         case .setWorkspaceMembers(let members):
             state.members = members.formDictionary(key: \.memberID)
@@ -78,6 +73,8 @@ func workspaceReducer(state: inout WorkspaceState,
             state.currentWorkspaceID = workspaceID
         
         case let .listWorkspaces(userID):
+//            state.workspaces.send(.isLoading(last: nil))
+            state.workspaces = .isLoading(last: nil)
             return environment.trickleWebRepository
                 .listUserWorkspaces(userID: userID)
                 .map({ streamable in
@@ -129,6 +126,16 @@ extension WorkspaceData: Identifiable {
     }
 }
 
+extension WorkspaceData: Hashable {
+//    static func == (lhs: WorkspaceData, rhs: WorkspaceData) -> Bool {
+//        lhs.workspaceID == rhs.workspaceID
+//    }
+//    
+//    func hash(into hasher: inout Hasher) {
+//        hasher.combine(workspaceID)
+//    }
+}
+
 
 
 // MARK: - MemberData
@@ -142,4 +149,9 @@ struct MemberData: Codable {
         case avatarURL = "avatarUrl"
         case createAt, updateAt
     }
+}
+
+
+extension MemberData: Hashable {
+    
 }

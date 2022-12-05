@@ -18,14 +18,22 @@ struct NavigationCellView<V: View, P : Hashable>: View {
     }
     
     var body: some View {
+        
+#if os(macOS)
+        /// Cause bugs when wrapped in `ZStack`
+        NavigationLink(value: value) {
+            content()
+        }
+#elseif os(iOS)
         ZStack {
+            content()
             NavigationLink(value: value) {
                 EmptyView()
             }
             .opacity(0)
             .buttonStyle(.plain)
-            
-            content()
         }
+#endif
+        
     }
 }

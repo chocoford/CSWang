@@ -9,14 +9,10 @@ import SwiftUI
 
 struct ChannelView: View {
     @EnvironmentObject var store: AppStore
-
     @State private var workspace: WorkspaceData? = nil
-//    var workspace: WorkspaceData? {
-//        store.state.workspace.currentWorkspace
-//    }
     
     var channel: GroupData? {
-        store.state.workspace.channel.channelInfo
+        store.state.workspace.channel.currentChannel
     }
     
     var memberInfo: MemberData? {
@@ -25,7 +21,7 @@ struct ChannelView: View {
     
     var body: some View {
         if let workspace = workspace,
-           let channel = channel {
+           let _ = channel {
             VStack {
                 AvatarView(url: URL(string: memberInfo?.avatarURL ?? ""),
                            fallbackText: String(memberInfo?.name.prefix(2) ?? ""),

@@ -9,12 +9,13 @@ import SwiftUI
 
 struct InviteMembersView: View {
     @EnvironmentObject var store: AppStore
+    
+//    var workspace: WorkspaceData? {
+//        store.state.workspace.currentWorkspace
+//    }
+    @State private var workspace: WorkspaceData?
     @State private var searchText: String = ""
-    @State private var invitedMemberIDs = Set<String>() {
-        willSet(val) {
-            preInvitedMemberIDs = val
-        }
-    }
+    @State private var invitedMemberIDs = Set<String>()
     @State private var preInvitedMemberIDs = Set<String>()
     @State private var showAddMembersSheet: Bool = false
     
@@ -22,6 +23,10 @@ struct InviteMembersView: View {
         invitedMemberIDs.compactMap {
             store.state.workspace.members?[$0]
         }
+    }
+    
+    init(worksapce: WorkspaceData? = nil) {
+        self.workspace = worksapce
     }
 
     var body: some View {
@@ -63,9 +68,20 @@ struct InviteMembersView: View {
             }
         }
         .navigationTitle("Invite members")
+        .toolbar(content: {
+            Button {
+                Task {
+                    await createChannel()
+                }
+            } label: {
+                Text("Create")
+            }
+        })
         .sheet(isPresented: $showAddMembersSheet) {
             VStack {
-                MembersListView(members: store.state.workspace.allMembers,
+                MembersListView(members: store.state.workspace.allMembers?.filter {
+                    $0.memberID != workspace?.userMemberInfo.memberID
+                },
                                 selectedMemberIDs: $preInvitedMemberIDs)
                 .frame(width: 400, height: 300)
                 HStack {
@@ -83,12 +99,27 @@ struct InviteMembersView: View {
                 }
             }
         }
+//        .onReceive(store.state.workspace.currentWorkspace) {
+//            workspace = $0
+//        }
+        .onChange(of: invitedMemberIDs) { newValue in
+                   preInvitedMemberIDs = newValue
+        }
+    }
+    
+    func createChannel() async {
+        guard let workspace = workspace else {
+            return
+        }
+        await store.send(.channel(action: .createChannel(workspaceID: workspace.workspaceID,
+                                                         memberID: workspace.userMemberInfo.memberID,
+                                                         invitedMemberIDs: Array(invitedMemberIDs) + [workspace.userMemberInfo.memberID])))
     }
 }
 
 struct InviteMembersView_Previews: PreviewProvider {
     static var previews: some View {
-        InviteMembersView()
+        InviteMembersView(worksapce: nil)
             .environmentObject(AppStore.preview)
     }
 }

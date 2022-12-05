@@ -36,8 +36,12 @@ struct TrickleWebRepository: WebRepository {
         call(endpoint: API.listChannelMembers(workspaceID: workspaceID, channelID: channelID))
     }
     
-    func createChannel(workspaceID: String, memberID: String) -> AnyPublisher<GroupData, Error> {
-        call(endpoint: API.createChannel(workspaceID: workspaceID, memberID: memberID))
+    func createChannel(workspaceID: String,
+                       memberID: String,
+                       invitedMemberIDs: [String]) -> AnyPublisher<GroupData, Error> {
+        call(endpoint: API.createChannel(workspaceID: workspaceID,
+                                         memberID: memberID,
+                                         invitedMemberIDs: invitedMemberIDs))
     }
 }
 
@@ -45,13 +49,11 @@ struct TrickleWebRepository: WebRepository {
 
 extension TrickleWebRepository {
     enum API {
-//        case login
         case getUserData(userID: String)
         case listWorkspaces(userID: String)
         case listPrivateChannels(workspaceID: String, memberID: String)
         case listChannelMembers(workspaceID: String, channelID: String?)
-        case createChannel(workspaceID: String, memberID: String)
-//        case listPosts(String)
+        case createChannel(workspaceID: String, memberID: String, invitedMemberIDs: [String])
     }
 }
 
@@ -66,18 +68,15 @@ extension TrickleWebRepository.API: APICall {
                 return "/f2b/v1/workspaces?userId=\(userID)"
                 
             case let .listPrivateChannels(workspaceID, memberID):
-                return "/f2b/v1/workspaces/\(workspaceID)/privateGroups?memberID=\(memberID)&version=\(Date().timeIntervalSince1970)"
-                //            case .listPosts:
-                //                return "/workspaces/30788161542029315/trickles?limit=5&memberId=30799568975167493&workspaceId=30788161542029315&version=1669566798516&apiVersion=2"
-            
+                return "/f2b/v1/workspaces/\(workspaceID)/privateGroups?memberId=\(memberID)&version=\(Int(Date().timeIntervalSince1970))"
                 
             case let .listChannelMembers(workspaceID, channelID):
                 if let channelID = channelID {
-                    return "/f2b/v1/workspaces/\(workspaceID)/groups/\(channelID)/members?limit=1024&version=\(Date().timeIntervalSince1970)"
+                    return "/f2b/v1/workspaces/\(workspaceID)/groups/\(channelID)/members?limit=1024&version=\(Int(Date().timeIntervalSince1970))"
                 }
-                return "/f2b/v1/workspaces/\(workspaceID)/members?limit=1024&version=\(Date().timeIntervalSince1970)"
+                return "/f2b/v1/workspaces/\(workspaceID)/members?limit=1024&version=\(Int(Date().timeIntervalSince1970))"
 
-            case let .createChannel(workspaceID, _):
+            case let .createChannel(workspaceID, _, _):
                 return "/f2b/v1/workspaces/\(workspaceID)/groups"
 
         }
@@ -92,22 +91,36 @@ extension TrickleWebRepository.API: APICall {
         }
     }
     var headers: [String: String]? {
-        return ["Accept": "application/json", "Authorization": "Bearer \(AuthMiddleware.shared.token ?? "")"]
+        
+        var defaults = [
+            "Accept": "application/json",
+            "Authorization": "Bearer \(AuthMiddleware.shared.token ?? "")",
+            "trickle-trace-id": UUID().uuidString.replacingOccurrences(of: "-", with: ""),
+            "trickle-api-version": "2",
+        ]
+        
+        switch self {
+            case .createChannel:
+                defaults["Content-Type"] = "application/json"
+            default:
+                break
+        }
+        return defaults
     }
     func body() throws -> Data? {
         switch self {
-            case let .createChannel(_, memberID):
+            case let .createChannel(_, memberID, invitedMemberIDs):
                 struct Payload: Codable {
                     let name: String
                     let memberIds: [String]
                     let isWorkspacePublic: Bool
                     let ownerId: String
                 }
-                let payload = Payload(name: "CS-Wang",
-                                      memberIds: [],
+                let payload = Payload(name: "Who's shit?",
+                                      memberIds: invitedMemberIDs,
                                       isWorkspacePublic: false,
                                       ownerId: memberID)
-                return try TrickleWebRepository.makeBody(payload: payload)
+                return try makeBody(payload: payload)
             default:
                 return nil
         }

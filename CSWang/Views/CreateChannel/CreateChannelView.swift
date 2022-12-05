@@ -22,7 +22,7 @@ struct CreateChannelView: View {
                 .padding()
 
                 NavigationLink("Create the channel") {
-                   
+                   InviteMembersView()
                 }
                 .buttonStyle(PrimaryButtonStyle())
             }
