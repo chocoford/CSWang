@@ -21,7 +21,13 @@ struct UserInfo: Codable, Equatable {
         let id: String
         let name: String?
         let email: String?
-        let avatarUrl: URL?
+        let avatarURL: URL?
+        
+        enum CodingKeys: String, CodingKey {
+            case id, email
+            case avatarURL = "avatarUrl"
+            case name = "nickname"
+        }
     }
     
     let user: UserData

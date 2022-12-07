@@ -200,7 +200,6 @@ extension TrickleWebRepository.API: APICall {
         }
     }
     var headers: [String: String]? {
-        
         var defaults = [
             "Accept": "*/*",
             "Authorization": "Bearer \(AuthMiddleware.shared.token ?? "")",

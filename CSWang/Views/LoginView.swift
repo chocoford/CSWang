@@ -10,6 +10,10 @@ import Combine
 
 struct LoginSheet: ViewModifier {
     @EnvironmentObject var store: AppStore
+    var userInfo: Loadable<UserInfo> {
+        store.state.user.userInfo
+    }
+    
     @State private var show: Bool = false
 
     func body(content: Content) -> some View {
@@ -20,9 +24,13 @@ struct LoginSheet: ViewModifier {
             .task {
                 await checkAuth()
             }
-            .onReceive(store.state.user.hasLogin) { hasLogin in
-                if !hasLogin {
-                    show = true
+            .onChange(of: userInfo) { userInfo in
+                switch userInfo {
+                    case .failed, .notRequested:
+                        show = true
+                    
+                    default:
+                        show = false
                 }
             }
     }
@@ -32,7 +40,7 @@ struct LoginSheet: ViewModifier {
             show = true
             return
         }
-        await store.send(.user(action: .setUserInfo(userInfo: userInfo)))
+        await store.send(.user(action: .setUserInfo(userInfo: .isLoading(last: userInfo))))
     }
 }
 
@@ -63,11 +71,11 @@ struct LoginView: View {
     func getAuth() {
         signInModel.signIn(to: "https://devapp.trickle.so/app/authorization?third_party=CSWang", scheme: "CSWang")
             .sink { completion in
-
+                
             } receiveValue: { token in
-                print(token)
+                AuthMiddleware.shared.updateToken(token: token)
                 Task {
-                    await store.send(.user(action: .getUserInfo(token: token)))
+                    await store.send(.user(action: .loadUserInfo))
                 }
             }
             .store(in: &cancellables)

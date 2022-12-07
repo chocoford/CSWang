@@ -19,6 +19,9 @@ enum AppAction {
     case channel(action: ChannelAction)
     /// 铲屎
     case chanshi(action: CSAction)
+    
+    /// app action
+    case clear
 }
 
 typealias AppStore = Store<AppState, AppAction, AppEnvironment>
@@ -28,7 +31,6 @@ let appReducer: Reducer<AppState, AppAction, AppEnvironment> = Reducer { state, 
     switch action {
         case .user(let action):
             return userReducer(state: &state.user, action: action, environment: environment)
-                .map(AppAction.user)
                 .eraseToAnyPublisher()
         case .workspace(let action):
             return workspaceReducer(state: &state.workspace, action: action, environment: environment)
@@ -43,7 +45,12 @@ let appReducer: Reducer<AppState, AppAction, AppEnvironment> = Reducer { state, 
         case .chanshi(let action):
             return csReducer(state: &state.workspace.channel.chanshi, action: action, environment: environment)
                 .eraseToAnyPublisher()
+            
+        case .clear:
+            state = .init()
     }
+    
+    return Empty().eraseToAnyPublisher()
 }
 
 func formDic<T>(payload: AnyStreamable<T>, id: KeyPath<T, String>) -> [String: T] {
@@ -90,7 +97,7 @@ extension AppState {
         
         
         // MARK: - workspaces
-        previewState.user.userInfo = .init(user: .init(id: "123", name: "Chocoford", email: nil, avatarUrl: URL(string: "https://testres.trickle.so/upload/users/29967960227446785/1666774231375_006mowZngy1fz3u72cx1lj307e06tq2y.jpg")))
+        previewState.user.userInfo = .loaded(data: .init(user: .init(id: "123", name: "Chocoford", email: nil, avatarURL: URL(string: "https://testres.trickle.so/upload/users/29967960227446785/1666774231375_006mowZngy1fz3u72cx1lj307e06tq2y.jpg")))) 
         previewState.workspace.workspaces = .loaded(data: formDic(payload: load("workspaces.json"), id: \.workspaceID))
         previewState.workspace.currentWorkspaceID = previewState.workspace.allWorkspaces.first?.workspaceID
         previewState.workspace.members = formDic(payload: load("members.json"), id: \.memberID)

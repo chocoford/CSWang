@@ -29,27 +29,9 @@ struct WorkspacessListView: View {
         NavigationSplitView {
             content
             .navigationTitle("Workspaces")
-            .toolbar {
-                LogoutButton()
-            }
-            .onReceive(store.state.user.hasLogin) { hasLogin in
-                if hasLogin {
-                    Task {
-                        await reloadWorkspaces()
-                    }
-                }
-            }
         } detail: {
             WorkspaceDetailView()
         }
-//        .onReceive(store.state.workspace.workspaces) { workspaces in
-//            self.workspaces = workspaces.map({ workspaces in
-//                workspaces.values.sorted {
-//                    $0.createAt < $1.createAt
-//                }
-//            })
-//        }
-        
     }
     
     @ViewBuilder private var content: some View {
@@ -69,7 +51,7 @@ struct WorkspacessListView: View {
 // MARK: - Side effects
 extension WorkspacessListView {
     private func reloadWorkspaces() async {
-        guard let userID = store.state.user.userInfo?.user.id else {
+        guard let userID = store.state.user.userInfo.value?.user.id else {
             print("no userID")
             return
         }
@@ -119,8 +101,6 @@ extension WorkspacessListView {
                 .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
 #if os(iOS)
                 .listRowBackground(Color.init(uiColor: .systemBackground))
-#elseif os(macOS)
-                .listRowBackground(Color.init(nsColor: .textBackgroundColor))
 #endif
             }
             .listStyle(.plain)
@@ -129,15 +109,16 @@ extension WorkspacessListView {
             })
             Divider()
             HStack {
-                AvatarView(url: store.state.user.userInfo?.user.avatarUrl,
-                           fallbackText: String((store.state.user.userInfo?.user.name ?? "?").prefix(2)))
-                Text(store.state.user.userInfo?.user.name ?? "Unknown")
+                AvatarView(url: store.state.user.userInfo.value?.user.avatarURL,
+                           fallbackText: String((store.state.user.userInfo.value?.user.name ?? "?").prefix(2)))
+                Text(store.state.user.userInfo.value?.user.name ?? "Unknown")
                 Spacer()
-                Button {
-                     
-                } label: {
-                    Image(systemName: "gear")
-                }
+                LogoutButton()
+//                Button {
+//
+//                } label: {
+//                    Image(systemName: "gear")
+//                }
             }
             .padding(.horizontal)
         }

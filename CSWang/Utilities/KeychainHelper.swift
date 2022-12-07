@@ -68,7 +68,10 @@ final class KeychainHelper {
             ] as CFDictionary
         
         // Delete item from keychain
-        SecItemDelete(query)
+        DispatchQueue.global().async {
+            SecItemDelete(query)
+        }
+        
     }
     
     func save<T>(_ item: T, service: String, account: String) where T : Codable {

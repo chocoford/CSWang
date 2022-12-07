@@ -11,37 +11,35 @@ import OSLog
 
 struct UserState {
     var tokenInfo: TokenInfo? = nil
-    var userInfo: UserInfo? = nil {
-        willSet(val) {
-            hasLogin.send(val != nil)
-        }
-    }
-    
-    //MARK: Getters
-    let hasLogin: PassthroughSubject<Bool, Never> = .init()
+    var userInfo: Loadable<UserInfo> = .notRequested
 }
 
 
 enum UserAction {
-    case setUserInfo(userInfo: UserInfo?)
-    case getUserInfo(token: String)
+    case loadUserInfo
+    case setUserInfo(userInfo: Loadable<UserInfo>)
 }
 
  
 func userReducer(state: inout UserState,
                  action: UserAction,
-                 environment: AppEnvironment) -> AnyPublisher<UserAction, Never> {
+                 environment: AppEnvironment) -> AnyPublisher<AppAction, Never> {
     let logger = Logger(subsystem: "CSWang", category: "userReducer")
     switch action {
         case let .setUserInfo(userInfo):
             state.userInfo = userInfo
-            if let userInfo = userInfo {
+            if let userInfo = userInfo.value {
                 DispatchQueue.global().async {
                     AuthMiddleware.shared.saveTokenToKeychain(userInfo: userInfo)
                 }
+                return Just(.workspace(action: .listWorkspaces(userID: userInfo.user.id))).eraseToAnyPublisher()
             }
+            
 
-        case let .getUserInfo(token):
+        case .loadUserInfo:
+            guard let token = AuthMiddleware.shared.token else {
+                break
+            }
             guard let tokenInfo = decodeToken(token: token) else {
                 logger.error("can not decode token: \(token)")
                 break
@@ -51,9 +49,9 @@ func userReducer(state: inout UserState,
                 .getUserData(userID: tokenInfo.sub)
                 .replaceError(with: nil)
                 .map {
-                    guard $0 != nil else { return UserAction.setUserInfo(userInfo: nil) }
+                    guard $0 != nil else { return .user(action: .setUserInfo(userInfo: .failed(.notFound))) }
                     let userInfo = UserInfo(user: $0!.user, token: token)
-                    return UserAction.setUserInfo(userInfo: userInfo)
+                    return .user(action: .setUserInfo(userInfo: .loaded(data: userInfo)))
                 }
                 .eraseToAnyPublisher()
     }

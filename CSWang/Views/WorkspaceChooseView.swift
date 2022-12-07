@@ -60,7 +60,7 @@ struct WorkspaceChooseView: View {
         }
         .onAppear {
             Task {
-                let userID = store.state.user.userInfo?.user.id ?? ""
+                let userID = store.state.user.userInfo.value?.user.id ?? ""
                 await store.send(.workspace(action: .listWorkspaces(userID: userID)))
             }
         }

@@ -8,9 +8,13 @@
 import SwiftUI
 
 struct LogoutButton: View {
+    @EnvironmentObject var store: AppStore
     var body: some View {
         Button {
             AuthMiddleware.shared.removeToken()
+            Task {
+                await store.send(.clear)
+            }
         } label: {
             Image(systemName: "rectangle.portrait.and.arrow.right")
         }
