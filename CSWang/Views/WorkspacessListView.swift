@@ -101,6 +101,8 @@ extension WorkspacessListView {
                 .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
 #if os(iOS)
                 .listRowBackground(Color.init(uiColor: .systemBackground))
+#elseif os(macOS)
+                .listRowBackground(Color.init(nsColor: .textBackgroundColor))
 #endif
             }
             .listStyle(.plain)

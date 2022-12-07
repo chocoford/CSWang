@@ -159,7 +159,8 @@ struct TrickleData: Codable {
     let trickleID: String
     let authorMemberInfo: MemberData
 //    let receiverInfo: ReceiverInfo
-    let createAt, updateAt, editAt: Int
+    let createAt, updateAt: Int
+    let editAt: Int?
     let title: String
     let blocks: [Block]
 //    let tagInfo, mentionedMemberInfo: [JSONAny]

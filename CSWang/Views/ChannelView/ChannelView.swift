@@ -90,11 +90,9 @@ private extension ChannelView {
         guard let workspace = workspace,
               let channel = channel.value,
               let member = memberInfo else { return }
-        await store.send(.channel(action: .createTrickle(workspaceID: workspace.workspaceID,
+        await store.send(.chanshi(action: .joinCSChannel(workspaceID: workspace.workspaceID,
                                                          channelID: channel.groupID,
-                                                         payload: .init(authorMemberID: member.memberID,
-                                                                        blocks: TrickleIntergratable.createPost(type: .helloWorld),
-                                                                        mentionedMemberIDs: []))))
+                                                         memberID: member.memberID)))
     }
 }
 
@@ -169,7 +167,9 @@ extension ChannelView {
         VStack {
             Text("It seems that there is already a channel.")
             Button {
-                
+                Task {
+                    await joinChannel()
+                }
             } label: {
                 Text("Join")
             }
