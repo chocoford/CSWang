@@ -14,6 +14,7 @@ struct CreateChannelView: View {
         store.state.workspace.currentWorkspace
     }
     
+    
     var body: some View {
 //        NavigationStack {
             VStack {
@@ -49,6 +50,13 @@ struct CreateChannelView: View {
         await store.send(.channel(action: .createChannel(workspaceID: workspace.workspaceID,
                                                          memberID: workspace.userMemberInfo.memberID,
                                                          invitedMemberIDs: [])))
+        if let channelID = store.state.workspace.channel.currentChannel.value?.groupID {
+            await store.send(.channel(action: .createTrickle(workspaceID: workspace.workspaceID,
+                                                             channelID: channelID,
+                                                             payload: .init(authorMemberID: workspace.userMemberInfo.memberID,
+                                                                            blocks: TrickleIntergratable.createPost(type: .helloWorld),
+                                                                            mentionedMemberIDs: []))))
+        }
     }
 }
 

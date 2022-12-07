@@ -20,17 +20,9 @@ protocol WebRepository {
 extension WebRepository {
     func call<Value>(endpoint: APICall, httpCodes: HTTPCodes = .success) -> AnyPublisher<Value, Error>
         where Value: Decodable {
-            logger.log("calling \(endpoint.method) \(endpoint.path)") //; \nHeaders: \(endpoint.headers ?? [:])
-            if let body = try? endpoint.body() {
-                do {
-                    let payload = try JSONSerialization.jsonObject(with: body)
-                    logger.log("body: \(String(describing: payload))")
-                } catch {
-                    logger.error("can not serialize body")
-                }
-            }
         do {
             let request = try endpoint.urlRequest(baseURL: baseURL)
+            logger.info("\(request.prettyDescription)")
             return session
                 .dataTaskPublisher(for: request)
                 .map({ (data, res) in
@@ -67,8 +59,13 @@ extension Publisher where Output == URLSession.DataTaskPublisher.Output {
                     throw APIError.unexpectedResponse
                 }
                 guard httpCodes.contains(code) else {
+                    var reason = ""
+                    if let jsonObject = try? JSONSerialization.jsonObject(with: $0.data, options: []),
+                       let data = try? JSONSerialization.data(withJSONObject: jsonObject, options: [.prettyPrinted, .sortedKeys]) {
+                        reason = String(data: data, encoding: .utf8) ?? ""
+                    }
                     throw APIError.httpCode(code,
-                                            reason: "\(try? JSONSerialization.jsonObject(with: $0.data, options: []))",
+                                            reason: reason,
                                             headers: ($0.response as? HTTPURLResponse)?.allHeaderFields)
                 }
                 return $0.0

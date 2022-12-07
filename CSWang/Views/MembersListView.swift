@@ -42,10 +42,6 @@ struct MembersListView: View {
         }
         
     }
-    
-    private func loadMembers() {
-        
-    }
 }
 
 struct MembersListView_Previews: PreviewProvider {

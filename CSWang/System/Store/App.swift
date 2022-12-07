@@ -17,12 +17,14 @@ enum AppAction {
     case user(action: UserAction)
     case workspace(action: WorkspaceAction)
     case channel(action: ChannelAction)
+    /// 铲屎
+    case chanshi(action: CSAction)
 }
 
 typealias AppStore = Store<AppState, AppAction, AppEnvironment>
 
 
-func appReducer(state: inout AppState, action: AppAction, environment: AppEnvironment) -> AnyPublisher<AppAction, Never> {
+let appReducer: Reducer<AppState, AppAction, AppEnvironment> = Reducer { state, action, environment in
     switch action {
         case .user(let action):
             return userReducer(state: &state.user, action: action, environment: environment)
@@ -36,6 +38,10 @@ func appReducer(state: inout AppState, action: AppAction, environment: AppEnviro
         case .channel(let action):
             return channelReducer(state: &state.workspace.channel, action: action, environment: environment)
                 .map(AppAction.channel)
+                .eraseToAnyPublisher()
+            
+        case .chanshi(let action):
+            return csReducer(state: &state.workspace.channel.chanshi, action: action, environment: environment)
                 .eraseToAnyPublisher()
     }
 }
@@ -91,7 +97,7 @@ extension AppState {
         
         // MARK: - channels
         previewState.workspace.channel.channels = .loaded(data: formDic(payload: load("publicGroups.json"), id: \.groupID))
-        previewState.workspace.channel.currentChannelID = previewState.workspace.channel.channels.value?.first?.value.groupID
+//        previewState.workspace.channel.currentChannelID = previewState.workspace.channel.channels.value?.first?.value.groupID
         
         return previewState
     }()

@@ -92,7 +92,9 @@ private extension WorkspacessListView {
     }
     
     func loadingView(_ previouslyLoaded: [WorkspaceData]?) -> some View {
-        Text("loading")
+        LoadingView { _ in
+            Text("Loading...")
+        }
     }
     
     func failedView(_ error: Error) -> some View {

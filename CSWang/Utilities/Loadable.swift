@@ -8,12 +8,28 @@
 import Foundation
 import SwiftUI
 
-enum Loadable<T> {
+enum LoadableError: Error, LocalizedError {
+    case cancelled
+    case notFound
+    case unexpected(error: Error)
+    
+    var localized: String {
+        switch self {
+            case .cancelled:
+                return "Canceled by user."
+            case .notFound:
+                return "Entity not found."
+            case .unexpected(let error):
+                return error.localizedDescription
+        }
+    }
+}
 
+enum Loadable<T> {
     case notRequested
     case isLoading(last: T?) //, cancelBag: CancelBag
     case loaded(data: T)
-    case failed(Error)
+    case failed(LoadableError)
 
     var value: T? {
         switch self {
@@ -22,10 +38,10 @@ enum Loadable<T> {
         default: return nil
         }
     }
-    var error: Error? {
+    var error: LoadableError? {
         switch self {
         case let .failed(error): return error
-        default: return nil
+            default: return nil
         }
     }
 }
@@ -47,7 +63,7 @@ extension Loadable {
                         domain: NSCocoaErrorDomain, code: NSUserCancelledError,
                         userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("Canceled by user",
                                                                                 comment: "")])
-                    self = .failed(error)
+                    self = .failed(.unexpected(error: error))
                 }
             default: break
         }
@@ -64,11 +80,10 @@ extension Loadable {
                     return .loaded(data: try transform(value))
             }
         } catch {
-            return .failed(error)
+            return .failed(.unexpected(error: error))
         }
     }
 }
-
 //protocol SomeOptional {
 //    associatedtype Wrapped
 //    func unwrap() throws -> Wrapped
