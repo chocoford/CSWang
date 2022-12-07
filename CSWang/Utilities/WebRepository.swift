@@ -35,7 +35,6 @@ extension WebRepository {
                     }
                     return (data, res)
                 })
-                .eraseToAnyPublisher()
                 .requestJSON(httpCodes: httpCodes)
                 .mapError {
                     logger.error("\($0.localizedDescription)")

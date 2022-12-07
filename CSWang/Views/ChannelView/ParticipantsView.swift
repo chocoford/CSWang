@@ -63,8 +63,10 @@ extension ParticipantsView {
 private extension ParticipantsView {
     var notRequestedView: some View {
         Text("No data")
-            .task {
-                await loadParticipants()
+            .onAppear {
+                Task {
+                    await loadParticipants()
+                }
             }
     }
     
@@ -87,8 +89,12 @@ extension ParticipantsView {
         List {
             ForEach(data, id: \.memberID) { participant in
                 HStack {
+                    AvatarView(url: URL(string: participant.avatarURL), fallbackText: participant.name.prefix(2))
                     Text(participant.name)
+                    Spacer()
                 }
+                .padding()
+                .background(.ultraThickMaterial, in: RoundedRectangle(cornerRadius: 12))
             }
         }
     }

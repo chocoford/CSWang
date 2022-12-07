@@ -8,9 +8,9 @@
 import SwiftUI
 import ShapeBuilder
 
-struct AvatarView: View {
+struct AvatarView<S: StringProtocol>: View {
     var url: URL?
-    var fallbackText: String
+    var fallbackText: S
     
     enum AvatarShape {
         case circle

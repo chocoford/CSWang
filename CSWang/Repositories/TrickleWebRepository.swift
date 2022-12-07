@@ -175,7 +175,7 @@ extension TrickleWebRepository.API: APICall {
     
     var gloabalQueryItems: Codable? {
         struct TrickleWebAPIQuery: Codable {
-            var version: Int = Int(Date().timeIntervalSince1970)
+            var version: Int = Int(Date().timeIntervalSince1970 * 1000)
             var apiVersion: Int = 2
         }
         return TrickleWebAPIQuery()

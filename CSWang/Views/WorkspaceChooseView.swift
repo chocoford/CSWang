@@ -25,11 +25,11 @@ struct WorkspaceChooseSheet: ViewModifier {
             }
 
             .onAppear {
-                if store.state.user.userInfo != nil && store.state.workspace.currentWorkspaceID == nil {
+                if store.state.user.userInfo.value != nil && store.state.workspace.currentWorkspaceID == nil {
                     show = true
                 }
             }
-            .onChange(of: store.state.user.userInfo) { newValue in
+            .onChange(of: store.state.user.userInfo.value) { newValue in
                 if newValue != nil && store.state.workspace.currentWorkspaceID == nil {
                     show = true
                 }
