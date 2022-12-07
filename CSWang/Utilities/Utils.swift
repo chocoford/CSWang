@@ -24,3 +24,9 @@ func decodeToken(token: String) -> TokenInfo? {
     }
 
 }
+
+var currentWeek: Int {
+    let calendar = Calendar.current
+    let week = calendar.component(.weekOfYear, from: Date.now)
+    return week
+}

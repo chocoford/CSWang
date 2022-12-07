@@ -37,7 +37,17 @@ struct CSState {
     }
     var userChannelState: UserChannelState = .checking
     
+    enum WeekState {
+        case unknown
+        case underway
+        case finished
+    }
     
+    var lastWeekState: WeekState = .unknown
+    var currentWeekState: WeekState = .unknown
+    
+    
+    var csInfo: CSUserInfo = .init()
 }
 
 enum CSAction {
@@ -48,6 +58,12 @@ enum CSAction {
     case joinCSChannel(workspaceID: String, channelID: String, memberID: String)
     case checkHasJoined(workspaceID: String, channelID: String, memberID: String)
     
+    case setGameInfo(info: Loadable<CSUserInfo.GambleInfo?>)
+    case publishScore(workspaceID: String, channelID: String, memberID: String, score: Int)
+    
+    case initailWeekCheck(workspaceID: String, channelID: String, memberID: String)
+    case getUserLatestGameInfo(workspaceID: String, channelID: String, memberID: String)
+    case getLatestSummary(workspaceID: String, channelID: String, memberID: String)
 }
 
 //let csReducer: Reducer<CSState, AppAction, AppEnvironment> = Reducer { state, action, environment in
@@ -123,6 +139,109 @@ func csReducer(state: inout CSState,
                     return Just(AppAction.chanshi(action: .setUserChannelState(.notJoined)))
                 }
                 .eraseToAnyPublisher()
+            
+        case .setGameInfo(let info):
+            state.csInfo.roundGame = info
+            
+        case .publishScore(let workspaceID, let channelID, let memberID, let score):
+            return environment.trickleWebRepository
+                .createPost(workspaceID: workspaceID,
+                            channelID: channelID,
+                            payload: .init(authorMemberID: memberID,
+                                           blocks: TrickleIntergratable.createPost(type: .gamble(score: score))))
+                .map { _ in
+                        .chanshi(action: .setUserChannelState(.checking))
+                }
+                .catch {
+                    logger.error("\($0)")
+                    return Just(AppAction.chanshi(action: .setUserChannelState(.notJoined)))
+                }
+                .eraseToAnyPublisher()
+            
+        case .initailWeekCheck(let workspaceID, let channelID, let memberID):
+            break
+//            return environment.trickleWebRepository
+//                .listPosts(workspaceID: workspaceID,
+//                           query: .init(workspaceID: workspaceID,
+//                                        receiverID: channelID,
+//                                        memberID: memberID))
+//                .map {
+//                    if $0.items.contains(where: {
+//                        TrickleIntergratable.getType($0.blocks) == .gamble(score: 0)
+//                    }) {
+//                        /// Check last week is finished or not.
+//                        return .chanshi(action: .getLatestSummary(workspaceID: workspaceID, channelID: channelID, memberID: memberID))
+//                    } else {
+//                        state.lastWeekState = .finished
+//                        state.currentWeekState = .underway
+//                    }
+//                    return AppAction.nap
+//                }
+//                .catch { _ in
+//                    return Just(AppAction.nap)
+//                }
+//                .eraseToAnyPublisher()
+            
+        case .getUserLatestGameInfo(let workspaceID, let channelID, let memberID):
+//            return environment.trickleWebRepository
+//                .listPosts(workspaceID: workspaceID, query: .init(workspaceID: workspaceID,
+//                                                                  receiverID: channelID,
+//                                                                  memberID: memberID,
+//                                                                  authorID: memberID))
+//                .map {
+//                    guard let post: TrickleData = $0.items.first(where: {
+//                        return TrickleIntergratable.getType($0.blocks)?.id == TrickleIntergratable.PostType.gamble(score: 0).id
+//                    }) else {
+//                        return .nap
+//                    }
+//                    guard let gameInfo = TrickleIntergratable.extractGameInfo(post.blocks) else {
+//                        return .nap
+//                    }
+//
+//                    if gameInfo.weekNum == currentWeek {
+//                        return .chanshi(action: .setGameInfo(info: .loaded(data: .init(weekNum: gameInfo.weekNum,
+//                                                                                                score: gameInfo.score,
+//                                                                                                rank: nil,
+//                                                                                                absent: false,
+//                                                                                                isValid: true))))
+//                    } else {
+//                        return .chanshi(action: .setCsInfo(info: .loaded(data: nil)))
+//                    }
+//                }
+//                .catch { _ in
+//                    return Just(.nap)
+//                }
+//                .eraseToAnyPublisher()
+            break
+        
+        case .getLatestSummary(let workspaceID, let channelID, let memberID):
+            break
+//            return environment.trickleWebRepository
+//                .listPosts(workspaceID: workspaceID,
+//                           query: .init(workspaceID: workspaceID,
+//                                        receiverID: channelID,
+//                                        memberID: memberID,
+//                                        limit: 20))
+//                .map {
+//                    if let summaryInfo = TrickleIntergratable.getLatestSummary(trickles: $0.items) {
+//                        if summaryInfo.week == currentWeek {
+//                            state.currentWeekState = .finished
+//                            state.lastWeekState = .finished
+//                        } else if summaryInfo.week == currentWeek - 1 {
+//                            state.currentWeekState = .underway
+//                            state.lastWeekState = .finished
+//                        } else {
+//                            // 依次补发
+//                        }
+//                    } else {
+//
+//                    }
+//                    return .nap
+//                }
+//                .catch({ _ in
+//                    return Just(.nap)
+//                })
+//                .eraseToAnyPublisher()
     }
     
     

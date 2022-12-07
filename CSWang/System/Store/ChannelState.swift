@@ -39,6 +39,8 @@ struct ChannelState {
         }
     }
     
+    var channelPosts: Loadable<[TrickleData]> = .notRequested
+    
     var chanshi: CSState = .init()
 }
 
@@ -53,11 +55,14 @@ enum ChannelAction {
     case listPrivateChannels(workspaceID: String, memberID: String)
     
     case createTrickle(workspaceID: String, channelID: String, payload: TrickleWebRepository.API.CreatePostPayload)
+    
+    case setChannelPosts(data: Loadable<[TrickleData]>)
+    case listTrickles(workspaceID: String, channelID: String, memberID: String, until: Int?)
 }
 
 func channelReducer(state: inout ChannelState,
                     action: ChannelAction,
-                    environment: AppEnvironment) -> AnyPublisher<ChannelAction, Never> {
+                    environment: AppEnvironment) -> AnyPublisher<AppAction, Never> {
 //    let logger = Logger(subsystem: "CSWang", category: "channelReducer")
     switch action {
         case .noAction:
@@ -78,7 +83,7 @@ func channelReducer(state: inout ChannelState,
                                memberID: memberID,
                                invitedMemberIDs: invitedMemberIDs)
                 .map { [state] in
-                    ChannelAction.setChannels(items: state.allChannels + [$0.group])
+                        .channel(action: .setChannels(items: state.allChannels + [$0.group]))
                 }
                 .catch { _ in
                     Empty()
@@ -94,7 +99,7 @@ func channelReducer(state: inout ChannelState,
                 })
                 .replaceError(with: [])
                 .map({
-                    return ChannelAction.setChannels(items: $0)
+                    return .channel(action: .setChannels(items: $0))
                 })
                 .eraseToAnyPublisher()
             
@@ -107,7 +112,7 @@ func channelReducer(state: inout ChannelState,
                 })
                 .replaceError(with: [])
                 .map({
-                    return ChannelAction.setChannels(items: $0)
+                    return .channel(action: .setChannels(items: $0))
                 })
                 .eraseToAnyPublisher()
             
@@ -117,14 +122,36 @@ func channelReducer(state: inout ChannelState,
                             channelID: channelID,
                             payload: payload)
                 .map { _ in
-                    return ChannelAction.noAction
+                    return .nap
                 }
                 .catch { _ in
                     Empty()
                 }
                 .eraseToAnyPublisher()
             
+        case .setChannelPosts(let data):
+            state.channelPosts = data
         
+        case .listTrickles(let workspaceID, let channelID, let memberID, let until):
+            return environment.trickleWebRepository
+                .listPosts(workspaceID: workspaceID,
+                           query: .init(workspaceID: workspaceID, receiverID: channelID, memberID: memberID, until: until, limit: 40))
+                .retry(3)
+                .map { [state] in
+                    _ = AppAction.channel(action: .setChannelPosts(data: .isLoading(last: (state.channelPosts.value ?? []) + $0.items)))
+                    if let nextTS = $0.nextTs {
+                        return .channel(action: .listTrickles(workspaceID: workspaceID,
+                                                              channelID: channelID,
+                                                              memberID: memberID,
+                                                              until: nextTS))
+                    } else {
+                        return .nap
+                    }
+                }
+                .catch({ error in
+                    return Just(.channel(action: .setChannelPosts(data: .failed(.unexpected(error: error)))))
+                })
+                .eraseToAnyPublisher()
             
     }
     

@@ -12,10 +12,13 @@ struct Block: Codable {
     enum BlockType: String, Codable {
         case h1, h2, h3
         case richText = "rich_texts"
+        case divider
+        case numberedList
         
         enum CodingKeys: String, CodingKey {
-            case h1, h2, h3
+            case h1, h2, h3, divider
             case richText = "rich_texts"
+            case numberedList = "number_list"
         }
     }
     
@@ -28,8 +31,9 @@ struct Block: Codable {
     let isCurrent: Bool
     let constraint: String
     let display: String
+    let userDefinedValue: String?
     
-    init(type: BlockType, blocks: [Block] = [], elements: [Element]) {
+    init(type: BlockType, value: String? = nil, blocks: [Block] = [], elements: [Element]) {
         self.id = UUID().uuidString
         self.type = type
         self.isFirst = true
@@ -39,6 +43,7 @@ struct Block: Codable {
         self.isCurrent = false
         self.constraint = "free"
         self.display = "block"
+        self.userDefinedValue = value
     }
 }
 
@@ -67,8 +72,14 @@ struct Element: Codable {
 
 struct TrickleIntergratable {
     enum PostType: Identifiable, Equatable {
+        static func == (lhs: TrickleIntergratable.PostType, rhs: TrickleIntergratable.PostType) -> Bool {
+            lhs.id == rhs.id
+        }
+        
         case helloWorld
         case membersChange(invitedMembers: [MemberData])
+        case gamble(score: Int)
+        case summary(userIDAndScores: [(String, Int)])
         
         var id: String {
             switch self {
@@ -77,6 +88,12 @@ struct TrickleIntergratable {
                     
                 case .membersChange:
                     return "members changed"
+                    
+                case .gamble:
+                    return "gamble"
+                    
+                case .summary:
+                    return "summary"
             }
         }
     }
@@ -89,6 +106,9 @@ struct TrickleIntergratable {
     }
     
     static func createPost(type: PostType) -> [Block] {
+        let calendar = Calendar.current
+        let week = calendar.component(.weekOfYear, from: Date.now)
+        
         var blocks: [Block] = [
             generateIdentifier(type)
         ]
@@ -116,6 +136,39 @@ struct TrickleIntergratable {
                               ]
                           }),
                 ]
+            case .gamble(let score):
+                blocks += [
+                    Block(type: .h3,
+                          elements: [
+                            Element(.text, text: "Week \(week)", value: String(week))
+                          ]),
+                    Block(type: .richText,
+                          elements: [
+                            Element(.text, text: "I get a score of \(score) in this round.", value: "\(score)")
+                          ])
+                ]
+            case .summary(let userIDAndScores):
+                blocks += [
+                    Block(type: .h3,
+                          elements: [
+                            Element(.text, text: "Week \(week) has finished!", value: String(week))
+                          ]),
+                    Block(type: .richText,
+                          elements: [
+                            Element(.text, text: "rank")
+                          ]),
+                    Block(type: .divider,
+                          elements: [
+                            Element(.text, text: "")
+                          ])
+                ] + userIDAndScores.enumerated().map { (index, tuple) in
+                    Block(type: .numberedList,
+                          value: "\(index + 1).",
+                          elements: [
+                            Element(.user, text: "", value: tuple.0),
+                            Element(.text, text: "", value: "\(tuple.1)"),
+                          ])
+                }
         }
         return blocks
     }
@@ -132,6 +185,9 @@ struct TrickleIntergratable {
             case PostType.membersChange(invitedMembers: []).id:
                 return PostType.membersChange(invitedMembers: [])
                 
+            case PostType.gamble(score: 0).id:
+                return PostType.gamble(score: 0)
+                
             default:
                 return nil
         }
@@ -141,7 +197,7 @@ struct TrickleIntergratable {
         guard getType(blocks) == .membersChange(invitedMembers: []) else {
             return []
         }
-        guard blocks.count > 2 else {
+        guard blocks.count == 3 else {
             return []
         }
         guard let elements = blocks[2].elements else { return [] }
@@ -150,5 +206,108 @@ struct TrickleIntergratable {
         return members.filter { member in
             memberIDs.contains(member.memberID)
         }
+    }
+    
+    static func getLatestSummary(trickles: [TrickleData]) -> SummaryInfo? {
+        for trickle in trickles {
+            if TrickleIntergratable.getType(trickle.blocks)?.id != TrickleIntergratable.PostType.summary(userIDAndScores: []).id {
+                continue
+            }
+            guard trickle.blocks.count > 3 else { continue }
+            
+            let weekBlock = trickle.blocks[1]
+            guard weekBlock.type == .h3,
+                  let weekElement = weekBlock.elements,
+                  weekElement.count == 1,
+                  let weekString = weekElement[0].value,
+                  let week = Int(weekString) else {
+                continue
+            }
+            
+            var needContinue = false
+            var resultRanks: [(String, Int)] = []
+            for block in trickle.blocks.suffix(trickle.blocks.count - 2) {
+                guard block.type == .numberedList else {
+                    needContinue = true
+                    break
+                }
+                
+                guard let elements = block.elements,
+                      elements.count == 2 else {
+                    needContinue = true
+                    break
+                }
+                
+                let userElement = elements[0]
+                guard let memberID = userElement.value else {
+                    needContinue = true
+                    break
+                }
+                let scoreElement = elements[1]
+                guard let scoreString = scoreElement.value,
+                      let score = Int(scoreString) else {
+                    needContinue = true
+                    break
+                }
+                
+                resultRanks.append((memberID, score))
+            }
+            if needContinue {
+                continue
+            }
+            
+            return .init(week: week,
+                         rankedParticipantIDsAndScores: resultRanks)
+        }
+        return nil
+    }
+    
+    static func getLatestGameInfo(from trickles: [TrickleData]) -> CSUserInfo.GambleInfo? {
+        guard let post = trickles.first(where: {
+            TrickleIntergratable.getType($0.blocks)?.id == TrickleIntergratable.PostType.gamble(score: 0).id
+        }) else {
+            return nil
+        }
+        guard let gameInfo = TrickleIntergratable.extractGameInfo(post.blocks) else {
+            return nil
+        }
+        
+        if gameInfo.weekNum == currentWeek {
+            return .init(weekNum: gameInfo.weekNum,
+                         score: gameInfo.score,
+                         rank: nil,
+                         absent: false,
+                         isValid: true)
+        } else {
+            return nil
+        }
+    }
+    
+    static func extractGameInfo(_ blocks: [Block]) -> CSUserInfo.GambleInfo? {
+        guard getType(blocks) == .gamble(score: 0) else {
+            return nil
+        }
+        guard blocks.count == 3 else {
+            return nil
+        }
+        let weekBlock = blocks[1]
+        guard weekBlock.type == .h1,
+              let weekElement = weekBlock.elements,
+              weekElement.count == 1,
+              let weekString = weekElement[0].value,
+              let week = Int(weekString) else {
+            return nil
+        }
+        
+        guard let scoreElements = blocks[2].elements,
+              scoreElements.count == 1,
+              let value = scoreElements[0].value,
+              let score = Int(value) else { return nil }
+
+        return .init(weekNum: week,
+                     score: score,
+                     rank: 0,
+                     absent: false,
+                     isValid: true)
     }
 }

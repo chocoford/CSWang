@@ -22,6 +22,7 @@ enum AppAction {
     
     /// app action
     case clear
+    case nap
 }
 
 typealias AppStore = Store<AppState, AppAction, AppEnvironment>
@@ -39,7 +40,6 @@ let appReducer: Reducer<AppState, AppAction, AppEnvironment> = Reducer { state, 
             
         case .channel(let action):
             return channelReducer(state: &state.workspace.channel, action: action, environment: environment)
-                .map(AppAction.channel)
                 .eraseToAnyPublisher()
             
         case .chanshi(let action):
@@ -48,6 +48,9 @@ let appReducer: Reducer<AppState, AppAction, AppEnvironment> = Reducer { state, 
             
         case .clear:
             state = .init()
+            
+        case .nap:
+            break
     }
     
     return Empty().eraseToAnyPublisher()

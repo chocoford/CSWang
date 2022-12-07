@@ -39,8 +39,4 @@ struct UserInfo: Codable, Equatable {
         let id: UUID
         let token: String
     }
-//    func getKeychainRepresentation() throws -> KeychainRepresentation {
-//        guard self.id != nil && self.token != nil else { throw AuthError.userIdMissing }
-//        return KeychainRepresentation(id: self.id!, token: self.token!)
-//    }
 }

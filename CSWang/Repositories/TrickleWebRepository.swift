@@ -104,6 +104,12 @@ extension TrickleWebRepository {
                 case blocks
                 case mentionedMemberIDs = "mentionedMemberIds"
             }
+            
+            init(authorMemberID: String, blocks: [Block], mentionedMemberIDs: [String] = []) {
+                self.authorMemberID = authorMemberID
+                self.blocks = blocks
+                self.mentionedMemberIDs = mentionedMemberIDs
+            }
         }
         case createPost(workspaceID: String, channelID: String, payload: CreatePostPayload)
         
