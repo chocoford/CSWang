@@ -44,6 +44,26 @@ enum Loadable<T> {
             default: return nil
         }
     }
+    
+    enum State {
+        case notRequested
+        case isLoading
+        case loaded
+        case failed
+    }
+    
+    var state: State {
+        switch self {
+            case .notRequested:
+                return .notRequested
+            case .isLoading:
+                return .isLoading
+            case .loaded:
+                return .loaded
+            case .failed:
+                return .failed
+        }
+    }
 }
 
 extension Loadable {

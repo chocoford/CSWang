@@ -9,11 +9,6 @@ import Foundation
 import Combine
 import OSLog
 
-enum ChannelError: Error {
-    case unjoined
-    
-}
-
 struct ChannelState {
     var channels: Loadable<[String: GroupData]> = .notRequested
     
@@ -38,16 +33,12 @@ struct ChannelState {
                 return .failed(error)
         }
     }
-    
-    var channelPosts: Loadable<[TrickleData]> = .notRequested
-    
+        
     var chanshi: CSState = .init()
 }
 
 enum ChannelAction {
-    case noAction
     case setChannels(items: [GroupData])
-//    case setCurrentChannel(channelID: String?)
     case createChannel(workspaceID: String, memberID: String, invitedMemberIDs: [String])
     case listPublicChannels(workspaceID: String, memberID: String)
     
@@ -55,9 +46,6 @@ enum ChannelAction {
     case listPrivateChannels(workspaceID: String, memberID: String)
     
     case createTrickle(workspaceID: String, channelID: String, payload: TrickleWebRepository.API.CreatePostPayload)
-    
-    case setChannelPosts(data: Loadable<[TrickleData]>)
-    case listTrickles(workspaceID: String, channelID: String, memberID: String, until: Int?)
 }
 
 func channelReducer(state: inout ChannelState,
@@ -65,8 +53,6 @@ func channelReducer(state: inout ChannelState,
                     environment: AppEnvironment) -> AnyPublisher<AppAction, Never> {
 //    let logger = Logger(subsystem: "CSWang", category: "channelReducer")
     switch action {
-        case .noAction:
-            break
         case .setChannels(let items):
             state.channels = .loaded(data: items.formDictionary(key: \.groupID))
             state.chanshi.participants = .notRequested
@@ -129,30 +115,7 @@ func channelReducer(state: inout ChannelState,
                 }
                 .eraseToAnyPublisher()
             
-        case .setChannelPosts(let data):
-            state.channelPosts = data
-        
-        case .listTrickles(let workspaceID, let channelID, let memberID, let until):
-            return environment.trickleWebRepository
-                .listPosts(workspaceID: workspaceID,
-                           query: .init(workspaceID: workspaceID, receiverID: channelID, memberID: memberID, until: until, limit: 40))
-                .retry(3)
-                .map { [state] in
-                    _ = AppAction.channel(action: .setChannelPosts(data: .isLoading(last: (state.channelPosts.value ?? []) + $0.items)))
-                    if let nextTS = $0.nextTs {
-                        return .channel(action: .listTrickles(workspaceID: workspaceID,
-                                                              channelID: channelID,
-                                                              memberID: memberID,
-                                                              until: nextTS))
-                    } else {
-                        return .nap
-                    }
-                }
-                .catch({ error in
-                    return Just(.channel(action: .setChannelPosts(data: .failed(.unexpected(error: error)))))
-                })
-                .eraseToAnyPublisher()
-            
+
     }
     
     return Empty().eraseToAnyPublisher()

@@ -39,6 +39,7 @@
 		39D289A5293F0DB200846BF6 /* CSState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289A4293F0DB200846BF6 /* CSState.swift */; };
 		39D289A8294077C600846BF6 /* WorkspaceChooseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289A7294077C600846BF6 /* WorkspaceChooseView.swift */; };
 		39D289AB2940886B00846BF6 /* CSUserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289AA2940886B00846BF6 /* CSUserInfo.swift */; };
+		39D289AD29419C6C00846BF6 /* Dictionary+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289AC29419C6C00846BF6 /* Dictionary+Extension.swift */; };
 		39EF55F62937AB0B005F10F4 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F52937AB0B005F10F4 /* AvatarView.swift */; };
 		39EF55FA2937C19F005F10F4 /* MemberCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F92937C19F005F10F4 /* MemberCardView.swift */; };
 		39EF55FD2937CB1F005F10F4 /* ShapeBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 39EF55FC2937CB1F005F10F4 /* ShapeBuilder */; };
@@ -114,6 +115,7 @@
 		39D289A4293F0DB200846BF6 /* CSState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSState.swift; sourceTree = "<group>"; };
 		39D289A7294077C600846BF6 /* WorkspaceChooseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkspaceChooseView.swift; sourceTree = "<group>"; };
 		39D289AA2940886B00846BF6 /* CSUserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSUserInfo.swift; sourceTree = "<group>"; };
+		39D289AC29419C6C00846BF6 /* Dictionary+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Extension.swift"; sourceTree = "<group>"; };
 		39EF55F52937AB0B005F10F4 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 		39EF55F92937C19F005F10F4 /* MemberCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberCardView.swift; sourceTree = "<group>"; };
 		39F12D2B2933CF8F005F5D48 /* CSWang.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CSWang.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -375,6 +377,7 @@
 				39F12D7F2934A9C8005F5D48 /* View+Extension.swift */,
 				39396B082937D3FB00EDD29F /* Encodable+Extension.swift */,
 				390B46A92939E0DF00E15DC3 /* Array+Extension.swift */,
+				39D289AC29419C6C00846BF6 /* Dictionary+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -563,6 +566,7 @@
 				39396B092937D3FB00EDD29F /* Encodable+Extension.swift in Sources */,
 				390B46A62939DBE900E15DC3 /* ChannelView.swift in Sources */,
 				390B46BB293CCA1900E15DC3 /* Loadable.swift in Sources */,
+				39D289AD29419C6C00846BF6 /* Dictionary+Extension.swift in Sources */,
 				390B46AA2939E0DF00E15DC3 /* Array+Extension.swift in Sources */,
 				390B46982938F37400E15DC3 /* WorkspacessListView.swift in Sources */,
 				39F12D7D293494A4005F5D48 /* Color.swift in Sources */,

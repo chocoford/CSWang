@@ -7,29 +7,6 @@
 
 import SwiftUI
 
-enum CSInfo: String, CaseIterable {
-    case immunityNum
-    case lastCleanDate
-    case nextCleanDate
-
-    var localized: String {
-        switch self {
-            case .immunityNum:
-                return "豁免权"
-            case .lastCleanDate:
-                return "上一次铲屎时间"
-            case .nextCleanDate:
-                return "下一次铲屎时间"
-        }
-    }
-}
-
-extension CSInfo: Identifiable {
-    var id: String {
-        return self.rawValue
-    }
-}
-
 struct ChannelView: View {
     @EnvironmentObject var store: AppStore
     
@@ -45,6 +22,10 @@ struct ChannelView: View {
         workspace?.userMemberInfo
     }
     
+    var csState: CSState {
+        store.state.workspace.channel.chanshi
+    }
+    
     var body: some View {
         content
     }
@@ -57,14 +38,25 @@ struct ChannelView: View {
             case .isLoading(let last):
                 loadingView(last)
             case .loaded(let data):
-                switch store.state.workspace.channel.chanshi.userChannelState {
-                    case .notJoined:
-                        joinChannelView()
-                    case .joined:
-                        loadedView(data)
-                    case .checking:
-                        loadingView(nil)
-                            .onAppear(perform: checkUserChannelState)
+                switch store.state.workspace.channel.chanshi.trickles {
+                    case .notRequested:
+                        fetchingView()
+                            .onAppear(perform: loadAllPosts)
+                    case .isLoading:
+                        fetchingView()
+                    case .loaded:
+                        switch store.state.workspace.channel.chanshi.userChannelState {
+                            case .notJoined:
+                                joinChannelView()
+                            case .joined:
+                                loadedView(data)
+                                    .onAppear(perform: getChanShiInfo)
+                            case .checking:
+                                loadingView(nil)
+                                    .onAppear(perform: checkUserChannelState)
+                        }
+                    case .failed(let error):
+                        failedView(error)
                 }
             case .failed(let error):
                 failedView(error)
@@ -76,13 +68,11 @@ struct ChannelView: View {
 //MARK: - Side Effects
 private extension ChannelView {
     private func checkUserChannelState() {
-        guard let workspace = workspace,
-              let channel = channel.value,
-              let member = memberInfo else { return }
+        guard let member = memberInfo else {
+            return
+        }
         Task {
-            await store.send(.chanshi(action: .checkHasJoined(workspaceID: workspace.workspaceID,
-                                                              channelID: channel.groupID,
-                                                              memberID: member.memberID)))
+            await store.send(.chanshi(action: .checkHasJoined(memberID: member.memberID)))
         }
     }
     
@@ -94,6 +84,38 @@ private extension ChannelView {
                                                          channelID: channel.groupID,
                                                          memberID: member.memberID)))
     }
+    
+    private func getChanShiInfo() {
+        Task {
+            await store.send(.chanshi(action: .weekStateCheck))
+        }
+    }
+    
+    private func loadAllPosts() {
+        guard let workspace = workspace,
+              let channel = channel.value,
+              let member = memberInfo else { return }
+        Task {
+            await store.send(.chanshi(action: .listAllTrickles(workspaceID: workspace.workspaceID,
+                                                               channelID: channel.groupID,
+                                                               memberID: member.memberID)))
+        }
+    }
+    
+    private func gamble() async {
+        guard let workspace = workspace,
+              let channel = channel.value,
+              let member = memberInfo else { return }
+        
+        if case .ready = csState.userGambleState {
+            let score = Int.random(in: 0..<100)
+            await store.send(.chanshi(action: .publishScore(workspaceID: workspace.workspaceID,
+                                                            channelID: channel.groupID,
+                                                            memberID: member.memberID,
+                                                            score: score)))
+        }
+
+    }
 }
 
 
@@ -101,6 +123,14 @@ private extension ChannelView {
 private extension ChannelView {
     var notRequestedView: some View {
         Text("No data")
+    }
+    
+    func fetchingView() -> some View {
+        VStack {
+            LoadingView { _ in
+                Text("Fetching data...")
+            }
+        }
     }
     
     func loadingView(_ previouslyLoaded: GroupData?) -> some View {
@@ -132,20 +162,37 @@ extension ChannelView {
     func loadedView(_ data: GroupData) -> some View {
         NavigationStack {
             VStack {
-                AvatarView(url: URL(string: memberInfo?.avatarURL ?? ""),
-                           fallbackText: String(memberInfo?.name.prefix(2) ?? ""),
-                           size: 80)
+                Text("Week \(currentWeek)")
+                    .font(.largeTitle)
+                    .fontWeight(.black)
                 
-                Text(memberInfo?.name ?? "Unknown")
-                    .font(.title)
-                    .fontWeight(.bold)
+                Text("状态：\(csState.currentWeekState.localized)")
+                
                 List {
-                    ForEach(CSInfo.allCases) { info in
-                        HStack {
-                            Text(info.localized)
-                            Spacer()
-                            Text("0")
+                    Section {
+                        Text("铲屎状态")
+                        Button {
+                            Task {
+                                await gamble()
+                            }
+                        } label: {
+                            Text("Play")
                         }
+                    } header: {
+                        Text("本周铲屎信息")
+                    }
+                    
+                    Section {
+                        Text("豁免权数量")
+                    } header: {
+                        Text("资产")
+                    }
+                    
+                    Section {
+                        Text("累计铲屎次数")
+                        Text("总铲屎数量排名")
+                    } header: {
+                        Text("记录")
                     }
                 }
                 Spacer()

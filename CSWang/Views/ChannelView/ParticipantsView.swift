@@ -48,14 +48,11 @@ struct ParticipantsView: View {
 //MARK: - Side Effects
 extension ParticipantsView {
     private func loadParticipants() async {
-        guard let workspace = workspace,
-              let channel = channel.value else {
-            return
-        }
-        await store.send(.chanshi(action: .loadParticipants(workspaceID: workspace.workspaceID,
-                                                            channelID: channel.groupID,
-                                                            memberID: workspace.userMemberInfo.memberID,
-                                                            channelMembers: members)))
+//        guard let workspace = workspace,
+//              let channel = channel.value else {
+//            return
+//        }
+        await store.send(.chanshi(action: .loadParticipants(channelMembers: members)))
     }
 }
 
