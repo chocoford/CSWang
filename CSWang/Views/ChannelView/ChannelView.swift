@@ -86,8 +86,10 @@ private extension ChannelView {
     }
     
     private func getChanShiInfo() {
+        guard let member = memberInfo else { return }
         Task {
             await store.send(.chanshi(action: .weekStateCheck))
+            await store.send(.chanshi(action: .getUserCSInfo(memberID: member.memberID)))
         }
     }
     
@@ -170,7 +172,15 @@ extension ChannelView {
                 
                 List {
                     Section {
-                        Text("铲屎状态")
+                        HStack {
+                            Text("铲屎状态")
+                            Spacer()
+                            if let gameInfo = csState.csInfo.roundGame {
+                                Text("得分：\(gameInfo.score)")
+                            } else {
+                                Text("未得分")
+                            }
+                        }
                         Button {
                             Task {
                                 await gamble()

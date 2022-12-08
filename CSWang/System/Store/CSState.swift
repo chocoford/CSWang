@@ -106,7 +106,7 @@ struct CSState {
     var userGambleState: UserGambleState = .ready
     
     
-    var csInfo: CSUserInfo = .init()
+    var csInfo: CSUserInfo = .init() 
 }
 
 enum CSAction {
@@ -120,12 +120,12 @@ enum CSAction {
     case joinCSChannel(workspaceID: String, channelID: String, memberID: String)
     case checkHasJoined(memberID: String)
     
-    case setGameInfo(info: Loadable<CSUserInfo.GambleInfo?>)
+    case setGameInfo(info: CSUserInfo.GambleInfo?)
     case publishScore(workspaceID: String, channelID: String, memberID: String, score: Int)
     
     case weekStateCheck
     
-    case getUserLatestGameInfo(workspaceID: String, channelID: String, memberID: String)
+    case getUserCSInfo(memberID: String)
     case getLatestSummary
 }
 
@@ -167,9 +167,9 @@ func csReducer(state: inout CSState,
             guard state.trickles.state == .loaded else { break }
             state.participants = .isLoading(last: state.participants.value)
             
-            let posts = state.trickles.value?.values.filter { trickle in
+            let posts = state.allTrickles.filter { trickle in
                 TrickleIntergratable.getType(trickle.blocks) == .helloWorld
-            } ?? []
+            }
             var uniqueMemberIDs = Set<String>()
             for post in posts {
                 uniqueMemberIDs.insert(post.authorMemberInfo.memberID)
@@ -177,8 +177,7 @@ func csReducer(state: inout CSState,
             let participants: [MemberData] = channelMembers.filter {
                 uniqueMemberIDs.contains($0.memberID)
             }
-            return Just(.chanshi(action: .setParticipants(members: participants)))
-                .eraseToAnyPublisher()
+            state.participants = .loaded(data: participants.formDictionary(key: \.memberID))
             
         case .setUserChannelState(let channelState):
             state.userChannelState = channelState
@@ -250,8 +249,8 @@ func csReducer(state: inout CSState,
                 break
             }
             
-            let latestGambleWeek = getWeek(second: latestGamble.createAt)
-            let latestSummaryWeek = getWeek(second: latestSummary.createAt)
+            let latestGambleWeek = getWeek(ms: latestGamble.createAt)
+            let latestSummaryWeek = getWeek(ms: latestSummary.createAt)
             
             guard latestSummaryWeek < currentWeek else {
                 setAsFinishedWeek()
@@ -263,36 +262,29 @@ func csReducer(state: inout CSState,
             // TODO: publish summary
             
             
-        case .getUserLatestGameInfo(let workspaceID, let channelID, let memberID):
-//            return environment.trickleWebRepository
-//                .listPosts(workspaceID: workspaceID, query: .init(workspaceID: workspaceID,
-//                                                                  receiverID: channelID,
-//                                                                  memberID: memberID,
-//                                                                  authorID: memberID))
-//                .map {
-//                    guard let post: TrickleData = $0.items.first(where: {
-//                        return TrickleIntergratable.getType($0.blocks)?.id == TrickleIntergratable.PostType.gamble(score: 0).id
-//                    }) else {
-//                        return .nap
-//                    }
-//                    guard let gameInfo = TrickleIntergratable.extractGameInfo(post.blocks) else {
-//                        return .nap
-//                    }
-//
-//                    if gameInfo.weekNum == currentWeek {
-//                        return .chanshi(action: .setGameInfo(info: .loaded(data: .init(weekNum: gameInfo.weekNum,
-//                                                                                                score: gameInfo.score,
-//                                                                                                rank: nil,
-//                                                                                                absent: false,
-//                                                                                                isValid: true))))
-//                    } else {
-//                        return .chanshi(action: .setCsInfo(info: .loaded(data: nil)))
-//                    }
-//                }
-//                .catch { _ in
-//                    return Just(.nap)
-//                }
-//                .eraseToAnyPublisher()
+            
+        case .getUserCSInfo(let memberID):
+            /// 只有两种状态：
+            /// 1. 新的一周，用户是第一人
+            /// 2. 进行中的周
+            guard state.trickles.state == .loaded else { break }
+            let latestUserGamble = state.allTrickles.first {
+                if case .gamble = TrickleIntergratable.getType($0.blocks),
+                   $0.authorMemberInfo.memberID == memberID { return true }
+                return false
+            }
+            
+            guard let latestUserGamble = latestUserGamble else { break }
+            
+            let latestUserGambleWeek = getWeek(ms: latestUserGamble.createAt)
+            
+            if latestUserGambleWeek == currentWeek {
+                let gameInfo = TrickleIntergratable.extractGameInfo(latestUserGamble)
+                state.csInfo.roundGame = gameInfo
+            } else {
+                state.csInfo.roundGame = nil
+            }
+            
             break
         
         case .getLatestSummary:

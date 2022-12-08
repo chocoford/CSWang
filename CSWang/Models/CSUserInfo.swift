@@ -8,10 +8,6 @@
 import Foundation
 
 struct CSUserInfo {
-//    /// trickle member info
-//    let name: String
-//    let avatarURL: String
-    
     // MARK: - app user info
     let immunityNum: Int
     let lastCleanDate: Date?
@@ -22,18 +18,18 @@ struct CSUserInfo {
         /// 从一年开始周数
         let weekNum: Int
         let score: Int
-        let rank: Int?
+        var rank: Int? = nil
         
         let absent: Bool
         /// 有可能被修改，如果有editAt，则视作无效
         let isValid: Bool
     }
     
-    var roundGame: Loadable<GambleInfo?>
+    var roundGame: GambleInfo?
     var historyGames: [GambleInfo] = []
     
 //name: String, avatarURL: String,
-    init(immunityNum: Int = 0, lastCleanDate: Date? = nil, nextCleanDate: Date? = nil, roundGame: Loadable<GambleInfo?> = .notRequested) {
+    init(immunityNum: Int = 0, lastCleanDate: Date? = nil, nextCleanDate: Date? = nil, roundGame: GambleInfo? = nil) {
 //        self.name = name
 //        self.avatarURL = avatarURL
         self.immunityNum = immunityNum

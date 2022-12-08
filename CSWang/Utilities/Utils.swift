@@ -31,8 +31,8 @@ var currentWeek: Int {
     return week
 }
 
-func getWeek(second: Int) -> Int {
+func getWeek(ms: Int) -> Int {
     let calendar = Calendar.current
-    let week = calendar.component(.weekOfYear, from: Date(timeIntervalSince1970: Double(second) / 1000))
+    let week = calendar.component(.weekOfYear, from: Date(timeIntervalSince1970: Double(ms)))
     return week
 }

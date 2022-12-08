@@ -268,7 +268,7 @@ struct TrickleIntergratable {
         }) else {
             return nil
         }
-        guard let gameInfo = TrickleIntergratable.extractGameInfo(post.blocks) else {
+        guard let gameInfo = TrickleIntergratable.extractGameInfo(post) else {
             return nil
         }
         
@@ -283,15 +283,16 @@ struct TrickleIntergratable {
         }
     }
     
-    static func extractGameInfo(_ blocks: [Block]) -> CSUserInfo.GambleInfo? {
-        guard getType(blocks) == .gamble(score: 0) else {
+    static func extractGameInfo(_ trickle: TrickleData) -> CSUserInfo.GambleInfo? {
+        let blocks = trickle.blocks
+        guard case .gamble = getType(blocks) else {
             return nil
         }
         guard blocks.count == 3 else {
             return nil
         }
         let weekBlock = blocks[1]
-        guard weekBlock.type == .h1,
+        guard weekBlock.type == .h3,
               let weekElement = weekBlock.elements,
               weekElement.count == 1,
               let weekString = weekElement[0].value,
@@ -306,8 +307,7 @@ struct TrickleIntergratable {
 
         return .init(weekNum: week,
                      score: score,
-                     rank: 0,
                      absent: false,
-                     isValid: true)
+                     isValid: trickle.editAt == nil)
     }
 }
