@@ -181,20 +181,7 @@ extension ChannelView {
                 }
                 .padding(.vertical)
                 ScrollView {
-                    gameInfoRow
-                    rankChartView
-//                    Section {
-//                        Text("豁免权数量")
-//                    } header: {
-//                        Text("资产")
-//                    }
-//
-//                    Section {
-//                        Text("累计铲屎次数")
-//                        Text("总铲屎数量排名")
-//                    } header: {
-//                        Text("记录")
-//                    }
+                    gameInfoView
                 }
             }
             .padding(.horizontal)
@@ -226,8 +213,8 @@ extension ChannelView {
     }
 }
 
-// MARK: - Components
-extension ChannelView {
+// MARK: - Components: Game Info View
+private extension ChannelView {
     func GameInfoCard(title: String, content: String) -> some View {
         VStack {
             Text(title)
@@ -280,6 +267,29 @@ extension ChannelView {
             BarMark(x: .value("score", $0.score), y: .value("participant", $0.memberData.name))
         }
     }
+    
+    @ViewBuilder var gameInfoView: some View {
+        VStack {
+            gameInfoRow
+            rankChartView
+        }
+    }
+}
+
+// MARK: - Components: Properties(资产) View
+private extension ChannelView {
+//    Section {
+//        Text("豁免权数量")
+//    } header: {
+//        Text("资产")
+//    }
+//    
+//    Section {
+//        Text("累计铲屎次数")
+//        Text("总铲屎数量排名")
+//    } header: {
+//        Text("记录")
+//    }
 }
 
 struct ChannelView_Previews: PreviewProvider {
