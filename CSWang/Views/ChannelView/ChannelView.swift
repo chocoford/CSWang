@@ -171,33 +171,16 @@ extension ChannelView {
     func loadedView(_ data: GroupData) -> some View {
         NavigationStack {
             VStack {
-                Text("Week \(currentWeek)")
-                    .font(.largeTitle)
-                    .fontWeight(.black)
-                
-                Text("状态：\(csState.currentWeekState.localized)")
-                
-                List {
-                    Section {
-                        HStack {
-                            Text("铲屎状态")
-                            Spacer()
-                            if let gameInfo = csState.csInfo.roundGame {
-                                Text("得分：\(gameInfo.score)")
-                            } else {
-                                Text("未得分")
-                            }
-                        }
-                        Button {
-                            Task {
-                                await gamble()
-                            }
-                        } label: {
-                            Text("Play")
-                        }
-                    } header: {
-                        Text("本周铲屎信息")
-                    }
+                VStack {
+                    Text("Week \(currentWeek)")
+                        .font(.largeTitle)
+                        .fontWeight(.black)
+                    
+                    Text("状态：\(csState.currentWeekState.localized)")
+                }
+                .padding(.vertical)
+                ScrollView {
+                    gameInfoRow
                     
                     Section {
                         Text("豁免权数量")
@@ -212,9 +195,8 @@ extension ChannelView {
                         Text("记录")
                     }
                 }
-                Spacer()
-                
             }
+            .padding(.horizontal)
             .navigationTitle(workspace?.name ?? "")
             .toolbar {
                 NavigationLink {
@@ -226,6 +208,7 @@ extension ChannelView {
             }
         }
     }
+
     
     func joinChannelView() -> some View {
         VStack {
@@ -238,6 +221,56 @@ extension ChannelView {
                 Text("Join")
             }
             .buttonStyle(PrimaryButtonStyle())
+        }
+    }
+}
+
+// MARK: - Components
+extension ChannelView {
+    func GameInfoCard(title: String, content: String) -> some View {
+        VStack {
+            Text(title)
+            Text(content)
+                .font(.title)
+                .fontWeight(.bold)
+                .padding(6)
+        }
+    }
+    
+    @ViewBuilder var gameInfoRow: some View {
+        VStack(alignment: .leading) {
+            Text("Game")
+                .font(.subheadline)
+                .foregroundColor(.gray)
+            
+            HStack {
+                Spacer()
+                GameInfoCard(title: "Score", content: csState.csInfo.roundGame != nil ? "\(csState.csInfo.roundGame!.score)" : "-")
+                Spacer()
+                Divider()
+                Spacer()
+                GameInfoCard(title: "Rank", content: csState.csInfo.roundGame != nil ? "\(csState.csInfo.roundGame!.score)" : "-")
+                Spacer()
+            }
+            .padding()
+            .background(.ultraThickMaterial)
+            .if(csState.csInfo.roundGame == nil, transform: { content in
+                content
+                    .overlay(.ultraThinMaterial.opacity(0.9))
+                    .overlay {
+                        Button {
+                            Task {
+                                await gamble()
+                            }
+                        } label: {
+                            Text("Play")
+                                .padding(.horizontal)
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .shadow(radius: 4)
+                    }
+            })
+                .containerShape(RoundedRectangle(cornerRadius: 8))
         }
     }
 }
