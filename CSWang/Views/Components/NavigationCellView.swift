@@ -19,12 +19,12 @@ struct NavigationCellView<V: View, P : Hashable>: View {
     
     var body: some View {
         
-#if os(macOS)
-        /// Cause bugs when wrapped in `ZStack`
-        NavigationLink(value: value) {
-            content()
-        }
-#elseif os(iOS)
+//#if os(macOS)
+//        /// Cause bugs when wrapped in `ZStack`
+//        NavigationLink(value: value) {
+//            content()
+//        }
+//#elseif os(iOS)
         ZStack {
             content()
             NavigationLink(value: value) {
@@ -33,7 +33,7 @@ struct NavigationCellView<V: View, P : Hashable>: View {
             .opacity(0)
             .buttonStyle(.plain)
         }
-#endif
+//#endif
         
     }
 }

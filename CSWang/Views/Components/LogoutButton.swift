@@ -18,6 +18,7 @@ struct LogoutButton: View {
         } label: {
             Image(systemName: "rectangle.portrait.and.arrow.right")
         }
+        .buttonStyle(SecondaryButtonStyle())
     }
 }
 

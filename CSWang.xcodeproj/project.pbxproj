@@ -40,6 +40,7 @@
 		39D289A8294077C600846BF6 /* WorkspaceChooseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289A7294077C600846BF6 /* WorkspaceChooseView.swift */; };
 		39D289AB2940886B00846BF6 /* CSUserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289AA2940886B00846BF6 /* CSUserInfo.swift */; };
 		39D289AD29419C6C00846BF6 /* Dictionary+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289AC29419C6C00846BF6 /* Dictionary+Extension.swift */; };
+		39D289AF2943A24100846BF6 /* SecondaryButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289AE2943A24100846BF6 /* SecondaryButtonStyle.swift */; };
 		39EF55F62937AB0B005F10F4 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F52937AB0B005F10F4 /* AvatarView.swift */; };
 		39EF55FA2937C19F005F10F4 /* MemberCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F92937C19F005F10F4 /* MemberCardView.swift */; };
 		39EF55FD2937CB1F005F10F4 /* ShapeBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 39EF55FC2937CB1F005F10F4 /* ShapeBuilder */; };
@@ -116,6 +117,7 @@
 		39D289A7294077C600846BF6 /* WorkspaceChooseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkspaceChooseView.swift; sourceTree = "<group>"; };
 		39D289AA2940886B00846BF6 /* CSUserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSUserInfo.swift; sourceTree = "<group>"; };
 		39D289AC29419C6C00846BF6 /* Dictionary+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Extension.swift"; sourceTree = "<group>"; };
+		39D289AE2943A24100846BF6 /* SecondaryButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryButtonStyle.swift; sourceTree = "<group>"; };
 		39EF55F52937AB0B005F10F4 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 		39EF55F92937C19F005F10F4 /* MemberCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberCardView.swift; sourceTree = "<group>"; };
 		39F12D2B2933CF8F005F5D48 /* CSWang.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CSWang.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -357,6 +359,7 @@
 			isa = PBXGroup;
 			children = (
 				39F12D7829347B31005F5D48 /* PrimaryButtonStyle.swift */,
+				39D289AE2943A24100846BF6 /* SecondaryButtonStyle.swift */,
 				39A9B4B1293782CC002599FE /* ListButtonStyle.swift */,
 				390B469D2939B6ED00E15DC3 /* CellListStyle.swift */,
 			);
@@ -542,6 +545,7 @@
 				390B46B2293B2E2300E15DC3 /* CreateChannelDetailView.swift in Sources */,
 				39A9B4B2293782CC002599FE /* ListButtonStyle.swift in Sources */,
 				39D289A3293EF74B00846BF6 /* ParticipantsView.swift in Sources */,
+				39D289AF2943A24100846BF6 /* SecondaryButtonStyle.swift in Sources */,
 				390B46A82939DEAE00E15DC3 /* ChannelState.swift in Sources */,
 				390B46A42939CBDA00E15DC3 /* CreateChannelView.swift in Sources */,
 				39F12D7929347B31005F5D48 /* PrimaryButtonStyle.swift in Sources */,

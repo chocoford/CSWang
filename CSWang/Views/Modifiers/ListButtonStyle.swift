@@ -55,7 +55,7 @@ struct ListLabelStyle: LabelStyle {
                 .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(active ? Color.accentColor :  hovering ? Color.gray.opacity(0.5) : Color.clear)
+                        .fill(active ? Color.second.active :  hovering ? Color.second.hovered : Color.second.default)
                 )
                 .animation(.easeOut(duration: 0.2), value: hovering)
                 .onHover { over in
