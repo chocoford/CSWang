@@ -121,16 +121,17 @@ extension TrickleWebRepository {
             let text: String?
             let until: Int?
             let limit: Int?
+            let order: Int?
             
             enum CodingKeys: String, CodingKey {
                 case workspaceID = "workspaceId"
                 case receiverID = "receiverIds"
                 case memberID = "memberId"
                 case authorID = "authorId"
-                case text, until, limit
+                case text, until, limit, order
             }
             
-            init(workspaceID: String, receiverID: String, memberID: String, authorID: String? = nil, text: String? = nil, until: Int? = nil, limit: Int? = 10) {
+            init(workspaceID: String, receiverID: String, memberID: String, authorID: String? = nil, text: String? = nil, until: Int? = nil, limit: Int? = 10, order: Int? = nil) {
                 self.workspaceID = workspaceID
                 self.receiverID = receiverID
                 self.memberID = memberID
@@ -138,6 +139,7 @@ extension TrickleWebRepository {
                 self.text = text
                 self.until = until
                 self.limit = limit
+                self.order = order
             }
         }
         case listPosts(workspaceID: String, payload: ListPostsQuery)

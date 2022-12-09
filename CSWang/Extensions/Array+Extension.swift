@@ -15,4 +15,18 @@ extension Array {
         }
         return dic
     }
+    
+    /// ignore duplicate keys in array
+    func removeDuplicate(keyPath: KeyPath<Self.Element, String>) -> Self {
+        var set = Set<String>()
+        var results: Self = []
+        for item in self {
+            let key = item[keyPath: keyPath]
+            guard !set.contains(key) else { continue }
+            set.insert(key)
+            results.append(item)
+        }
+        return results
+    }
 }
+

@@ -12,14 +12,8 @@ struct Block: Codable {
     enum BlockType: String, Codable {
         case h1, h2, h3
         case richText = "rich_texts"
-        case divider
-        case numberedList
-        
-        enum CodingKeys: String, CodingKey {
-            case h1, h2, h3, divider
-            case richText = "rich_texts"
-            case numberedList = "number_list"
-        }
+        case divider = "hr"
+        case numberedList = "number_list"
     }
     
     let id: String
@@ -79,7 +73,7 @@ struct TrickleIntergratable {
         case helloWorld
         case membersChange(invitedMembers: [MemberData])
         case gamble(score: Int)
-        case summary(userIDAndScores: [(String, Int)])
+        case summary(memberAndScores: [(MemberData, Int)])
         
         var id: String {
             switch self {
@@ -147,7 +141,7 @@ struct TrickleIntergratable {
                             Element(.text, text: "I get a score of \(score) in this round.", value: "\(score)")
                           ])
                 ]
-            case .summary(let userIDAndScores):
+            case .summary(let memberAndScores):
                 blocks += [
                     Block(type: .h3,
                           elements: [
@@ -161,12 +155,12 @@ struct TrickleIntergratable {
                           elements: [
                             Element(.text, text: "")
                           ])
-                ] + userIDAndScores.enumerated().map { (index, tuple) in
+                ] + memberAndScores.sorted(by: {$0.1 > $1.1}).enumerated().map { (index, tuple) in
                     Block(type: .numberedList,
                           value: "\(index + 1).",
                           elements: [
-                            Element(.user, text: "", value: tuple.0),
-                            Element(.text, text: "", value: "\(tuple.1)"),
+                            Element(.user, text: "\(tuple.0.name)", value: tuple.0.memberID),
+                            Element(.text, text: " got a score of \(tuple.1)", value: "\(tuple.1)"),
                           ])
                 }
         }
@@ -187,6 +181,9 @@ struct TrickleIntergratable {
                 
             case PostType.gamble(score: 0).id:
                 return PostType.gamble(score: 0)
+                
+            case PostType.summary(memberAndScores: []).id:
+                return PostType.summary(memberAndScores: [])
                 
             default:
                 return nil
@@ -210,7 +207,7 @@ struct TrickleIntergratable {
     
     static func getLatestSummary(trickles: [TrickleData]) -> SummaryInfo? {
         for trickle in trickles {
-            if TrickleIntergratable.getType(trickle.blocks)?.id != TrickleIntergratable.PostType.summary(userIDAndScores: []).id {
+            if case .summary = TrickleIntergratable.getType(trickle.blocks) {
                 continue
             }
             guard trickle.blocks.count > 3 else { continue }
@@ -262,26 +259,26 @@ struct TrickleIntergratable {
         return nil
     }
     
-    static func getLatestGameInfo(from trickles: [TrickleData]) -> CSUserInfo.GambleInfo? {
-        guard let post = trickles.first(where: {
-            TrickleIntergratable.getType($0.blocks)?.id == TrickleIntergratable.PostType.gamble(score: 0).id
-        }) else {
-            return nil
-        }
-        guard let gameInfo = TrickleIntergratable.extractGameInfo(post) else {
-            return nil
-        }
-        
-        if gameInfo.weekNum == currentWeek {
-            return .init(weekNum: gameInfo.weekNum,
-                         score: gameInfo.score,
-                         rank: nil,
-                         absent: false,
-                         isValid: true)
-        } else {
-            return nil
-        }
-    }
+//    static func getLatestGameInfo(from trickles: [TrickleData]) -> CSUserInfo.GambleInfo? {
+//        guard let post = trickles.first(where: {
+//            TrickleIntergratable.getType($0.blocks)?.id == TrickleIntergratable.PostType.gamble(score: 0).id
+//        }) else {
+//            return nil
+//        }
+//        guard let gameInfo = TrickleIntergratable.extractGameInfo(post) else {
+//            return nil
+//        }
+//
+//        if gameInfo.weekNum == currentWeek {
+//            return .init(weekNum: gameInfo.weekNum,
+//                         score: gameInfo.score,
+//                         rank: nil,
+//                         absent: false,
+//                         isValid: true)
+//        } else {
+//            return nil
+//        }
+//    }
     
     static func extractGameInfo(_ trickle: TrickleData) -> CSUserInfo.GambleInfo? {
         let blocks = trickle.blocks
@@ -305,9 +302,32 @@ struct TrickleIntergratable {
               let value = scoreElements[0].value,
               let score = Int(value) else { return nil }
 
-        return .init(weekNum: week,
+        return .init(memberData: trickle.authorMemberInfo,
+                     weekNum: week,
                      score: score,
                      absent: false,
                      isValid: trickle.editAt == nil)
+    }
+    
+    static func roundGamesNum(_ trickles: [TrickleData]) -> Int {
+        let trickles = trickles.filter {
+            getWeek(second: $0.createAt) == currentWeek
+        }
+        return trickles.count
+    }
+    
+    static func getWeeklyGameInfos(_ trickles: [TrickleData]) -> [CSUserInfo.GambleInfo] {
+        let weeklyGambleTrickles = trickles.filter {
+            if getWeek(second: $0.createAt) == currentWeek,
+               case .gamble = getType($0.blocks) {
+                return true
+            }
+            return false
+        }
+            .removeDuplicate(keyPath: \.authorMemberInfo.memberID)
+        
+        return weeklyGambleTrickles.compactMap {
+            extractGameInfo($0)
+        }
     }
 }

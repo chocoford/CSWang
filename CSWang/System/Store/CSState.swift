@@ -112,6 +112,7 @@ struct CSState {
 enum CSAction {
     case setTrickles(data: Loadable<[String: TrickleData]>)
     case listAllTrickles(workspaceID: String, channelID: String, memberID: String, until: Int? = nil)
+    case freshenTrickles(workspaceID: String, channelID: String, memberID: String)
     
     case setParticipants(members: [MemberData])
     case loadParticipants(channelMembers: [MemberData])
@@ -127,6 +128,7 @@ enum CSAction {
     
     case getUserCSInfo(memberID: String)
     case getLatestSummary
+    case summarizeIfNeeded(workspaceID: String, channelID: String, memberID: String)
 }
 
 //let csReducer: Reducer<CSState, AppAction, AppEnvironment> = Reducer { state, action, environment in
@@ -159,6 +161,28 @@ func csReducer(state: inout CSState,
                     return Just(.chanshi(action: .setTrickles(data: .failed(.unexpected(error: error)))))
                 })
                 .eraseToAnyPublisher()
+            
+        case .freshenTrickles(let workspaceID, let channelID, let memberID):
+            guard case .loaded = state.trickles,
+                let nextTs = state.allTrickles.first?.createAt else { break }
+            
+            return environment.trickleWebRepository
+                .listPosts(workspaceID: workspaceID,
+                           query: .init(workspaceID: workspaceID,
+                                        receiverID: channelID,
+                                        memberID: memberID,
+                                        until: nextTs,
+                                        limit: 100,
+                                        order: 1))
+                .retry(3)
+                .map { [state] in
+                    return .chanshi(action: .setTrickles(data: .loaded(data: (state.allTrickles + $0.items).formDictionary(key: \.trickleID))))
+                }
+                .catch { _ in
+                    return Just(.nap)
+                }
+                .eraseToAnyPublisher()
+            
             
         case .setParticipants(let members):
             state.participants = .loaded(data: members.formDictionary(key: \.memberID))
@@ -219,8 +243,8 @@ func csReducer(state: inout CSState,
                             channelID: channelID,
                             payload: .init(authorMemberID: memberID,
                                            blocks: TrickleIntergratable.createPost(type: .gamble(score: score))))
-                .map { _ in
-                        .chanshi(action: .setUserChannelState(.checking))
+                .map { [state] in
+                    return .chanshi(action: .setTrickles(data: .loaded(data: ([$0] + state.allTrickles).formDictionary(key: \.trickleID))))
                 }
                 .catch {
                     logger.error("\($0)")
@@ -249,8 +273,8 @@ func csReducer(state: inout CSState,
                 break
             }
             
-            let latestGambleWeek = getWeek(ms: latestGamble.createAt)
-            let latestSummaryWeek = getWeek(ms: latestSummary.createAt)
+            let latestGambleWeek = getWeek(second: latestGamble.createAt)
+            let latestSummaryWeek = getWeek(second: latestSummary.createAt)
             
             guard latestSummaryWeek < currentWeek else {
                 setAsFinishedWeek()
@@ -276,7 +300,7 @@ func csReducer(state: inout CSState,
             
             guard let latestUserGamble = latestUserGamble else { break }
             
-            let latestUserGambleWeek = getWeek(ms: latestUserGamble.createAt)
+            let latestUserGambleWeek = getWeek(second: latestUserGamble.createAt)
             
             if latestUserGambleWeek == currentWeek {
                 let gameInfo = TrickleIntergratable.extractGameInfo(latestUserGamble)
@@ -303,6 +327,33 @@ func csReducer(state: inout CSState,
             } else {
                 
             }
+            
+        case .summarizeIfNeeded(let workspaceID, let channelID, let memberID):
+            guard state.trickles.state == .loaded else { break }
+            guard case .loaded = state.allParticipants else { break }
+            
+            let gameInfos = TrickleIntergratable.getWeeklyGameInfos(state.allTrickles)
+            
+            guard gameInfos.count == state.allParticipants.value?.count ?? 0 else {
+                break
+            }
+            
+            
+            return environment.trickleWebRepository
+                .createPost(workspaceID: workspaceID,
+                            channelID: channelID,
+                            payload: .init(authorMemberID: memberID,
+                                           blocks: TrickleIntergratable.createPost(type: .summary(memberAndScores: gameInfos.map {
+                    ($0.memberData, $0.score)
+                }))))
+                .map { [state] in
+                    return .chanshi(action: .setTrickles(data: .loaded(data: ([$0] + state.allTrickles).formDictionary(key: \.trickleID))))
+                }
+                .catch { _ in
+                    Just(.nap)
+                }
+                .eraseToAnyPublisher()
+            
     }
     
     

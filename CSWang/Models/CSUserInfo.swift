@@ -15,6 +15,7 @@ struct CSUserInfo {
     
     // MARK: - game info (this week)
     struct GambleInfo {
+        let memberData: MemberData
         /// 从一年开始周数
         let weekNum: Int
         let score: Int

@@ -101,6 +101,8 @@ private extension ChannelView {
             await store.send(.chanshi(action: .listAllTrickles(workspaceID: workspace.workspaceID,
                                                                channelID: channel.groupID,
                                                                memberID: member.memberID)))
+            
+            await store.send(.chanshi(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
         }
     }
     
@@ -115,6 +117,11 @@ private extension ChannelView {
                                                             channelID: channel.groupID,
                                                             memberID: member.memberID,
                                                             score: score)))
+            await store.send(.chanshi(action: .getUserCSInfo(memberID: member.memberID)))
+            await store.send(.chanshi(action: .summarizeIfNeeded(workspaceID: workspace.workspaceID,
+                                                                 channelID: channel.groupID,
+                                                                 memberID: member.memberID)))
+            await store.send(.chanshi(action: .weekStateCheck))
         }
 
     }
