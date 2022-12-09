@@ -89,7 +89,7 @@ private extension ChannelView {
         guard let member = memberInfo else { return }
         Task {
             await store.send(.chanshi(action: .weekStateCheck))
-            await store.send(.chanshi(action: .getUserCSInfo(memberID: member.memberID)))
+            await store.send(.chanshi(action: .getUserCSInfo(memberData: member)))
         }
     }
     
@@ -117,7 +117,7 @@ private extension ChannelView {
                                                             channelID: channel.groupID,
                                                             memberID: member.memberID,
                                                             score: score)))
-            await store.send(.chanshi(action: .getUserCSInfo(memberID: member.memberID)))
+            await store.send(.chanshi(action: .getUserCSInfo(memberData: member)))
             await store.send(.chanshi(action: .summarizeIfNeeded(workspaceID: workspace.workspaceID,
                                                                  channelID: channel.groupID,
                                                                  memberID: member.memberID)))
@@ -249,7 +249,7 @@ extension ChannelView {
                 Spacer()
                 Divider()
                 Spacer()
-                GameInfoCard(title: "Rank", content: csState.csInfo.roundGame != nil ? "\(csState.csInfo.roundGame!.score)" : "-")
+                GameInfoCard(title: "Rank", content: "\(csState.csInfo.roundGame?.rank != nil ? (csState.csInfo.roundGame!.rank! + 1).formatted() : "-")")
                 Spacer()
             }
             .padding()

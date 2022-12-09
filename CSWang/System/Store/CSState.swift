@@ -17,11 +17,11 @@ struct CSState {
                 return []
             case .isLoading(let last):
                 return last?.values.sorted {
-                    $0.createAt < $1.createAt
+                    $0.createAt > $1.createAt
                 } ?? []
             case .loaded(let data):
                 return data.values.sorted {
-                    $0.createAt < $1.createAt
+                    $0.createAt > $1.createAt
                 }
             case .failed:
                 return []
@@ -29,21 +29,11 @@ struct CSState {
     }
     
     var latestGamble: TrickleData? {
-        allTrickles.first {
-            if case .gamble = TrickleIntergratable.getType($0.blocks) {
-                return true
-            }
-            return false
-        }
+        TrickleIntergratable.getLatestGameInfo(trickles: allTrickles)
     }
     
     var latestSummary: TrickleData? {
-        allTrickles.first {
-            if case .summary = TrickleIntergratable.getType($0.blocks) {
-                return true
-            }
-            return false
-        }
+        TrickleIntergratable.getLatestSummary(trickles: allTrickles)
     }
     
     // MARK: - Participant
@@ -126,8 +116,7 @@ enum CSAction {
     
     case weekStateCheck
     
-    case getUserCSInfo(memberID: String)
-    case getLatestSummary
+    case getUserCSInfo(memberData: MemberData)
     case summarizeIfNeeded(workspaceID: String, channelID: String, memberID: String)
 }
 
@@ -287,47 +276,41 @@ func csReducer(state: inout CSState,
             
             
             
-        case .getUserCSInfo(let memberID):
-            /// 只有两种状态：
-            /// 1. 新的一周，用户是第一人
-            /// 2. 进行中的周
+        case .getUserCSInfo(let memberData):
             guard state.trickles.state == .loaded else { break }
-            let latestUserGamble = state.allTrickles.first {
-                if case .gamble = TrickleIntergratable.getType($0.blocks),
-                   $0.authorMemberInfo.memberID == memberID { return true }
-                return false
+            
+            switch state.currentWeekState {
+                case .underway:
+                    let latestUserGamble = state.allTrickles.first {
+                        if case .gamble = TrickleIntergratable.getType($0.blocks),
+                           $0.authorMemberInfo.memberID == memberData.memberID { return true }
+                        return false
+                    }
+                    
+                    guard let latestUserGamble = latestUserGamble else { break }
+                    
+                    let latestUserGambleWeek = getWeek(second: latestUserGamble.createAt)
+                    
+                    if latestUserGambleWeek == currentWeek {
+                        var gameInfo = TrickleIntergratable.extractGameInfo(latestUserGamble)
+                        TrickleIntergratable.updateGambleRank(&gameInfo, allTrickles: state.allTrickles)
+                        state.csInfo.roundGame = gameInfo
+                    } else {
+                        state.csInfo.roundGame = nil
+                    }
+                case .finished:
+                    guard let summaryTrickle = state.latestSummary else { break }
+                    guard let userGameInfo = TrickleIntergratable.getUserGameInfo(from: summaryTrickle, userMemberData: memberData) else {
+                        state.csInfo.roundGame = nil
+                        break
+                    }
+                    state.csInfo.roundGame = userGameInfo
+                    
+                case .unknown:
+                    state.csInfo.roundGame = nil
             }
-            
-            guard let latestUserGamble = latestUserGamble else { break }
-            
-            let latestUserGambleWeek = getWeek(second: latestUserGamble.createAt)
-            
-            if latestUserGambleWeek == currentWeek {
-                let gameInfo = TrickleIntergratable.extractGameInfo(latestUserGamble)
-                state.csInfo.roundGame = gameInfo
-            } else {
-                state.csInfo.roundGame = nil
-            }
-            
             break
-        
-        case .getLatestSummary:
-            guard state.trickles.state == .loaded else { break }
-            
-            if let summaryInfo = TrickleIntergratable.getLatestSummary(trickles: state.allTrickles) {
-                if summaryInfo.week == currentWeek {
-                    state.currentWeekState = .finished
-                    state.lastWeekState = .finished
-                } else if summaryInfo.week == currentWeek - 1 {
-                    state.currentWeekState = .underway
-                    state.lastWeekState = .finished
-                } else {
-                    // 依次补发
-                }
-            } else {
-                
-            }
-            
+
         case .summarizeIfNeeded(let workspaceID, let channelID, let memberID):
             guard state.trickles.state == .loaded else { break }
             guard case .loaded = state.allParticipants else { break }

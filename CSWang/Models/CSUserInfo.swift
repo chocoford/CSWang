@@ -21,7 +21,7 @@ struct CSUserInfo {
         let score: Int
         var rank: Int? = nil
         
-        let absent: Bool
+//        let absent: Bool
         /// 有可能被修改，如果有editAt，则视作无效
         let isValid: Bool
     }

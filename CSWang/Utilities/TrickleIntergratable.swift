@@ -205,56 +205,20 @@ struct TrickleIntergratable {
         }
     }
     
-    static func getLatestSummary(trickles: [TrickleData]) -> SummaryInfo? {
+    static func getLatestGameInfo(trickles: [TrickleData]) -> TrickleData? {
         for trickle in trickles {
-            if case .summary = TrickleIntergratable.getType(trickle.blocks) {
-                continue
+            if extractGameInfo(trickle) != nil {
+                return trickle
             }
-            guard trickle.blocks.count > 3 else { continue }
-            
-            let weekBlock = trickle.blocks[1]
-            guard weekBlock.type == .h3,
-                  let weekElement = weekBlock.elements,
-                  weekElement.count == 1,
-                  let weekString = weekElement[0].value,
-                  let week = Int(weekString) else {
-                continue
+        }
+        return nil
+    }
+    
+    static func getLatestSummary(trickles: [TrickleData]) -> TrickleData? {
+        for trickle in trickles {
+            if extractSummaryInfo(trickle) != nil {
+                return trickle
             }
-            
-            var needContinue = false
-            var resultRanks: [(String, Int)] = []
-            for block in trickle.blocks.suffix(trickle.blocks.count - 2) {
-                guard block.type == .numberedList else {
-                    needContinue = true
-                    break
-                }
-                
-                guard let elements = block.elements,
-                      elements.count == 2 else {
-                    needContinue = true
-                    break
-                }
-                
-                let userElement = elements[0]
-                guard let memberID = userElement.value else {
-                    needContinue = true
-                    break
-                }
-                let scoreElement = elements[1]
-                guard let scoreString = scoreElement.value,
-                      let score = Int(scoreString) else {
-                    needContinue = true
-                    break
-                }
-                
-                resultRanks.append((memberID, score))
-            }
-            if needContinue {
-                continue
-            }
-            
-            return .init(week: week,
-                         rankedParticipantIDsAndScores: resultRanks)
         }
         return nil
     }
@@ -305,8 +269,66 @@ struct TrickleIntergratable {
         return .init(memberData: trickle.authorMemberInfo,
                      weekNum: week,
                      score: score,
-                     absent: false,
                      isValid: trickle.editAt == nil)
+    }
+    
+    static func updateGambleRank(_ gameInfo: inout CSUserInfo.GambleInfo?, allTrickles: [TrickleData]) {
+        guard gameInfo != nil else { return }
+        let rank = allTrickles.filter {
+            getWeek(second: $0.createAt) == currentWeek
+        }
+            .compactMap {
+                extractGameInfo($0)
+            }
+            .sorted {
+                $0.score > $1.score
+            }
+            .firstIndex {
+                $0.memberData.memberID == gameInfo!.memberData.memberID
+            }
+        gameInfo!.rank = rank
+    }
+    
+    static func extractSummaryInfo(_ trickle: TrickleData) -> SummaryInfo? {
+        guard case .summary = TrickleIntergratable.getType(trickle.blocks) else {
+            return nil
+        }
+        guard trickle.blocks.count > 3 else { return nil }
+        
+        let weekBlock = trickle.blocks[1]
+        guard weekBlock.type == .h3,
+              let weekElement = weekBlock.elements,
+              weekElement.count == 1,
+              let weekString = weekElement[0].value,
+              let week = Int(weekString) else {
+            return nil
+        }
+        
+        var resultRanks: [(String, Int)] = []
+        let rankLists = trickle.blocks.suffix(trickle.blocks.count - 4)
+        for block in rankLists {
+            guard block.type == .numberedList else {
+                return nil
+            }
+            
+            guard let elements = block.elements,
+                  elements.count == 2 else {
+                return nil
+            }
+            
+            let userElement = elements[0]
+            guard let memberID = userElement.value else {
+                return nil
+            }
+            let scoreElement = elements[1]
+            guard let scoreString = scoreElement.value,
+                  let score = Int(scoreString) else {
+                return nil
+            }
+            resultRanks.append((memberID, score))
+        }
+        
+        return .init(week: week, rankedParticipantIDsAndScores: resultRanks)
     }
     
     static func roundGamesNum(_ trickles: [TrickleData]) -> Int {
@@ -329,5 +351,21 @@ struct TrickleIntergratable {
         return weeklyGambleTrickles.compactMap {
             extractGameInfo($0)
         }
+    }
+    
+    static func getUserGameInfo(from summary: TrickleData, userMemberData: MemberData) -> CSUserInfo.GambleInfo? {
+        guard let summaryData = extractSummaryInfo(summary),
+              let summaryIndex = summaryData.rankedParticipantIDsAndScores.firstIndex(where: {
+            $0.0 == userMemberData.memberID
+        }) else {
+            return nil
+        }
+        let summaryTuple = summaryData.rankedParticipantIDsAndScores[summaryIndex]
+        
+        return .init(memberData: userMemberData,
+                     weekNum: summaryData.week,
+                     score: summaryTuple.1,
+                     rank: summaryIndex,
+                     isValid: summary.editAt == nil)
     }
 }
