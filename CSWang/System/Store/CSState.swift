@@ -36,6 +36,20 @@ struct CSState {
         TrickleIntergratable.getLatestSummary(trickles: allTrickles)
     }
     
+    var weeklyGambles: [TrickleData] {
+        TrickleIntergratable.getWeeklyGambles(allTrickles)
+    }
+    
+    var weeklyGameInfos: [CSUserInfo.GambleInfo] {
+        TrickleIntergratable.getWeeklyGambles(allTrickles)
+            .compactMap {
+                TrickleIntergratable.extractGameInfo($0)
+            }
+            .sorted {
+                $0.rank ?? 0 < $1.rank ?? 0
+            }
+    }
+    
     // MARK: - Participant
     var participants: Loadable<[String : MemberData]> = .notRequested
     

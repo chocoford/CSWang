@@ -223,27 +223,6 @@ struct TrickleIntergratable {
         return nil
     }
     
-//    static func getLatestGameInfo(from trickles: [TrickleData]) -> CSUserInfo.GambleInfo? {
-//        guard let post = trickles.first(where: {
-//            TrickleIntergratable.getType($0.blocks)?.id == TrickleIntergratable.PostType.gamble(score: 0).id
-//        }) else {
-//            return nil
-//        }
-//        guard let gameInfo = TrickleIntergratable.extractGameInfo(post) else {
-//            return nil
-//        }
-//
-//        if gameInfo.weekNum == currentWeek {
-//            return .init(weekNum: gameInfo.weekNum,
-//                         score: gameInfo.score,
-//                         rank: nil,
-//                         absent: false,
-//                         isValid: true)
-//        } else {
-//            return nil
-//        }
-//    }
-    
     static func extractGameInfo(_ trickle: TrickleData) -> CSUserInfo.GambleInfo? {
         let blocks = trickle.blocks
         guard case .gamble = getType(blocks) else {
@@ -336,6 +315,19 @@ struct TrickleIntergratable {
             getWeek(second: $0.createAt) == currentWeek
         }
         return trickles.count
+    }
+    
+    static func getWeeklyGambles(_ trickles: [TrickleData]) -> [TrickleData] {
+        let weeklyGambleTrickles = trickles.filter {
+            if getWeek(second: $0.createAt) == currentWeek,
+               case .gamble = getType($0.blocks) {
+                return true
+            }
+            return false
+        }
+            .removeDuplicate(keyPath: \.authorMemberInfo.memberID)
+        
+        return weeklyGambleTrickles
     }
     
     static func getWeeklyGameInfos(_ trickles: [TrickleData]) -> [CSUserInfo.GambleInfo] {

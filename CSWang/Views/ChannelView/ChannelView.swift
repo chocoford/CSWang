@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Charts
 
 struct ChannelView: View {
     @EnvironmentObject var store: AppStore
@@ -181,19 +182,19 @@ extension ChannelView {
                 .padding(.vertical)
                 ScrollView {
                     gameInfoRow
-                    
-                    Section {
-                        Text("豁免权数量")
-                    } header: {
-                        Text("资产")
-                    }
-                    
-                    Section {
-                        Text("累计铲屎次数")
-                        Text("总铲屎数量排名")
-                    } header: {
-                        Text("记录")
-                    }
+                    rankChartView
+//                    Section {
+//                        Text("豁免权数量")
+//                    } header: {
+//                        Text("资产")
+//                    }
+//
+//                    Section {
+//                        Text("累计铲屎次数")
+//                        Text("总铲屎数量排名")
+//                    } header: {
+//                        Text("记录")
+//                    }
                 }
             }
             .padding(.horizontal)
@@ -271,6 +272,12 @@ extension ChannelView {
                     }
             })
                 .containerShape(RoundedRectangle(cornerRadius: 8))
+        }
+    }
+    
+    @ViewBuilder var rankChartView: some View {
+        Chart(store.state.workspace.channel.chanshi.weeklyGameInfos, id: \.memberData) {
+            BarMark(x: .value("score", $0.score), y: .value("participant", $0.memberData.name))
         }
     }
 }
