@@ -41,6 +41,8 @@
 		39D289AB2940886B00846BF6 /* CSUserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289AA2940886B00846BF6 /* CSUserInfo.swift */; };
 		39D289AD29419C6C00846BF6 /* Dictionary+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289AC29419C6C00846BF6 /* Dictionary+Extension.swift */; };
 		39D289AF2943A24100846BF6 /* SecondaryButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289AE2943A24100846BF6 /* SecondaryButtonStyle.swift */; };
+		39D289B22944590B00846BF6 /* TrickleSocketRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289B12944590B00846BF6 /* TrickleSocketRepository.swift */; };
+		39D289B42944592B00846BF6 /* WebSocketStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289B32944592B00846BF6 /* WebSocketStream.swift */; };
 		39EF55F62937AB0B005F10F4 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F52937AB0B005F10F4 /* AvatarView.swift */; };
 		39EF55FA2937C19F005F10F4 /* MemberCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F92937C19F005F10F4 /* MemberCardView.swift */; };
 		39EF55FD2937CB1F005F10F4 /* ShapeBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 39EF55FC2937CB1F005F10F4 /* ShapeBuilder */; };
@@ -118,6 +120,8 @@
 		39D289AA2940886B00846BF6 /* CSUserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSUserInfo.swift; sourceTree = "<group>"; };
 		39D289AC29419C6C00846BF6 /* Dictionary+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Extension.swift"; sourceTree = "<group>"; };
 		39D289AE2943A24100846BF6 /* SecondaryButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondaryButtonStyle.swift; sourceTree = "<group>"; };
+		39D289B12944590B00846BF6 /* TrickleSocketRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrickleSocketRepository.swift; sourceTree = "<group>"; };
+		39D289B32944592B00846BF6 /* WebSocketStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketStream.swift; sourceTree = "<group>"; };
 		39EF55F52937AB0B005F10F4 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 		39EF55F92937C19F005F10F4 /* MemberCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberCardView.swift; sourceTree = "<group>"; };
 		39F12D2B2933CF8F005F5D48 /* CSWang.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CSWang.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -310,6 +314,7 @@
 			isa = PBXGroup;
 			children = (
 				39F12D6D2933D6FE005F5D48 /* TrickleWebRepository.swift */,
+				39D289B12944590B00846BF6 /* TrickleSocketRepository.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -320,6 +325,7 @@
 				39F12D5E2933D072005F5D48 /* Store.swift */,
 				39F12D642933D250005F5D48 /* APICall.swift */,
 				39F12D622933D235005F5D48 /* WebRepository.swift */,
+				39D289B32944592B00846BF6 /* WebSocketStream.swift */,
 				39F12D6F2933DC69005F5D48 /* KeychainHelper.swift */,
 				39D2899D293E56A300846BF6 /* TrickleIntergratable.swift */,
 				39F12D812934C2BB005F5D48 /* WebAuth.swift */,
@@ -489,6 +495,7 @@
 			packageReferences = (
 				39A9B49E29361F32002599FE /* XCRemoteSwiftPackageReference "JWTDecode" */,
 				39EF55FB2937CB1F005F10F4 /* XCRemoteSwiftPackageReference "ShapeBuilder" */,
+				39D289B029444EBC00846BF6 /* XCRemoteSwiftPackageReference "socket" */,
 			);
 			productRefGroup = 39F12D2C2933CF8F005F5D48 /* Products */;
 			projectDirPath = "";
@@ -542,6 +549,7 @@
 				39F12D652933D250005F5D48 /* APICall.swift in Sources */,
 				39EF55FA2937C19F005F10F4 /* MemberCardView.swift in Sources */,
 				39F12D312933CF8F005F5D48 /* ContentView.swift in Sources */,
+				39D289B42944592B00846BF6 /* WebSocketStream.swift in Sources */,
 				390B46B2293B2E2300E15DC3 /* CreateChannelDetailView.swift in Sources */,
 				39A9B4B2293782CC002599FE /* ListButtonStyle.swift in Sources */,
 				39D289A3293EF74B00846BF6 /* ParticipantsView.swift in Sources */,
@@ -572,6 +580,7 @@
 				390B46BB293CCA1900E15DC3 /* Loadable.swift in Sources */,
 				39D289AD29419C6C00846BF6 /* Dictionary+Extension.swift in Sources */,
 				390B46AA2939E0DF00E15DC3 /* Array+Extension.swift in Sources */,
+				39D289B22944590B00846BF6 /* TrickleSocketRepository.swift in Sources */,
 				390B46982938F37400E15DC3 /* WorkspacessListView.swift in Sources */,
 				39F12D7D293494A4005F5D48 /* Color.swift in Sources */,
 				39A9B4A829372A49002599FE /* UserState.swift in Sources */,
@@ -944,6 +953,14 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 3.0.0;
+			};
+		};
+		39D289B029444EBC00846BF6 /* XCRemoteSwiftPackageReference "socket" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
+			requirement = {
+				branch = master;
+				kind = branch;
 			};
 		};
 		39EF55FB2937CB1F005F10F4 /* XCRemoteSwiftPackageReference "ShapeBuilder" */ = {

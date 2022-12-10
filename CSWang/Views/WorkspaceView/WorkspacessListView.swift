@@ -108,14 +108,38 @@ extension WorkspacessListView {
                 setCurrentWorkspace(workspaceID: newValue?.workspaceID)
             })
             Divider()
-            HStack {
-                AvatarView(url: store.state.user.userInfo.value?.user.avatarURL,
-                           fallbackText: String((store.state.user.userInfo.value?.user.name ?? "?").prefix(2)))
-                Text(store.state.user.userInfo.value?.user.name ?? "Unknown")
+            userInfoToolbar
+                .padding()
+        }
+    }
+    
+    func toolbarView(userInfo: UserInfo?) -> some View {
+        HStack {
+            if let userInfo = userInfo {
+                AvatarView(url: userInfo.user.avatarURL,
+                           fallbackText: String((userInfo.user.name ?? "?").prefix(2)))
+                Text(userInfo.user.name ?? "Unknown")
                 Spacer()
                 LogoutButton()
+            } else {
+                Image(systemName: "person.circle")
+                    .resizable()
+                    .scaledToFit()
+                Text("Log in")
             }
-            .padding()
+        }
+    }
+    
+    @ViewBuilder var userInfoToolbar: some View {
+        switch store.state.user.userInfo {
+            case .notRequested:
+                EmptyView()
+            case .loaded(let data):
+                toolbarView(userInfo: data)
+            case .isLoading(let last):
+                toolbarView(userInfo: last)
+            case .failed(_):
+                toolbarView(userInfo: nil)
         }
     }
 }

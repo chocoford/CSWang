@@ -41,6 +41,7 @@ struct LoginSheet: ViewModifier {
             return
         }
         await store.send(.user(action: .setUserInfo(userInfo: .isLoading(last: userInfo))))
+        await store.send(.user(action: .loadUserInfo))
     }
 }
 

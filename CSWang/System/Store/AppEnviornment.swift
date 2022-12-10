@@ -9,11 +9,14 @@ import Foundation
 
 struct AppEnvironment {
     let trickleWebRepository: TrickleWebRepository
+//    let trickleWebSocket: WebSocketStream
+    //    var socket = WebSocketStream(url: <#T##URL#>)
     
     init() {
         let session = Self.configuredURLSession()
         trickleWebRepository = .init(session: session, baseURL: "https://devapp.trickle.so/api")
-        
+//        `${import.meta.env.VITE_API_DOMAIN_WS}${this.token}`
+//        trickleWebSocket = .init(url: URL(string: "?authToken=\()"), session: session)
     }
     
     private static func configuredURLSession() -> URLSession {

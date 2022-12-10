@@ -10,7 +10,11 @@ import Combine
 import OSLog
 
 struct UserState {
-    var tokenInfo: TokenInfo? = nil
+    var tokenInfo: TokenInfo? = nil {
+        willSet(val) {
+            print("will set token: \(val?.token ?? "nil")")
+        }
+    }
     var userInfo: Loadable<UserInfo> = .notRequested
 }
 
@@ -26,16 +30,6 @@ func userReducer(state: inout UserState,
                  environment: AppEnvironment) -> AnyPublisher<AppAction, Never> {
     let logger = Logger(subsystem: "CSWang", category: "userReducer")
     switch action {
-        case let .setUserInfo(userInfo):
-            state.userInfo = userInfo
-            if let userInfo = userInfo.value {
-                DispatchQueue.global().async {
-                    AuthMiddleware.shared.saveTokenToKeychain(userInfo: userInfo)
-                }
-                return Just(.workspace(action: .listWorkspaces(userID: userInfo.user.id))).eraseToAnyPublisher()
-            }
-            
-
         case .loadUserInfo:
             guard let token = AuthMiddleware.shared.token else {
                 break
@@ -53,6 +47,19 @@ func userReducer(state: inout UserState,
                     let userInfo = UserInfo(user: $0!.user, token: token)
                     return .user(action: .setUserInfo(userInfo: .loaded(data: userInfo)))
                 }
+                .eraseToAnyPublisher()
+            
+        case let .setUserInfo(userInfo):
+            state.userInfo = userInfo
+            
+            guard case .loaded = userInfo,
+                  let userInfo = userInfo.value else {
+                break
+            }
+            DispatchQueue.global().async {
+                AuthMiddleware.shared.saveTokenToKeychain(userInfo: userInfo)
+            }
+            return Just(.workspace(action: .listWorkspaces(userID: userInfo.user.id)))
                 .eraseToAnyPublisher()
     }
     
