@@ -26,13 +26,13 @@ extension WebRepository {
             return session
                 .dataTaskPublisher(for: request)
                 .map({ (data, res) in
-                    let json = try? JSONSerialization.jsonObject(with: data, options: [])
-                    if let objJson = json as? [String: Any] {
-                        logger.debug("json(object): \(objJson.debugDescription)")
-                    } else if
-                        let arrJson = json as? [[String: Any]] {
-                        logger.debug("json(array): \(arrJson.debugDescription)")
-                    }
+//                    let json = try? JSONSerialization.jsonObject(with: data, options: [])
+//                    if let objJson = json as? [String: Any] {
+//                        logger.debug("json(object): \(objJson.debugDescription)")
+//                    } else if
+//                        let arrJson = json as? [[String: Any]] {
+//                        logger.debug("json(array): \(arrJson.debugDescription)")
+//                    }
                     return (data, res)
                 })
                 .requestJSON(httpCodes: httpCodes)

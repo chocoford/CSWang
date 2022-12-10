@@ -34,7 +34,7 @@ final class AuthMiddleware {
         guard userInfo.token != nil else {
             return
         }
-        logger.info("saving user info to keychain: \(userInfo.token ?? "")")
+//        logger.info("saving user info to keychain: \(userInfo.token ?? "")")
         KeychainHelper.standard.save(userInfo, service: Self.service, account: Self.account)
         updateToken(token: userInfo.token!)
     }

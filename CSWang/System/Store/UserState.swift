@@ -10,12 +10,16 @@ import Combine
 import OSLog
 
 struct UserState {
-    var tokenInfo: TokenInfo? = nil {
+    var tokenInfo: TokenInfo? = nil
+    var userInfo: Loadable<UserInfo> = .notRequested {
         willSet(val) {
-            print("will set token: \(val?.token ?? "nil")")
+            guard case .loaded = val,
+            let token = val.value?.token else {
+                return
+            }
+            TrickleWebSocket.shared.initSocket(token: token)
         }
     }
-    var userInfo: Loadable<UserInfo> = .notRequested
 }
 
 
