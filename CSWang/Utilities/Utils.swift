@@ -41,3 +41,5 @@ func formBearer(with token: String?) -> String? {
     guard let token = token else { return nil }
     return "Bearer " + token
 }
+
+struct EmptyData: Codable {}

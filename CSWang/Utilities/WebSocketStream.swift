@@ -53,10 +53,12 @@ class WebSocketStream: AsyncSequence {
         }
     }
     
-    private func ping() {
+    func ping() {
         socket.sendPing { [weak self] error in
             if let error = error {
                 self?.logger.error("ping error: \(error)")
+            } else {
+                self?.logger.info("pong!")
             }
         }
     }
@@ -84,7 +86,7 @@ class WebSocketStream: AsyncSequence {
         }
     }
     
-    public func sendData(data: Codable) async {
+    public func send(data: Codable) async {
         socket.resume()
         do {
             logger.error("send data: \(String(describing: data))")
@@ -95,7 +97,7 @@ class WebSocketStream: AsyncSequence {
         }
     }
     
-    public func sendMessage(message: Codable) async {
+    public func send(message: Codable) async {
         socket.resume()
         do {
             logger.error("send message: \(String(describing: message))")
@@ -109,7 +111,7 @@ class WebSocketStream: AsyncSequence {
         }
     }
     
-    public func sendMessage(message: String) async {
+    public func send(message: String) async {
         socket.resume()
         do {
             logger.error("send message: \(String(describing: message))")
@@ -118,22 +120,18 @@ class WebSocketStream: AsyncSequence {
             logger.error("\(error)")
         }
     }
+    
 }
 
 
 class WebSocketStreamDelegate: NSObject, URLSessionWebSocketDelegate {
     func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didOpenWithProtocol protocol: String?) {
         print("Web socket opened")
-//        isOpened = true
-//        Task {
-//            await TrickleWebSocket.shared.stream?.sendMessage(message: TrickleWebSocket.ConnectMessage(authorization: "Bearer%20\(AuthMiddleware.shared.token!)"))
-//        }
     }
 
     
     func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
         print("Web socket closed")
-//        isOpened = false
         print(TrickleWebSocket.shared.stream?.closeCode, TrickleWebSocket.shared.stream?.closeReason)
     }
 }

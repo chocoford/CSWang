@@ -14,10 +14,11 @@ struct UserState {
     var userInfo: Loadable<UserInfo> = .notRequested {
         willSet(val) {
             guard case .loaded = val,
-            let token = val.value?.token else {
+            let token = val.value?.token,
+            let userID = val.value?.user.id else {
                 return
             }
-            TrickleWebSocket.shared.initSocket(token: token)
+            TrickleWebSocket.shared.initSocket(token: token, userID: userID)
         }
     }
 }

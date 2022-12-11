@@ -42,18 +42,6 @@ struct WorkspacessListView: View {
                 loadingView(last)
             case .loaded(let workspaces):
                 loadedView(workspaces: workspaces)
-                    .task {
-                        do {
-                            if let stream = TrickleWebSocket.shared.stream {
-                                for try await message in stream {
-//                                    if let data = JSONSerialization.data(withJSONObject: <#T##Any#>)
-                                    print(message)
-                                }
-                            }
-                        } catch {
-                            print(error)
-                        }
-                    }
             case .failed(let error):
                 failedView(error)
         }
