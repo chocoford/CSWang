@@ -52,6 +52,9 @@ struct ChannelView: View {
                             case .joined:
                                 loadedView(data)
                                     .onAppear(perform: getChanShiInfo)
+                                    .onReceive(TrickleWebSocket.shared.changeNotifyPulisher) { _ in
+                                        freshenPosts()
+                                    }
                             case .checking:
                                 loadingView(nil)
                                     .onAppear(perform: checkUserChannelState)
@@ -104,6 +107,18 @@ private extension ChannelView {
                                                                memberID: member.memberID)))
             
             await store.send(.chanshi(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
+        }
+    }
+    
+    private func freshenPosts() {
+        guard let workspace = workspace,
+              let channel = channel.value,
+              let member = memberInfo else { return }
+        Task {
+            await store.send(.chanshi(action: .freshenTrickles(workspaceID: workspace.workspaceID,
+                                                               channelID: channel.groupID,
+                                                               memberID: member.memberID)))
+            getChanShiInfo()
         }
     }
     
@@ -178,6 +193,11 @@ extension ChannelView {
                         .fontWeight(.black)
                     
                     Text("状态：\(csState.currentWeekState.localized)")
+                    if let summary = csState.lastWeekSummaryInfo,
+                       let index = summary.rankedParticipantIDsAndScores.prefix(5).firstIndex(where: {$0.0 == memberInfo?.memberID}) {
+                        Text("Your chanshi date：\(getWeekDayName(index: index))")
+                    }
+                    
                 }
                 .padding(.vertical)
                 ScrollView {
@@ -209,6 +229,28 @@ extension ChannelView {
                 Text("Join")
             }
             .buttonStyle(PrimaryButtonStyle())
+        }
+    }
+}
+
+private extension ChannelView {
+    @ViewBuilder var dutyView: some View {
+        VStack(alignment: .leading) {
+            Text("Last Week Info")
+                .font(.subheadline)
+                .foregroundColor(.gray)
+            HStack {
+                Spacer()
+                GameInfoCard(title: "Rank", content: "-")
+                Spacer()
+                Divider()
+                Spacer()
+                GameInfoCard(title: "Chanshi Date", content: "-")
+                Spacer()
+            }
+            .padding()
+            .background(.ultraThickMaterial)
+            .containerShape(RoundedRectangle(cornerRadius: 12))
         }
     }
 }

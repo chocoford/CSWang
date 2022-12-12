@@ -141,7 +141,7 @@ extension WorkspaceData: Hashable {
 
 
 // MARK: - MemberData
-struct MemberData: Codable {
+struct MemberData: Codable, Equatable {
     let name, role, status, memberID, avatarURL: String
     let email: String?
     let createAt, updateAt: Int?

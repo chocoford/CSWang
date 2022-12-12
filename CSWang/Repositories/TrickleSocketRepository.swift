@@ -7,6 +7,7 @@
 
 import Foundation
 import OSLog
+import Combine
 
 class TrickleWebSocket {
     static var shared: TrickleWebSocket = .init()
@@ -44,6 +45,8 @@ class TrickleWebSocket {
     
     var workspaceID: String?
     var memberID: String?
+    
+    var changeNotifyPulisher: PassthroughSubject<Void, Never> = .init()
     
     func initSocket(token: String, userID: String) {
         self.token = token
@@ -205,7 +208,7 @@ extension TrickleWebSocket {
                 guard let messageData = message.decode(IncomingMessage<[RoomMembers]>.self) else { fallthrough }
                 
             case .changeNotify:
-                guard let messageData = message.decode(IncomingMessage<ChangeNotifyData>.self) else { fallthrough }
+                guard let messageData = message.decode(IncomingMessage<[ChangeNotifyData]>.self) else { fallthrough }
                 logger.info("on change notify: \(messageData.description)")
                 onChangeNotify()
                 
@@ -278,7 +281,9 @@ extension TrickleWebSocket {
     }
     
     private func onChangeNotify() {
-        
+        DispatchQueue.main.async {
+            self.changeNotifyPulisher.send()
+        }
     }
 }
 
@@ -359,7 +364,7 @@ extension TrickleWebSocket {
     }
     
     struct ChangeNotifyData: Codable {
-        let codes: [String : [CodeData]]
+        let codes: [String : CodeData]
 
         struct CodeData: Codable {
             let version: Int

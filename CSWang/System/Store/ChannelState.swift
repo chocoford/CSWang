@@ -145,7 +145,7 @@ extension GroupData: Equatable {}
 
 
 // MARK: - TrickleData
-struct TrickleData: Codable {
+struct TrickleData: Codable, Equatable {
     let trickleID: String
     let authorMemberInfo: MemberData
 //    let receiverInfo: ReceiverInfo

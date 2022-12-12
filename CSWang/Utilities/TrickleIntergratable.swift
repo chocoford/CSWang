@@ -8,7 +8,7 @@
 import Foundation
 
 
-struct Block: Codable {
+struct Block: Codable, Equatable {
     enum BlockType: String, Codable {
         case h1, h2, h3
         case richText = "rich_texts"
@@ -41,7 +41,7 @@ struct Block: Codable {
     }
 }
 
-struct Element: Codable {
+struct Element: Codable, Equatable {
     enum ElementType: String, Codable {
         case text
         case inlineCode = "inline_code"
@@ -213,7 +213,15 @@ struct TrickleIntergratable {
         }
         return nil
     }
-    
+  
+    static func getSummary(trickles: [TrickleData], week: Int) -> TrickleData? {
+        for trickle in trickles.filter({getWeek(second: $0.createAt) == week}) {
+            if extractSummaryInfo(trickle) != nil {
+                return trickle
+            }
+        }
+        return nil
+    }
     static func getLatestSummary(trickles: [TrickleData]) -> TrickleData? {
         for trickle in trickles {
             if extractSummaryInfo(trickle) != nil {

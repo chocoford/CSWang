@@ -36,6 +36,15 @@ struct CSState {
         TrickleIntergratable.getLatestSummary(trickles: allTrickles)
     }
     
+    var lastWeekSummary: TrickleData? {
+        TrickleIntergratable.getSummary(trickles: allTrickles, week: currentWeek - 1)
+    }
+    
+    var lastWeekSummaryInfo: SummaryInfo? {
+        guard let lastWeekSummary = lastWeekSummary else { return nil }
+        return TrickleIntergratable.extractSummaryInfo(lastWeekSummary)
+    }
+    
     var weeklyGambles: [TrickleData] {
         TrickleIntergratable.getWeeklyGambles(allTrickles)
     }
