@@ -10,7 +10,7 @@ import SwiftUI
 struct SecondaryButtonStyle: ButtonStyle {
     var block: Bool = false
     
-    private struct PrimaryButtonStyleView<V: View>: View {
+    private struct SecondaryButtonStyleView<V: View>: View {
         @State private var hovering = false
         var isPressed: Bool
         
@@ -29,7 +29,6 @@ struct SecondaryButtonStyle: ButtonStyle {
                 }
             }
             .padding(10)
-            .foregroundColor(Color.white)
             .background(
                 isPressed ? Color.second.pressed : hovering ? Color.second.hovered : Color.second.default
             )
@@ -43,7 +42,7 @@ struct SecondaryButtonStyle: ButtonStyle {
     
     
     func makeBody(configuration: Self.Configuration) -> some View {
-        PrimaryButtonStyleView(isPressed: configuration.isPressed, block: block) {
+        SecondaryButtonStyleView(isPressed: configuration.isPressed, block: block) {
             configuration.label
         }
     }
