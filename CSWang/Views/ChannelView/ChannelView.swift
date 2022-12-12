@@ -95,6 +95,7 @@ private extension ChannelView {
         Task {
             await store.send(.chanshi(action: .weekStateCheck))
             await store.send(.chanshi(action: .getUserCSInfo(memberData: member)))
+            await store.send(.chanshi(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
         }
     }
     
@@ -106,7 +107,6 @@ private extension ChannelView {
             await store.send(.chanshi(action: .listAllTrickles(workspaceID: workspace.workspaceID,
                                                                channelID: channel.groupID,
                                                                memberID: member.memberID)))
-            
             await store.send(.chanshi(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
         }
     }
@@ -191,6 +191,7 @@ extension ChannelView {
             .toolbar {
                 NavigationLink {
                     ParticipantsView()
+                        .navigationTitle("Participants")
                 } label: {
                     Image(systemName: "person.2")
                 }

@@ -79,7 +79,7 @@ private extension ParticipantsView {
 
 extension ParticipantsView {
     func loadedView(_ data: [MemberData]) -> some View {
-        List {
+        ScrollView {
             ForEach(data, id: \.memberID) { participant in
                 HStack {
                     AvatarView(url: URL(string: participant.avatarURL), fallbackText: participant.name.prefix(2))
@@ -90,6 +90,7 @@ extension ParticipantsView {
                 .background(.ultraThickMaterial, in: RoundedRectangle(cornerRadius: 12))
             }
         }
+        .padding(.horizontal)
     }
 }
 

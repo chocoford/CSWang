@@ -10,7 +10,6 @@ import Combine
 
 
 struct WorkspaceState {
-//    var workspaces: CurrentValueSubject<Loadable<[String: WorkspaceData]>, Never> = .init(.notRequested)
     var workspaces: Loadable<[String: WorkspaceData]> = .notRequested
     var allWorkspaces: [WorkspaceData] {
         (workspaces.value ?? [:]).values.sorted {
@@ -20,12 +19,7 @@ struct WorkspaceState {
     var currentWorkspaceID: String?
     {
         willSet(val) {
-//            currentWorkspace.send(val != nil ? workspaces.value.value?[val!] : nil)
             members = nil
-//            channel.currentChannelID = nil
-//            if let workspaceID = val {
-//                WorkspaceAction.listWorkspaceMembers(workspaceID: workspaceID)
-//            }
         }
     }
     
@@ -33,7 +27,6 @@ struct WorkspaceState {
     var currentWorkspace: WorkspaceData? {
         currentWorkspaceID != nil ? workspaces.value?[currentWorkspaceID!] : nil
     }
-//    var currentWorkspace: PassthroughSubject<WorkspaceData?, Never> = .init()
     
     var channel: ChannelState = .init()
     

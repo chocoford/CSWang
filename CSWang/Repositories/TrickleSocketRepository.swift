@@ -87,8 +87,13 @@ class TrickleWebSocket {
                 await stream?.send(message: OutgoingMessage(action: .message, path: .roomStatus, data: data))
                 
             case .leaveRoom(let data):
-                await stream?.send(data: OutgoingMessage(action: .message, path: .leaveRoom, data: data))
+                await stream?.send(message: OutgoingMessage(action: .message, path: .leaveRoom, data: data))
         }
+//        
+//        if stream?.status != .running {
+//            logger.info("Socket is not running. Reiniting.")
+//            reinitSocket()
+//        }
     }
 }
 
@@ -182,7 +187,7 @@ extension TrickleWebSocket {
     private func handleMessage(_ message: String) {
         let msgDic = message.toJSON() ?? [:]
         guard let rawPath = msgDic["path"] as? String else {
-            logger.error("invalid path")
+            logger.error("invalid path. Message: \(msgDic)")
             return
         }
         switch IncomingMessagePath(rawValue: rawPath) {
@@ -210,6 +215,11 @@ extension TrickleWebSocket {
             case .changeNotify:
                 guard let messageData = message.decode(IncomingMessage<[ChangeNotifyData]>.self) else { fallthrough }
                 logger.info("on change notify: \(messageData.description)")
+                guard let _ = messageData.data?.first?.codes.keys.first(where: {
+                    $0.firstMatch(of: /workspace:[0-9]+:trickle/) != nil
+                }) else {
+                    break
+                }
                 onChangeNotify()
                 
             case .none:
@@ -374,7 +384,9 @@ extension TrickleWebSocket {
 
         struct LatestChangeEvent: Codable {
             let event: String
-            let eventData: EventData
+            
+            // don't care
+//            let eventData: EventData
         }
         
         struct Trigger: Codable {

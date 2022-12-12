@@ -30,6 +30,10 @@ class WebSocketStream: AsyncSequence {
     private var continuation: AsyncThrowingStream<Element, Error>.Continuation?
     private let socket: URLSessionWebSocketTask
     
+    var status: URLSessionTask.State {
+        socket.state
+    }
+    
     public var closeCode: String {
         String(describing: socket.closeCode)
     }

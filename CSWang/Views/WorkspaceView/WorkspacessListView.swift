@@ -56,7 +56,6 @@ struct WorkspacessListView: View {
 extension WorkspacessListView {
     private func reloadWorkspaces() async {
         guard let userID = store.state.user.userInfo.value?.user.id else {
-            print("no userID")
             return
         }
         await store.send(.workspace(action: .listWorkspaces(userID: userID)))

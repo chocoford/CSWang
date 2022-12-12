@@ -34,15 +34,6 @@ struct WorkspaceDetailView: View {
                 await store.send(.workspace(action: .listWorkspaceMembers(workspaceID: workspace.workspaceID)))
             }
         })
-//        .onReceive(store.state.workspace.currentWorkspace, perform: {workspace in
-//            self.workspace = workspace
-//            guard let workspace = workspace else {
-//                return
-//            }
-//            Task {
-//                await store.send(.workspace(action: .listWorkspaceMembers(workspaceID: workspace.workspaceID)))
-//            }
-//        })
     }
     
     @ViewBuilder private var content: some View {
