@@ -25,11 +25,13 @@ struct PrimaryButtonStyle: ButtonStyle {
                     Spacer()
                 }
                 content()
+                    .padding(.horizontal)
                 if block {
                     Spacer()
                 }
             }
             .padding(10)
+            
             .foregroundColor(Color.white)
             .background(
                 RoundedRectangle(cornerRadius: 8)

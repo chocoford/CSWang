@@ -31,6 +31,7 @@ struct ChannelView: View {
         content
     }
     
+    @State private var showGameView = false
     
     @ViewBuilder private var content: some View {
         switch channel {
@@ -122,25 +123,6 @@ private extension ChannelView {
         }
     }
     
-    private func gamble() async {
-        guard let workspace = workspace,
-              let channel = channel.value,
-              let member = memberInfo else { return }
-        
-        if case .ready = csState.userGambleState {
-            let score = Int.random(in: 0..<100)
-            await store.send(.chanshi(action: .publishScore(workspaceID: workspace.workspaceID,
-                                                            channelID: channel.groupID,
-                                                            memberID: member.memberID,
-                                                            score: score)))
-            await store.send(.chanshi(action: .getUserCSInfo(memberData: member)))
-            await store.send(.chanshi(action: .summarizeIfNeeded(workspaceID: workspace.workspaceID,
-                                                                 channelID: channel.groupID,
-                                                                 memberID: member.memberID)))
-            await store.send(.chanshi(action: .weekStateCheck))
-        }
-
-    }
 }
 
 
@@ -194,7 +176,7 @@ extension ChannelView {
                     
                     Text("状态：\(csState.currentWeekState.localized)")
                     if let summary = csState.lastWeekSummaryInfo,
-                       let index = summary.rankedParticipantIDsAndScores.prefix(5).firstIndex(where: {$0.0 == memberInfo?.memberID}) {
+                       let index = Array(summary.rankedParticipantIDsAndScores.reversed().prefix(5)).firstIndex(where: {$0.0 == memberInfo?.memberID}) {
                         Text("Your chanshi date：\(getWeekDayName(index: index))")
                     }
                     
@@ -289,18 +271,19 @@ private extension ChannelView {
                     .overlay(.ultraThinMaterial.opacity(0.9))
                     .overlay {
                         Button {
-                            Task {
-                                await gamble()
-                            }
+                            showGameView = true
                         } label: {
                             Text("Play")
-                                .padding(.horizontal)
                         }
                         .buttonStyle(PrimaryButtonStyle())
                         .shadow(radius: 4)
                     }
             })
                 .containerShape(RoundedRectangle(cornerRadius: 8))
+                .sheet(isPresented: $showGameView) {
+                GameView(show: $showGameView)
+                    .padding()
+            }
         }
     }
     
