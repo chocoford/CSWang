@@ -144,6 +144,10 @@ extension TrickleWebSocket {
         case helloAck = "connect_hello_ack"
         case joinRoomAck = "join_room_ack"
         case roomMembers = "room_members"
+        
+        /// actions
+        case sync
+        case changeNotify = "change_notify"
     }
     typealias IncomingEmptyMessage = IncomingMessage<EmptyData>
     typealias IncomingMessage<T: Codable> = Message<T, IncomingMessagePath>
@@ -196,8 +200,17 @@ extension TrickleWebSocket {
             case .roomMembers:
                 guard let messageData = message.decode(IncomingMessage<[RoomMembers]>.self) else { fallthrough }
                 logger.info("on room members: \(messageData.description)")
+                
+            case .sync:
+                guard let messageData = message.decode(IncomingMessage<[RoomMembers]>.self) else { fallthrough }
+                
+            case .changeNotify:
+                guard let messageData = message.decode(IncomingMessage<ChangeNotifyData>.self) else { fallthrough }
+                logger.info("on change notify: \(messageData.description)")
+                onChangeNotify()
+                
             case .none:
-                logger.error("invalid path. Message: \(msgDic)")
+                logger.error("Unhandled message: \(msgDic)")
         }
     }
     
@@ -262,6 +275,10 @@ extension TrickleWebSocket {
             }
             self.timers[configs.connectionID]?.roomHello = helloTimer
         }
+    }
+    
+    private func onChangeNotify() {
+        
     }
 }
 
@@ -339,5 +356,52 @@ extension TrickleWebSocket {
         
         let all: [String : [String]]
         let update: RoomMembersUpdate
+    }
+    
+    struct ChangeNotifyData: Codable {
+        let codes: [String : [CodeData]]
+
+        struct CodeData: Codable {
+            let version: Int
+            let latestChangeEvent: LatestChangeEvent
+            let trigger: Trigger
+        }
+
+        struct LatestChangeEvent: Codable {
+            let event: String
+            let eventData: EventData
+        }
+        
+        struct Trigger: Codable {
+            let trickleTraceID: String
+
+            enum CodingKeys: String, CodingKey {
+                case trickleTraceID = "trickleTraceId"
+            }
+        }
+
+
+        // MARK: - EventData
+        struct EventData: Codable {
+            let trickleID, title, authorMemberID: String
+            let mentionedMemberIDS: [String]
+            let receiverType, receiverID, workspaceID: String
+            let createAt: Int
+            let threadID, prevTrickleID, appMemberID: String?
+
+            enum CodingKeys: String, CodingKey {
+                case trickleID = "trickleId"
+                case title
+                case authorMemberID = "authorMemberId"
+                case mentionedMemberIDS = "mentionedMemberIds"
+                case receiverType
+                case receiverID = "receiverId"
+                case workspaceID = "workspaceId"
+                case createAt
+                case threadID = "threadId"
+                case prevTrickleID = "prevTrickleId"
+                case appMemberID = "appMemberId"
+            }
+        }
     }
 }
