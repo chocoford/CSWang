@@ -20,8 +20,16 @@ class TrickleWebSocket {
     var userID: String? = nil
     
     var configs: ConnectData? {
-        willSet(val) {
-            print("will set configs to \(val)")
+        willSet {
+            guard let configs = configs else { return }
+            for timers in self.timers.values {
+                timers.helloInterval?.invalidate()
+                timers.deadCountdown?.invalidate()
+                timers.ping?.invalidate()
+                timers.roomHello?.invalidate()
+                timers.roomDead?.invalidate()
+            }
+            timers[configs.connectionID] = nil
         }
     }
     
@@ -29,8 +37,13 @@ class TrickleWebSocket {
         var helloInterval: Timer?
         var deadCountdown: Timer?
         var ping: Timer?
+        var roomHello: Timer?
+        var roomDead: Timer?
     }
     var timers: [String : Timers] = [:]
+    
+    var workspaceID: String?
+    var memberID: String?
     
     func initSocket(token: String, userID: String) {
         self.token = token
@@ -57,7 +70,7 @@ class TrickleWebSocket {
         self.initSocket(token: token, userID: userID)
     }
     
-    public func send(_ message: MessageType) async {
+    private func send(_ message: MessageType) async {
         switch message {
             case .connect:
                 await stream?.send(message: OutgoingEmptyMessage(action: .message, path: .connect))
@@ -65,8 +78,30 @@ class TrickleWebSocket {
                 await stream?.send(message: OutgoingMessage(action: .message, path: .hello, data: data))
                 
             case .joinRoom(let data):
-                await stream?.send(message: OutgoingMessage(action: .message, path: .connect, data: data))
+                await stream?.send(message: OutgoingMessage(action: .message, path: .joinRoom, data: data))
+                
+            case .roomStatus(let data):
+                await stream?.send(message: OutgoingMessage(action: .message, path: .roomStatus, data: data))
+                
+            case .leaveRoom(let data):
+                await stream?.send(data: OutgoingMessage(action: .message, path: .leaveRoom, data: data))
         }
+    }
+}
+
+extension TrickleWebSocket {
+    public func joinRoom(workspaceID: String, memberID: String) async {
+        let workspaceID = "workspace:" + workspaceID
+        self.workspaceID = workspaceID
+        self.memberID = memberID
+        await send(.joinRoom(data: .init(roomID: workspaceID, memberID: memberID, status: .online)))
+    }
+    
+    public func leaveRoom(workspaceID: String, memberID: String) async {
+        self.workspaceID = nil
+        self.memberID = nil
+        await send(.leaveRoom(data: .init(roomID: workspaceID, memberID: memberID, status: .offline)))
+
     }
 }
 
@@ -74,19 +109,12 @@ class TrickleWebSocket {
 extension TrickleWebSocket {
     enum MessageType {
         case connect
-        
-        struct HelloData: Codable {
-            let userID: String
-            enum CodingKeys: String, CodingKey {
-                case userID = "userId"
-            }
-        }
+
         case hello(data: HelloData)
-        
-        struct JoinRoomData: Codable {
-            
-        }
-        case joinRoom(data: JoinRoomData)
+
+        case joinRoom(data: RoomData)
+        case roomStatus(data: RoomData)
+        case leaveRoom(data: RoomData)
     }
 
     enum MessageAction: String, Codable {
@@ -115,6 +143,7 @@ extension TrickleWebSocket {
         case connectSuccess = "connect_success"
         case helloAck = "connect_hello_ack"
         case joinRoomAck = "join_room_ack"
+        case roomMembers = "room_members"
     }
     typealias IncomingEmptyMessage = IncomingMessage<EmptyData>
     typealias IncomingMessage<T: Codable> = Message<T, IncomingMessagePath>
@@ -123,6 +152,8 @@ extension TrickleWebSocket {
         case connect
         case hello = "connect_hello"
         case joinRoom = "join_room"
+        case roomStatus = "room_status"
+        case leaveRoom = "leave_room"
     }
     typealias OutgoingEmptyMessage = OutgoingMessage<EmptyData>
     typealias OutgoingMessage<T: Codable> = Message<T, OutgoingMessagePath>
@@ -143,26 +174,30 @@ extension TrickleWebSocket {
     }
     private func handleMessage(_ message: String) {
         let msgDic = message.toJSON() ?? [:]
-        logger.info("on message: \(msgDic)")
         guard let rawPath = msgDic["path"] as? String else {
             logger.error("invalid path")
             return
         }
         switch IncomingMessagePath(rawValue: rawPath) {
             case .connectSuccess:
-                guard let messageData = message.decode(IncomingMessage<[ConnectData]>.self) else { return }
-                logger.info("on connect.")
+                guard let messageData = message.decode(IncomingMessage<[ConnectData]>.self) else { fallthrough }
+                logger.info("on connect: \(messageData.description)")
                 onConnect(messageData)
                 
             case .helloAck:
-                guard let messageData = message.decode(IncomingMessage<HelloAckData>.self) else { return }
-                logger.info("on hello ack.")
+                guard let messageData = message.decode(IncomingMessage<HelloAckData>.self) else { fallthrough }
+                logger.info("on hello ack: \(messageData.description)")
                 onHelloAck(messageData)
             case .joinRoomAck:
-                break
+                guard let messageData = message.decode(IncomingEmptyMessage.self) else { fallthrough }
+                logger.info("on join room ack: \(messageData.description)")
+                onJoinRoomAck(messageData)
                             
+            case .roomMembers:
+                guard let messageData = message.decode(IncomingMessage<[RoomMembers]>.self) else { fallthrough }
+                logger.info("on room members: \(messageData.description)")
             case .none:
-                logger.error("invalid path")
+                logger.error("invalid path. Message: \(msgDic)")
         }
     }
     
@@ -189,7 +224,7 @@ extension TrickleWebSocket {
 //                                                 repeats: true) { timer in
 //                self.stream?.ping()
 //            }
-//            
+//
 //            self.timers[data.connectionID]?.ping = pingTimer
         }
     }
@@ -210,6 +245,24 @@ extension TrickleWebSocket {
         timers[configs.connectionID]?.deadCountdown = dead
     }
     
+    
+    private func onJoinRoomAck(_ data: IncomingEmptyMessage) {
+        guard let configs = self.configs else { return }
+        DispatchQueue.main.async {
+            /// 开启`room_status_hello`机制
+            let helloTimer = Timer.scheduledTimer(withTimeInterval: Double(self.configs?.roomStatusHelloInterval ?? 30),
+                                                  repeats: true) { timer in
+                Task {
+                    guard let workspaceID = self.workspaceID,
+                          let memberID = self.memberID else {
+                        return
+                    }
+                    await self.send(.roomStatus(data: .init(roomID: workspaceID, memberID: memberID, status: .online)))
+                }
+            }
+            self.timers[configs.connectionID]?.roomHello = helloTimer
+        }
+    }
 }
 
 // MARK: - internal interface
@@ -217,6 +270,31 @@ private extension TrickleWebSocket {
     typealias Configs = ConnectData
 }
 
+extension TrickleWebSocket.MessageType {
+    struct HelloData: Codable {
+        let userID: String
+        enum CodingKeys: String, CodingKey {
+            case userID = "userId"
+        }
+    }
+    
+    struct RoomData: Codable {
+        let roomID, memberID: String
+        enum Status: String, Codable {
+            case online
+            case offline
+        }
+        let status: Status
+        
+        enum CodingKeys: String, CodingKey {
+            case roomID = "roomId"
+            case memberID = "memberId"
+            case status
+        }
+    }
+}
+
+// MARK: - Incoming Socket Data
 extension TrickleWebSocket {
     struct ConnectData: Codable {
         var connectionID: String
@@ -244,5 +322,22 @@ extension TrickleWebSocket {
         enum CodingKeys: String, CodingKey {
             case connectionID = "connId"
         }
+    }
+    
+    struct RoomMembers: Codable {
+        struct RoomMembersUpdate: Codable {
+            let memberID: String
+            let roomID: String
+            let type: String
+            
+            enum CodingKeys: String, CodingKey {
+                case memberID = "memberId"
+                case roomID = "roomId"
+                case type
+            }
+        }
+        
+        let all: [String : [String]]
+        let update: RoomMembersUpdate
     }
 }

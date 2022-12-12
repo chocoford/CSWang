@@ -23,6 +23,10 @@ struct WorkspacessListView: View {
             }
         }
     }
+    
+    var workspace: WorkspaceData? {
+        store.state.workspace.currentWorkspace
+    }
     @State private var selectedWorkspace: WorkspaceData?
     
     var body: some View {
@@ -107,6 +111,16 @@ extension WorkspacessListView {
             .onChange(of: selectedWorkspace, perform: { newValue in
                 setCurrentWorkspace(workspaceID: newValue?.workspaceID)
             })
+            .onChange(of: workspace) { [workspace] newValue in
+                Task {
+                    if let oldWorkspae = workspace {
+                        await TrickleWebSocket.shared.leaveRoom(workspaceID: oldWorkspae.workspaceID, memberID: oldWorkspae.userMemberInfo.memberID)
+                    }
+                    if let newWorkspace = newValue {
+                        await TrickleWebSocket.shared.joinRoom(workspaceID: newWorkspace.workspaceID, memberID: newWorkspace.userMemberInfo.memberID)
+                    }
+                }
+            }
             Divider()
             userInfoToolbar
                 .padding()

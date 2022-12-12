@@ -14,4 +14,12 @@ extension Encodable {
     var dictionary: [String: Any] {
         return (try? JSONSerialization.jsonObject(with: JSONEncoder().encode(self))) as? [String: Any] ?? [:]
     }
+    
+    var description: String {
+//        guard let data = try? JSONSerialization.data(withJSONObject: self, options: [.prettyPrinted, .sortedKeys]),
+//              let json = try? JSONSerialization.jsonObject(with: data) else {
+//            return ""
+//        }
+        return String(describing: self)
+    }
 }
