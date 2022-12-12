@@ -10,7 +10,7 @@ import Combine
 
 struct WorkspaceDetailView: View {
     @EnvironmentObject var store: AppStore
-//    @State private var workspace: WorkspaceData? = nil
+
     var workspace: WorkspaceData? {
         store.state.workspace.currentWorkspace
     }
@@ -18,21 +18,10 @@ struct WorkspaceDetailView: View {
         workspace?.userMemberInfo
     }
     
-//    init(workspace: WorkspaceData?) {
-//        self.workspace = workspace
-//    }
-    
     var body: some View {
         content
-        .onChange(of: store.state.workspace.currentWorkspace, perform: { workspace in
-            guard let workspace = workspace else {
-                return
-            }
-            Task {
-                await store.send(.channel(action: .listPublicChannels(workspaceID: workspace.workspaceID,
-                                                                      memberID: workspace.userMemberInfo.memberID)))
-                await store.send(.workspace(action: .listWorkspaceMembers(workspaceID: workspace.workspaceID)))
-            }
+        .onChange(of: workspace, perform: { _ in
+           loadWorkspaceDetails()
         })
     }
     
@@ -41,6 +30,19 @@ struct WorkspaceDetailView: View {
             ChannelView()
         } else {
             Text("Choose a workspace")
+        }
+    }
+}
+
+private extension WorkspaceDetailView {
+    func loadWorkspaceDetails() {
+        guard let workspace = workspace else {
+            return
+        }
+        Task {
+            await store.send(.channel(action: .listPublicChannels(workspaceID: workspace.workspaceID,
+                                                                  memberID: workspace.userMemberInfo.memberID)))
+            await store.send(.workspace(action: .listWorkspaceMembers(workspaceID: workspace.workspaceID)))
         }
     }
 }

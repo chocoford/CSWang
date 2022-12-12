@@ -11,7 +11,9 @@ import Foundation
 import AppKit
 
 class AppDelegate: NSObject, NSApplicationDelegate {
-    
+    func applicationWillTerminate(_ notification: Notification) {
+        TrickleWebSocket.shared.close()
+    }
 }
 
 #endif

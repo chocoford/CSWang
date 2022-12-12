@@ -9,8 +9,6 @@ import Foundation
 
 struct AppEnvironment {
     let trickleWebRepository: TrickleWebRepository
-//    let trickleWebSocket: WebSocketStream
-    //    var socket = WebSocketStream(url: <#T##URL#>)
     
     init() {
         let session = Self.configuredURLSession()

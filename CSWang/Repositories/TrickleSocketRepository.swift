@@ -24,11 +24,7 @@ class TrickleWebSocket {
         willSet {
             guard let configs = configs else { return }
             for timers in self.timers.values {
-                timers.helloInterval?.invalidate()
-                timers.deadCountdown?.invalidate()
-                timers.ping?.invalidate()
-                timers.roomHello?.invalidate()
-                timers.roomDead?.invalidate()
+                timers.invalidAll()
             }
             timers[configs.connectionID] = nil
         }
@@ -40,6 +36,14 @@ class TrickleWebSocket {
         var ping: Timer?
         var roomHello: Timer?
         var roomDead: Timer?
+        
+        func invalidAll() {
+            helloInterval?.invalidate()
+            deadCountdown?.invalidate()
+            ping?.invalidate()
+            roomHello?.invalidate()
+            roomDead?.invalidate()
+        }
     }
     var timers: [String : Timers] = [:]
     
@@ -94,6 +98,18 @@ class TrickleWebSocket {
 //            logger.info("Socket is not running. Reiniting.")
 //            reinitSocket()
 //        }
+    }
+    
+    public func close() {
+        Task {
+            if let workspaceID = workspaceID,
+               let memberID = memberID {
+               await leaveRoom(workspaceID: workspaceID, memberID: memberID)
+            }
+            timers.values.forEach { timer in
+                timer.invalidAll()
+            }
+        }
     }
 }
 
