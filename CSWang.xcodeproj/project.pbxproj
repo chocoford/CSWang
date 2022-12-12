@@ -45,6 +45,7 @@
 		39D289B42944592B00846BF6 /* WebSocketStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289B32944592B00846BF6 /* WebSocketStream.swift */; };
 		39D289B62944EF3D00846BF6 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289B52944EF3D00846BF6 /* String+Extension.swift */; };
 		39D289B929472E7100846BF6 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289B829472E7100846BF6 /* GameView.swift */; };
+		39D289BB294755F800846BF6 /* AppDelegateIOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289BA294755F800846BF6 /* AppDelegateIOS.swift */; };
 		39EF55F62937AB0B005F10F4 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F52937AB0B005F10F4 /* AvatarView.swift */; };
 		39EF55FA2937C19F005F10F4 /* MemberCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F92937C19F005F10F4 /* MemberCardView.swift */; };
 		39EF55FD2937CB1F005F10F4 /* ShapeBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 39EF55FC2937CB1F005F10F4 /* ShapeBuilder */; };
@@ -126,6 +127,7 @@
 		39D289B32944592B00846BF6 /* WebSocketStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebSocketStream.swift; sourceTree = "<group>"; };
 		39D289B52944EF3D00846BF6 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 		39D289B829472E7100846BF6 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
+		39D289BA294755F800846BF6 /* AppDelegateIOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateIOS.swift; sourceTree = "<group>"; };
 		39EF55F52937AB0B005F10F4 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 		39EF55F92937C19F005F10F4 /* MemberCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberCardView.swift; sourceTree = "<group>"; };
 		39F12D2B2933CF8F005F5D48 /* CSWang.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CSWang.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -317,6 +319,7 @@
 			children = (
 				39F12D2E2933CF8F005F5D48 /* CSWangApp.swift */,
 				39A9B4A329371403002599FE /* AppDelegateMac.swift */,
+				39D289BA294755F800846BF6 /* AppDelegateIOS.swift */,
 				39A9B4A129367D62002599FE /* AuthMiddleware.swift */,
 				39F12D662933D4E6005F5D48 /* Store */,
 			);
@@ -598,6 +601,7 @@
 				39D289B22944590B00846BF6 /* TrickleSocketRepository.swift in Sources */,
 				390B46982938F37400E15DC3 /* WorkspacessListView.swift in Sources */,
 				39F12D7D293494A4005F5D48 /* Color.swift in Sources */,
+				39D289BB294755F800846BF6 /* AppDelegateIOS.swift in Sources */,
 				39A9B4A829372A49002599FE /* UserState.swift in Sources */,
 				390B46A02939C72700E15DC3 /* NavigationCellView.swift in Sources */,
 				390B469E2939B6ED00E15DC3 /* CellListStyle.swift in Sources */,
