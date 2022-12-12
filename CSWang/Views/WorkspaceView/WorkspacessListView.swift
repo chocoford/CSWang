@@ -94,19 +94,34 @@ private extension WorkspacessListView {
 
 // MARK: - Displaying Content
 extension WorkspacessListView {
+    func listWrapper<V: View>(_ workspaces: [WorkspaceData], @ViewBuilder content: @escaping (_ workspace: WorkspaceData) -> V) -> some View {
+#if os(macOS)
+        ScrollView {
+            ForEach(workspaces) { workspace in
+                content(workspace)
+            }
+        }
+#elseif os(iOS)
+        List(workspaces, selection: $selectedWorkspace) { workspace in
+            content(workspace)
+                .listRowSeparator(.hidden)
+                .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+        }
+        .listStyle(.plain)
+#endif
+    }
+    
     func loadedView(workspaces: [WorkspaceData]) -> some View {
         VStack {
-            ScrollView {
-                ForEach(workspaces) { workspace in
-                    NavigationCellView(value: workspace) {
-                        WorkspaceCellView(workspace: workspace,
-                                          selected: selectedWorkspace?.workspaceID == workspace.workspaceID)
-                        .onTapGesture {
-                            selectedWorkspace = workspace
-                        }
+            listWrapper(workspaces) { workspace in
+                NavigationCellView(value: workspace) {
+                    WorkspaceCellView(workspace: workspace,
+                                      selected: selectedWorkspace?.workspaceID == workspace.workspaceID)
+                    .onTapGesture {
+                        selectedWorkspace = workspace
                     }
-                    .padding(.horizontal)
                 }
+                .padding(.horizontal)
             }
             .onChange(of: selectedWorkspace, perform: { newValue in
                 setCurrentWorkspace(workspaceID: newValue?.workspaceID)
