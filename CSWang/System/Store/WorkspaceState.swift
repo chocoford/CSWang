@@ -20,6 +20,7 @@ struct WorkspaceState {
     {
         willSet(val) {
             members = nil
+            channel = .init()
         }
     }
     
@@ -59,7 +60,6 @@ func workspaceReducer(state: inout WorkspaceState,
         case .setWorkspaces(items: let items):
             state.workspaces = .loaded(data: items.formDictionary(key: \.workspaceID))
             state.channel.channels = .notRequested
-//            state.workspaces.send(.loaded(items.formDictionary(key: \.workspaceID)))
             
         case .setWorkspaceMembers(let members):
             state.members = members.formDictionary(key: \.memberID)
@@ -68,7 +68,6 @@ func workspaceReducer(state: inout WorkspaceState,
             state.currentWorkspaceID = workspaceID
         
         case let .listWorkspaces(userID):
-//            state.workspaces.send(.isLoading(last: nil))
             state.workspaces = .isLoading(last: nil)
             return environment.trickleWebRepository
                 .listUserWorkspaces(userID: userID)
@@ -97,7 +96,7 @@ func workspaceReducer(state: inout WorkspaceState,
     return Empty().eraseToAnyPublisher()
 }
 
-struct WorkspaceData: Codable {
+struct WorkspaceData: Codable, Hashable {
     let workspaceID: String
     let ownerID, name: String
     let memberNum, removedMemberNum: Int
@@ -120,17 +119,6 @@ extension WorkspaceData: Identifiable {
         workspaceID
     }
 }
-
-extension WorkspaceData: Hashable {
-//    static func == (lhs: WorkspaceData, rhs: WorkspaceData) -> Bool {
-//        lhs.workspaceID == rhs.workspaceID
-//    }
-//    
-//    func hash(into hasher: inout Hasher) {
-//        hasher.combine(workspaceID)
-//    }
-}
-
 
 
 // MARK: - MemberData

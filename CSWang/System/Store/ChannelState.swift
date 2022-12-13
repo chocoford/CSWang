@@ -38,14 +38,13 @@ struct ChannelState {
 }
 
 enum ChannelAction {
+    case addChannels(items: [GroupData])
     case setChannels(items: [GroupData])
     case createChannel(workspaceID: String, memberID: String, invitedMemberIDs: [String])
     case listPublicChannels(workspaceID: String, memberID: String)
     
     @available(*, deprecated, message: "Will not be used")
     case listPrivateChannels(workspaceID: String, memberID: String)
-    
-    case createTrickle(workspaceID: String, channelID: String, payload: TrickleWebRepository.API.CreatePostPayload)
 }
 
 func channelReducer(state: inout ChannelState,
@@ -53,12 +52,15 @@ func channelReducer(state: inout ChannelState,
                     environment: AppEnvironment) -> AnyPublisher<AppAction, Never> {
 //    let logger = Logger(subsystem: "CSWang", category: "channelReducer")
     switch action {
+        case .addChannels(let items):
+            return Just(.channel(action: .setChannels(items: state.allChannels + items)))
+                .eraseToAnyPublisher()
+            
         case .setChannels(let items):
             state.channels = .loaded(data: items.formDictionary(key: \.groupID))
             state.chanshi.participants = .notRequested
             
             // get specific channel
-
             state.currentChannelID = state.channels.value!.values.first {
                $0.name == "Who's shit?"
             }?.groupID
@@ -68,8 +70,8 @@ func channelReducer(state: inout ChannelState,
                 .createChannel(workspaceID: workspaceID,
                                memberID: memberID,
                                invitedMemberIDs: invitedMemberIDs)
-                .map { [state] in
-                        .channel(action: .setChannels(items: state.allChannels + [$0.group]))
+                .map {
+                    .channel(action: .addChannels(items: [$0.group]))
                 }
                 .catch { _ in
                     Empty()
@@ -101,21 +103,6 @@ func channelReducer(state: inout ChannelState,
                     return .channel(action: .setChannels(items: $0))
                 })
                 .eraseToAnyPublisher()
-            
-        case let .createTrickle(workspaceID, channelID, payload):
-            return environment.trickleWebRepository
-                .createPost(workspaceID: workspaceID,
-                            channelID: channelID,
-                            payload: payload)
-                .map { _ in
-                    return .nap
-                }
-                .catch { _ in
-                    Empty()
-                }
-                .eraseToAnyPublisher()
-            
-
     }
     
     return Empty().eraseToAnyPublisher()
@@ -144,29 +131,3 @@ struct GroupDataWrapper: Codable {
 extension GroupData: Equatable {}
 
 
-// MARK: - TrickleData
-struct TrickleData: Codable, Equatable {
-    let trickleID: String
-    let authorMemberInfo: MemberData
-//    let receiverInfo: ReceiverInfo
-    let createAt, updateAt: Int
-    let editAt: Int?
-    let title: String
-    let blocks: [Block]
-//    let tagInfo, mentionedMemberInfo: [JSONAny]
-//    let isPublic, allowGuestMemberComment, allowGuestMemberReact, allowWorkspaceMemberComment: Bool
-//    let allowWorkspaceMemberReact: Bool
-//    let likeCounts, commentCounts: Int
-//    let hasLiked: Bool
-//    let latestLikeMemberInfo, commentInfo, referTrickleInfo, reactionInfo: [JSONAny]
-//    let viewedMemberInfo: ViewedMemberInfo
-//    let threadID: JSONNull?
-
-    enum CodingKeys: String, CodingKey {
-        case trickleID = "trickleId"
-        case authorMemberInfo, createAt, updateAt, editAt, title, blocks
-//        , isPublic, allowGuestMemberComment, allowGuestMemberReact, allowWorkspaceMemberComment, allowWorkspaceMemberReact, likeCounts, commentCounts, hasLiked
-//        case receiverInfo, tagInfo, latestLikeMemberInfo, viewedMemberInfo, commentInfo, referTrickleInfo, reactionInfo,
-//        case threadID = "threadId"
-    }
-}

@@ -55,7 +55,7 @@ struct CSState {
                 TrickleIntergratable.extractGameInfo($0)
             }
             .sorted {
-                $0.rank ?? 0 < $1.rank ?? 0
+                $0.score > $1.score
             }
     }
     
@@ -80,14 +80,7 @@ struct CSState {
         }
     }
     
-    // MARK: - User Channel State
-    enum UserChannelState {
-        case joined
-        case notJoined
-        case checking
-    }
-    var userChannelState: UserChannelState = .checking
-    
+
     
     // MARK: - Week State
     enum WeekState {
@@ -124,15 +117,15 @@ struct CSState {
 
 enum CSAction {
     case setTrickles(data: Loadable<[String: TrickleData]>)
+    case addTrickles(data: [TrickleData])
     case listAllTrickles(workspaceID: String, channelID: String, memberID: String, until: Int? = nil)
     case freshenTrickles(workspaceID: String, channelID: String, memberID: String)
+    case createTrickle(workspaceID: String, channelID: String, payload: TrickleWebRepository.API.CreatePostPayload)
     
     case setParticipants(members: [MemberData])
     case loadParticipants(channelMembers: [MemberData])
     
-    case setUserChannelState(_ state: CSState.UserChannelState)
     case joinCSChannel(workspaceID: String, channelID: String, memberID: String)
-    case checkHasJoined(memberID: String)
     
     case setGameInfo(info: CSUserInfo.GambleInfo?)
     case publishScore(workspaceID: String, channelID: String, memberID: String, score: Int)
@@ -151,6 +144,9 @@ func csReducer(state: inout CSState,
     switch action {
         case .setTrickles(let data):
             state.trickles = data
+            
+        case .addTrickles(let data):
+            state.trickles = .loaded(data: (state.allTrickles + data).formDictionary(key: \.trickleID))
         
         case .listAllTrickles(let workspaceID, let channelID, let memberID, let until):
             return environment.trickleWebRepository
@@ -187,14 +183,27 @@ func csReducer(state: inout CSState,
                                         limit: 100,
                                         order: 1))
                 .retry(3)
-                .map { [state] in
-                    return .chanshi(action: .setTrickles(data: .loaded(data: (state.allTrickles + $0.items).formDictionary(key: \.trickleID))))
+                .map {
+                    return .chanshi(action: .addTrickles(data: $0.items))
                 }
                 .catch { _ in
                     return Just(.nap)
                 }
                 .eraseToAnyPublisher()
             
+            
+        case let .createTrickle(workspaceID, channelID, payload):
+            return environment.trickleWebRepository
+                .createPost(workspaceID: workspaceID,
+                            channelID: channelID,
+                            payload: payload)
+                .map {
+                    return .chanshi(action: .addTrickles(data: [$0]))
+                }
+                .catch { _ in
+                    Empty()
+                }
+                .eraseToAnyPublisher()
             
         case .setParticipants(let members):
             state.participants = .loaded(data: members.formDictionary(key: \.memberID))
@@ -215,55 +224,25 @@ func csReducer(state: inout CSState,
             }
             state.participants = .loaded(data: participants.formDictionary(key: \.memberID))
             
-        case .setUserChannelState(let channelState):
-            state.userChannelState = channelState
-            
-        case .checkHasJoined(let memberID):
-            guard state.trickles.state == .loaded else { break }
-            guard let _ = state.trickles.value?.values.first(where: {
-                return TrickleIntergratable.getType($0.blocks) == .helloWorld && $0.authorMemberInfo.memberID == memberID
-            }) else {
-                return Just(AppAction.chanshi(action: .setUserChannelState(.notJoined)))
-                    .eraseToAnyPublisher()
-            }
-            return Just(.chanshi(action: .setUserChannelState(.joined)))
-                .eraseToAnyPublisher()
-                
-            
         case .joinCSChannel(let workspaceID, let channelID, let memberID):
-            return environment.trickleWebRepository
-                .createPost(workspaceID: workspaceID,
-                            channelID: channelID,
-                            payload: .init(authorMemberID: memberID,
-                                           blocks: TrickleIntergratable.createPost(type: .helloWorld),
-                                           mentionedMemberIDs: []))
-                .map { _ in
-                        .chanshi(action: .setUserChannelState(.checking))
-                }
-                .catch {
-                    logger.error("\($0)")
-                    return Just(AppAction.chanshi(action: .setUserChannelState(.notJoined)))
-                }
-                .eraseToAnyPublisher()
+            return Just(.chanshi(action: .createTrickle(workspaceID: workspaceID,
+                                                        channelID: channelID,
+                                                        payload: .init(authorMemberID: memberID,
+                                                                       blocks: TrickleIntergratable.createPost(type: .helloWorld),
+                                                                       mentionedMemberIDs: []))))
+//            .debounce(for: 1.0, scheduler: DispatchQueue.main)
+            .eraseToAnyPublisher()
             
         case .setGameInfo(let info):
             state.csInfo.roundGame = info
             
         case .publishScore(let workspaceID, let channelID, let memberID, let score):
-            return environment.trickleWebRepository
-                .createPost(workspaceID: workspaceID,
-                            channelID: channelID,
-                            payload: .init(authorMemberID: memberID,
-                                           blocks: TrickleIntergratable.createPost(type: .gamble(score: score))))
-                .map { [state] in
-                    return .chanshi(action: .setTrickles(data: .loaded(data: ([$0] + state.allTrickles).formDictionary(key: \.trickleID))))
-                }
-                .catch {
-                    logger.error("\($0)")
-                    return Just(AppAction.chanshi(action: .setUserChannelState(.notJoined)))
-                }
-                .eraseToAnyPublisher()
-        
+            return  Just(.chanshi(action: .createTrickle(workspaceID: workspaceID,
+                                                         channelID: channelID,
+                                                         payload: .init(authorMemberID: memberID,
+                                                                        blocks: TrickleIntergratable.createPost(type: .gamble(score: score))))))
+            .eraseToAnyPublisher()
+            
             
         case .weekStateCheck:
             func setAsFinishedWeek() {
@@ -296,7 +275,6 @@ func csReducer(state: inout CSState,
             
             let weekDiff = latestGambleWeek - latestSummaryWeek
             // TODO: publish summary
-            
             
             
         case .getUserCSInfo(let memberData):
@@ -363,4 +341,31 @@ func csReducer(state: inout CSState,
     
     
     return Empty().eraseToAnyPublisher()
+}
+
+// MARK: - TrickleData
+struct TrickleData: Codable, Equatable {
+    let trickleID: String
+    let authorMemberInfo: MemberData
+//    let receiverInfo: ReceiverInfo
+    let createAt, updateAt: Int
+    let editAt: Int?
+    let title: String
+    let blocks: [Block]
+//    let tagInfo, mentionedMemberInfo: [JSONAny]
+//    let isPublic, allowGuestMemberComment, allowGuestMemberReact, allowWorkspaceMemberComment: Bool
+//    let allowWorkspaceMemberReact: Bool
+//    let likeCounts, commentCounts: Int
+//    let hasLiked: Bool
+//    let latestLikeMemberInfo, commentInfo, referTrickleInfo, reactionInfo: [JSONAny]
+//    let viewedMemberInfo: ViewedMemberInfo
+//    let threadID: JSONNull?
+
+    enum CodingKeys: String, CodingKey {
+        case trickleID = "trickleId"
+        case authorMemberInfo, createAt, updateAt, editAt, title, blocks
+//        , isPublic, allowGuestMemberComment, allowGuestMemberReact, allowWorkspaceMemberComment, allowWorkspaceMemberReact, likeCounts, commentCounts, hasLiked
+//        case receiverInfo, tagInfo, latestLikeMemberInfo, viewedMemberInfo, commentInfo, referTrickleInfo, reactionInfo,
+//        case threadID = "threadId"
+    }
 }

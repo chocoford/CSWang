@@ -46,6 +46,8 @@
 		39D289B62944EF3D00846BF6 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289B52944EF3D00846BF6 /* String+Extension.swift */; };
 		39D289B929472E7100846BF6 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289B829472E7100846BF6 /* GameView.swift */; };
 		39D289BB294755F800846BF6 /* AppDelegateIOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289BA294755F800846BF6 /* AppDelegateIOS.swift */; };
+		39D289BD2948483400846BF6 /* JoinChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289BC2948483400846BF6 /* JoinChannelView.swift */; };
+		39D289BF294849E900846BF6 /* LoadableButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289BE294849E900846BF6 /* LoadableButtonStyle.swift */; };
 		39EF55F62937AB0B005F10F4 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F52937AB0B005F10F4 /* AvatarView.swift */; };
 		39EF55FA2937C19F005F10F4 /* MemberCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F92937C19F005F10F4 /* MemberCardView.swift */; };
 		39EF55FD2937CB1F005F10F4 /* ShapeBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 39EF55FC2937CB1F005F10F4 /* ShapeBuilder */; };
@@ -128,6 +130,8 @@
 		39D289B52944EF3D00846BF6 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 		39D289B829472E7100846BF6 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		39D289BA294755F800846BF6 /* AppDelegateIOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateIOS.swift; sourceTree = "<group>"; };
+		39D289BC2948483400846BF6 /* JoinChannelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinChannelView.swift; sourceTree = "<group>"; };
+		39D289BE294849E900846BF6 /* LoadableButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadableButtonStyle.swift; sourceTree = "<group>"; };
 		39EF55F52937AB0B005F10F4 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 		39EF55F92937C19F005F10F4 /* MemberCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberCardView.swift; sourceTree = "<group>"; };
 		39F12D2B2933CF8F005F5D48 /* CSWang.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CSWang.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -209,6 +213,7 @@
 			isa = PBXGroup;
 			children = (
 				390B46A52939DBE900E15DC3 /* ChannelView.swift */,
+				39D289BC2948483400846BF6 /* JoinChannelView.swift */,
 				39D289A2293EF74B00846BF6 /* ParticipantsView.swift */,
 			);
 			path = ChannelView;
@@ -380,6 +385,7 @@
 		39F12D7A29347D9F005F5D48 /* Modifiers */ = {
 			isa = PBXGroup;
 			children = (
+				39D289BE294849E900846BF6 /* LoadableButtonStyle.swift */,
 				39F12D7829347B31005F5D48 /* PrimaryButtonStyle.swift */,
 				39D289AE2943A24100846BF6 /* SecondaryButtonStyle.swift */,
 				39A9B4B1293782CC002599FE /* ListButtonStyle.swift */,
@@ -561,6 +567,7 @@
 			files = (
 				39F12D5F2933D072005F5D48 /* Store.swift in Sources */,
 				390B46AC2939FD2000E15DC3 /* MembersListView.swift in Sources */,
+				39D289BF294849E900846BF6 /* LoadableButtonStyle.swift in Sources */,
 				39F12D632933D235005F5D48 /* WebRepository.swift in Sources */,
 				39F12D802934A9C8005F5D48 /* View+Extension.swift in Sources */,
 				39F12D652933D250005F5D48 /* APICall.swift in Sources */,
@@ -593,6 +600,7 @@
 				390B46B5293B330700E15DC3 /* InviteMembersView.swift in Sources */,
 				39F12D6E2933D6FE005F5D48 /* TrickleWebRepository.swift in Sources */,
 				390B469C293905A900E15DC3 /* WorkspaceDetailView.swift in Sources */,
+				39D289BD2948483400846BF6 /* JoinChannelView.swift in Sources */,
 				39396B092937D3FB00EDD29F /* Encodable+Extension.swift in Sources */,
 				390B46A62939DBE900E15DC3 /* ChannelView.swift in Sources */,
 				390B46BB293CCA1900E15DC3 /* Loadable.swift in Sources */,

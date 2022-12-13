@@ -16,31 +16,25 @@ struct CreateChannelView: View {
     
     
     var body: some View {
-//        NavigationStack {
-            VStack {
-                VStack{
-                    Text("Initialize")
-                        .font(.title)
-                        .fontWeight(.bold)
-                    
-                    Text("Create a channel to start")
-                }
-                .padding()
-
-//                NavigationLink("Create the channel") {
-//                   InviteMembersView()
-//                }
-                Button {
-                    Task {
-                        await createChannel()
-                    }
-                } label: {
-                    Text("Create the channel")
-                }
-                .buttonStyle(PrimaryButtonStyle())
+        VStack {
+            VStack{
+                Text("Initialize")
+                    .font(.title)
+                    .fontWeight(.bold)
+                
+                Text("Create a channel to start")
             }
+            .padding()
             
-//        }
+            Button {
+                Task {
+                    await createChannel()
+                }
+            } label: {
+                Text("Create the channel")
+            }
+            .buttonStyle(PrimaryButtonStyle())
+        }
     }
     
     func createChannel() async {
@@ -51,11 +45,9 @@ struct CreateChannelView: View {
                                                          memberID: workspace.userMemberInfo.memberID,
                                                          invitedMemberIDs: [])))
         if let channelID = store.state.workspace.channel.currentChannel.value?.groupID {
-            await store.send(.channel(action: .createTrickle(workspaceID: workspace.workspaceID,
+            await store.send(.chanshi(action: .joinCSChannel(workspaceID: workspace.workspaceID,
                                                              channelID: channelID,
-                                                             payload: .init(authorMemberID: workspace.userMemberInfo.memberID,
-                                                                            blocks: TrickleIntergratable.createPost(type: .helloWorld),
-                                                                            mentionedMemberIDs: []))))
+                                                             memberID: workspace.userMemberInfo.memberID)))
         }
     }
 }

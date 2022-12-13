@@ -47,20 +47,13 @@ struct ParticipantsView: View {
 
 //MARK: - Side Effects
 extension ParticipantsView {
-    private func loadParticipants() async {
-        await store.send(.chanshi(action: .loadParticipants(channelMembers: members)))
-    }
+
 }
 
 // MARK: - Loading Content
 private extension ParticipantsView {
     var notRequestedView: some View {
         Text("No data")
-//            .onAppear {
-//                Task {
-//                    await loadParticipants()
-//                }
-//            }
     }
     
     func loadingView(_ previouslyLoaded: [MemberData]?) -> some View {

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PrimaryButtonStyle: ButtonStyle {
     var block: Bool = false
+    var loading: Bool = false
     
     private struct PrimaryButtonStyleView<V: View>: View {
         @State private var hovering = false
@@ -47,8 +48,10 @@ struct PrimaryButtonStyle: ButtonStyle {
     
     
     func makeBody(configuration: Self.Configuration) -> some View {
-        PrimaryButtonStyleView(isPressed: configuration.isPressed, block: block) {
-            configuration.label
+        LoadableButtonStyleView(loading: loading) {
+            PrimaryButtonStyleView(isPressed: configuration.isPressed, block: block) {
+                configuration.label
+            }
         }
     }
 }

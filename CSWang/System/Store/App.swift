@@ -108,7 +108,6 @@ extension AppState {
         // MARK: - channels
         previewState.workspace.channel.channels = .loaded(data: formDic(payload: load("publicGroups.json"), id: \.groupID))
         previewState.workspace.channel.currentChannelID = previewState.workspace.channel.channels.value?.first?.value.groupID
-        previewState.workspace.channel.chanshi.userChannelState = .joined
         previewState.workspace.channel.chanshi.trickles = .loaded(data: [:])
         previewState.workspace.channel.chanshi.participants = .loaded(data: formDic(payload: load("members.json"), id: \.memberID))
         return previewState

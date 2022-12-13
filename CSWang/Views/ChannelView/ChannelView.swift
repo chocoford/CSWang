@@ -27,6 +27,23 @@ struct ChannelView: View {
         store.state.workspace.channel.chanshi
     }
     
+    // MARK: - User Channel State
+    enum UserChannelState {
+        case joined
+        case notJoined
+        case checking
+    }
+    var userChannelState: UserChannelState {
+        guard csState.trickles.state == .loaded else { return .checking }
+        if csState.trickles.value?.values.first(where: {
+            return TrickleIntergratable.getType($0.blocks) == .helloWorld && $0.authorMemberInfo.memberID == memberInfo?.memberID
+        }) != nil {
+            return .joined
+        }
+        return .notJoined
+    }
+    
+    
     var body: some View {
         content
     }
@@ -40,25 +57,29 @@ struct ChannelView: View {
             case .isLoading(let last):
                 loadingView(last)
             case .loaded(let data):
-                switch store.state.workspace.channel.chanshi.trickles {
+                switch csState.trickles {
                     case .notRequested:
                         fetchingView()
                             .onAppear(perform: loadAllPosts)
                     case .isLoading:
                         fetchingView()
                     case .loaded:
-                        switch store.state.workspace.channel.chanshi.userChannelState {
+                        switch userChannelState {
                             case .notJoined:
-                                joinChannelView()
+                                JoinChannelView()
                             case .joined:
                                 loadedView(data)
                                     .onAppear(perform: getChanShiInfo)
                                     .onReceive(TrickleWebSocket.shared.changeNotifyPulisher) { _ in
                                         freshenPosts()
                                     }
+                                    .onChange(of: store.state.workspace.members) { newValue in
+                                        Task {
+                                            await store.send(.chanshi(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
+                                        }
+                                    }
                             case .checking:
                                 loadingView(nil)
-                                    .onAppear(perform: checkUserChannelState)
                         }
                     case .failed(let error):
                         failedView(error)
@@ -72,24 +93,6 @@ struct ChannelView: View {
 
 //MARK: - Side Effects
 private extension ChannelView {
-    private func checkUserChannelState() {
-        guard let member = memberInfo else {
-            return
-        }
-        Task {
-            await store.send(.chanshi(action: .checkHasJoined(memberID: member.memberID)))
-        }
-    }
-    
-    private func joinChannel() async {
-        guard let workspace = workspace,
-              let channel = channel.value,
-              let member = memberInfo else { return }
-        await store.send(.chanshi(action: .joinCSChannel(workspaceID: workspace.workspaceID,
-                                                         channelID: channel.groupID,
-                                                         memberID: member.memberID)))
-    }
-    
     private func getChanShiInfo() {
         guard let member = memberInfo else { return }
         Task {
@@ -197,21 +200,6 @@ extension ChannelView {
                 }
                 .disabled(channel.value == nil)
             }
-        }
-    }
-
-    
-    func joinChannelView() -> some View {
-        VStack {
-            Text("It seems that there is already a channel.")
-            Button {
-                Task {
-                    await joinChannel()
-                }
-            } label: {
-                Text("Join")
-            }
-            .buttonStyle(PrimaryButtonStyle())
         }
     }
 }
