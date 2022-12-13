@@ -16,13 +16,12 @@ struct AppState {
 enum AppAction {
     case user(action: UserAction)
     case workspace(action: WorkspaceAction)
-    case channel(action: ChannelAction)
-    /// 铲屎
-    case chanshi(action: CSAction)
+//    case channel(action: ChannelAction)
+//    /// 铲屎
+//    case chanshi(action: CSAction)
     
     /// app action
     case clear
-    case nap
 }
 
 typealias AppStore = Store<AppState, AppAction, AppEnvironment>
@@ -31,26 +30,21 @@ typealias AppStore = Store<AppState, AppAction, AppEnvironment>
 let appReducer: Reducer<AppState, AppAction, AppEnvironment> = Reducer { state, action, environment in
     switch action {
         case .user(let action):
-            return userReducer(state: &state.user, action: action, environment: environment)
+            return userReducer(state: &state.user,
+                               action: action,
+                               environment: environment)
                 .eraseToAnyPublisher()
         case .workspace(let action):
-            return workspaceReducer(state: &state.workspace, action: action, environment: environment)
-                .map(AppAction.workspace)
+            return workspaceReducer(&state.workspace,
+                                    action,
+                                    environment)
+            .map {
+                .workspace(action: $0)
+            }
                 .eraseToAnyPublisher()
-            
-        case .channel(let action):
-            return channelReducer(state: &state.workspace.channel, action: action, environment: environment)
-                .eraseToAnyPublisher()
-            
-        case .chanshi(let action):
-            return csReducer(state: &state.workspace.channel.chanshi, action: action, environment: environment)
-                .eraseToAnyPublisher()
-            
+
         case .clear:
             state = .init()
-            
-        case .nap:
-            break
     }
     
     return Empty().eraseToAnyPublisher()
@@ -106,10 +100,10 @@ extension AppState {
         previewState.workspace.members = formDic(payload: load("members.json"), id: \.memberID)
         
         // MARK: - channels
-        previewState.workspace.channel.channels = .loaded(data: formDic(payload: load("publicGroups.json"), id: \.groupID))
-        previewState.workspace.channel.currentChannelID = previewState.workspace.channel.channels.value?.first?.value.groupID
-        previewState.workspace.channel.chanshi.trickles = .loaded(data: [:])
-        previewState.workspace.channel.chanshi.participants = .loaded(data: formDic(payload: load("members.json"), id: \.memberID))
+        previewState.workspace.channels = .loaded(data: formDic(payload: load("publicGroups.json"), id: \.groupID))
+        previewState.workspace.currentChannelID = previewState.workspace.channels.value?.first?.value.groupID
+        previewState.workspace.trickles = .loaded(data: [:])
+        previewState.workspace.participants = .loaded(data: formDic(payload: load("members.json"), id: \.memberID))
         return previewState
     }()
 }

@@ -136,6 +136,6 @@ class WebSocketStreamDelegate: NSObject, URLSessionWebSocketDelegate {
     
     func urlSession(_ session: URLSession, webSocketTask: URLSessionWebSocketTask, didCloseWith closeCode: URLSessionWebSocketTask.CloseCode, reason: Data?) {
         print("Web socket closed")
-        print(TrickleWebSocket.shared.stream?.closeCode, TrickleWebSocket.shared.stream?.closeReason)
+        print(TrickleWebSocket.shared.stream?.closeCode ?? "Unknown", TrickleWebSocket.shared.stream?.closeReason ?? "Unknown")
     }
 }

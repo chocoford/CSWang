@@ -10,16 +10,17 @@ import SwiftUI
 struct ParticipantsView: View {
     @EnvironmentObject var store: AppStore
     
-    var csState: CSState {
-        store.state.workspace.channel.chanshi
+    
+    var worksapceState: WorkspaceState {
+        store.state.workspace
     }
     
     var workspace: WorkspaceData? {
-        store.state.workspace.currentWorkspace
+        worksapceState.currentWorkspace
     }
     
     var channel: Loadable<GroupData> {
-        store.state.workspace.channel.currentChannel
+        store.state.workspace.currentChannel
     }
     
     var members: [MemberData] {
@@ -31,7 +32,7 @@ struct ParticipantsView: View {
     }
     
     @ViewBuilder private var content: some View {
-        switch csState.allParticipants {
+        switch worksapceState.allParticipants {
             case .notRequested:
                 notRequestedView
             case .isLoading(let last):

@@ -111,9 +111,7 @@ struct InviteMembersView: View {
         guard let workspace = workspace else {
             return
         }
-        await store.send(.channel(action: .createChannel(workspaceID: workspace.workspaceID,
-                                                         memberID: workspace.userMemberInfo.memberID,
-                                                         invitedMemberIDs: Array(invitedMemberIDs) + [workspace.userMemberInfo.memberID])))
+        await store.send(.workspace(action: .createChannel(invitedMemberIDs: Array(invitedMemberIDs) + [workspace.userMemberInfo.memberID])))
     }
 }
 #if DEBUG

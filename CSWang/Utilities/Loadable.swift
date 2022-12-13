@@ -11,6 +11,7 @@ import SwiftUI
 enum LoadableError: Error, LocalizedError {
     case cancelled
     case notFound
+    case parameterError
     case unexpected(error: Error)
     
     var localized: String {
@@ -19,6 +20,8 @@ enum LoadableError: Error, LocalizedError {
                 return "Canceled by user."
             case .notFound:
                 return "Entity not found."
+            case .parameterError:
+                return "Parameter error."
             case .unexpected(let error):
                 return error.localizedDescription
         }

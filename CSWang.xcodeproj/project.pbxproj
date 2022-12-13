@@ -15,7 +15,6 @@
 		390B46A22939CB1900E15DC3 /* ShitInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46A12939CB1800E15DC3 /* ShitInfoView.swift */; };
 		390B46A42939CBDA00E15DC3 /* CreateChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46A32939CBDA00E15DC3 /* CreateChannelView.swift */; };
 		390B46A62939DBE900E15DC3 /* ChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46A52939DBE900E15DC3 /* ChannelView.swift */; };
-		390B46A82939DEAE00E15DC3 /* ChannelState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46A72939DEAE00E15DC3 /* ChannelState.swift */; };
 		390B46AA2939E0DF00E15DC3 /* Array+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46A92939E0DF00E15DC3 /* Array+Extension.swift */; };
 		390B46AC2939FD2000E15DC3 /* MembersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46AB2939FD2000E15DC3 /* MembersListView.swift */; };
 		390B46B0293A08EA00E15DC3 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390B46AF293A08EA00E15DC3 /* LoadingView.swift */; };
@@ -36,7 +35,6 @@
 		39D2899A293E44A600846BF6 /* publicGroups.json in Resources */ = {isa = PBXBuildFile; fileRef = 39D28999293E44A600846BF6 /* publicGroups.json */; };
 		39D2899E293E56A300846BF6 /* TrickleIntergratable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D2899D293E56A300846BF6 /* TrickleIntergratable.swift */; };
 		39D289A3293EF74B00846BF6 /* ParticipantsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289A2293EF74B00846BF6 /* ParticipantsView.swift */; };
-		39D289A5293F0DB200846BF6 /* CSState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289A4293F0DB200846BF6 /* CSState.swift */; };
 		39D289A8294077C600846BF6 /* WorkspaceChooseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289A7294077C600846BF6 /* WorkspaceChooseView.swift */; };
 		39D289AB2940886B00846BF6 /* CSUserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289AA2940886B00846BF6 /* CSUserInfo.swift */; };
 		39D289AD29419C6C00846BF6 /* Dictionary+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289AC29419C6C00846BF6 /* Dictionary+Extension.swift */; };
@@ -100,7 +98,6 @@
 		390B46A12939CB1800E15DC3 /* ShitInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShitInfoView.swift; sourceTree = "<group>"; };
 		390B46A32939CBDA00E15DC3 /* CreateChannelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateChannelView.swift; sourceTree = "<group>"; };
 		390B46A52939DBE900E15DC3 /* ChannelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelView.swift; sourceTree = "<group>"; };
-		390B46A72939DEAE00E15DC3 /* ChannelState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChannelState.swift; sourceTree = "<group>"; };
 		390B46A92939E0DF00E15DC3 /* Array+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Extension.swift"; sourceTree = "<group>"; };
 		390B46AB2939FD2000E15DC3 /* MembersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembersListView.swift; sourceTree = "<group>"; };
 		390B46AF293A08EA00E15DC3 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
@@ -120,7 +117,6 @@
 		39D28999293E44A600846BF6 /* publicGroups.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = publicGroups.json; sourceTree = "<group>"; };
 		39D2899D293E56A300846BF6 /* TrickleIntergratable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrickleIntergratable.swift; sourceTree = "<group>"; };
 		39D289A2293EF74B00846BF6 /* ParticipantsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantsView.swift; sourceTree = "<group>"; };
-		39D289A4293F0DB200846BF6 /* CSState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSState.swift; sourceTree = "<group>"; };
 		39D289A7294077C600846BF6 /* WorkspaceChooseView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WorkspaceChooseView.swift; sourceTree = "<group>"; };
 		39D289AA2940886B00846BF6 /* CSUserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSUserInfo.swift; sourceTree = "<group>"; };
 		39D289AC29419C6C00846BF6 /* Dictionary+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Extension.swift"; sourceTree = "<group>"; };
@@ -364,8 +360,6 @@
 				39F12D602933D0AC005F5D48 /* App.swift */,
 				39A9B4A729372A49002599FE /* UserState.swift */,
 				39A9B4A929372B1A002599FE /* WorkspaceState.swift */,
-				390B46A72939DEAE00E15DC3 /* ChannelState.swift */,
-				39D289A4293F0DB200846BF6 /* CSState.swift */,
 			);
 			path = Store;
 			sourceTree = "<group>";
@@ -577,7 +571,6 @@
 				39A9B4B2293782CC002599FE /* ListButtonStyle.swift in Sources */,
 				39D289A3293EF74B00846BF6 /* ParticipantsView.swift in Sources */,
 				39D289AF2943A24100846BF6 /* SecondaryButtonStyle.swift in Sources */,
-				390B46A82939DEAE00E15DC3 /* ChannelState.swift in Sources */,
 				390B46A42939CBDA00E15DC3 /* CreateChannelView.swift in Sources */,
 				39F12D7929347B31005F5D48 /* PrimaryButtonStyle.swift in Sources */,
 				39F12D702933DC69005F5D48 /* KeychainHelper.swift in Sources */,
@@ -591,7 +584,6 @@
 				390B46B0293A08EA00E15DC3 /* LoadingView.swift in Sources */,
 				39D28998293E071000846BF6 /* LogoutButton.swift in Sources */,
 				39D289B62944EF3D00846BF6 /* String+Extension.swift in Sources */,
-				39D289A5293F0DB200846BF6 /* CSState.swift in Sources */,
 				39F12D612933D0AC005F5D48 /* App.swift in Sources */,
 				390B46BD293CCA3C00E15DC3 /* CancelBag.swift in Sources */,
 				390B46B9293CA6C800E15DC3 /* ErrorView.swift in Sources */,
@@ -771,7 +763,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CSWang/CSWang.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"CSWang/Preview Content\"";
 				DEVELOPMENT_TEAM = EQSKXJ7B7B;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -788,8 +780,8 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
@@ -812,7 +804,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CSWang/CSWang.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"CSWang/Preview Content\"";
 				DEVELOPMENT_TEAM = EQSKXJ7B7B;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -829,8 +821,8 @@
 				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";

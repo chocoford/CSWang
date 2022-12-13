@@ -41,11 +41,9 @@ struct CreateChannelView: View {
         guard let workspace = workspace else {
             return
         }
-        await store.send(.channel(action: .createChannel(workspaceID: workspace.workspaceID,
-                                                         memberID: workspace.userMemberInfo.memberID,
-                                                         invitedMemberIDs: [])))
-        if let channelID = store.state.workspace.channel.currentChannel.value?.groupID {
-            await store.send(.chanshi(action: .joinCSChannel(workspaceID: workspace.workspaceID,
+        await store.send(.workspace(action: .createChannel(invitedMemberIDs: [])))
+        if let channelID = store.state.workspace.currentChannel.value?.groupID {
+            await store.send(.workspace(action: .joinCSChannel(workspaceID: workspace.workspaceID,
                                                              channelID: channelID,
                                                              memberID: workspace.userMemberInfo.memberID)))
         }

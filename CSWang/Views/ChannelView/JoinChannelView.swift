@@ -10,12 +10,16 @@ import SwiftUI
 struct JoinChannelView: View {
     @EnvironmentObject var store: AppStore
     
+    var workspaceState: WorkspaceState {
+        store.state.workspace
+    }
+    
     var workspace: WorkspaceData? {
-        store.state.workspace.currentWorkspace
+        workspaceState.currentWorkspace
     }
     
     var channel: Loadable<GroupData> {
-        store.state.workspace.channel.currentChannel
+        workspaceState.currentChannel
     }
     
     var memberInfo: MemberData? {
@@ -47,7 +51,7 @@ private extension JoinChannelView {
               let channel = channel.value,
               let member = memberInfo else { return }
         joining = true
-        await store.send(.chanshi(action: .joinCSChannel(workspaceID: workspace.workspaceID,
+        await store.send(.workspace(action: .joinCSChannel(workspaceID: workspace.workspaceID,
                                                          channelID: channel.groupID,
                                                          memberID: member.memberID)))
         joining = true

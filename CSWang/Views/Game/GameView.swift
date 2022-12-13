@@ -11,22 +11,22 @@ import Combine
 struct GameView: View {
     @EnvironmentObject var store: AppStore
     
+    var workspaceState: WorkspaceState {
+        store.state.workspace
+    }
+    
     var workspace: WorkspaceData? {
-        store.state.workspace.currentWorkspace
+        workspaceState.currentWorkspace
     }
     
     var channel: Loadable<GroupData> {
-        store.state.workspace.channel.currentChannel
+        workspaceState.currentChannel
     }
     
     var memberInfo: MemberData? {
         workspace?.userMemberInfo
     }
-    
-    var csState: CSState {
-        store.state.workspace.channel.chanshi
-    }
-    
+
     @Binding var show: Bool
     
     @State private var points: [Int?] = .init(repeating: nil, count: 6)
@@ -97,17 +97,17 @@ struct GameView: View {
               let channel = channel.value,
               let member = memberInfo else { return }
         
-        if case .ready = csState.userGambleState {
+        if case .ready = workspaceState.userGambleState {
             let score = getResult()
-            await store.send(.chanshi(action: .publishScore(workspaceID: workspace.workspaceID,
+            await store.send(.workspace(action: .publishScore(workspaceID: workspace.workspaceID,
                                                             channelID: channel.groupID,
                                                             memberID: member.memberID,
                                                             score: score)))
-            await store.send(.chanshi(action: .getUserCSInfo(memberData: member)))
-            await store.send(.chanshi(action: .summarizeIfNeeded(workspaceID: workspace.workspaceID,
+            await store.send(.workspace(action: .getUserCSInfo(memberData: member)))
+            await store.send(.workspace(action: .summarizeIfNeeded(workspaceID: workspace.workspaceID,
                                                                  channelID: channel.groupID,
                                                                  memberID: member.memberID)))
-            await store.send(.chanshi(action: .weekStateCheck))
+            await store.send(.workspace(action: .weekStateCheck))
         }
 
     }

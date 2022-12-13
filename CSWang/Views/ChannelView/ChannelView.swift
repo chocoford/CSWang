@@ -11,22 +11,22 @@ import Charts
 struct ChannelView: View {
     @EnvironmentObject var store: AppStore
     
+    var workspaceState: WorkspaceState {
+        store.state.workspace
+    }
+    
     var workspace: WorkspaceData? {
-        store.state.workspace.currentWorkspace
+        workspaceState.currentWorkspace
     }
     
     var channel: Loadable<GroupData> {
-        store.state.workspace.channel.currentChannel
+        workspaceState.currentChannel
     }
     
     var memberInfo: MemberData? {
         workspace?.userMemberInfo
     }
-    
-    var csState: CSState {
-        store.state.workspace.channel.chanshi
-    }
-    
+
     // MARK: - User Channel State
     enum UserChannelState {
         case joined
@@ -34,8 +34,8 @@ struct ChannelView: View {
         case checking
     }
     var userChannelState: UserChannelState {
-        guard csState.trickles.state == .loaded else { return .checking }
-        if csState.trickles.value?.values.first(where: {
+        guard workspaceState.trickles.state == .loaded else { return .checking }
+        if workspaceState.trickles.value?.values.first(where: {
             return TrickleIntergratable.getType($0.blocks) == .helloWorld && $0.authorMemberInfo.memberID == memberInfo?.memberID
         }) != nil {
             return .joined
@@ -57,7 +57,7 @@ struct ChannelView: View {
             case .isLoading(let last):
                 loadingView(last)
             case .loaded(let data):
-                switch csState.trickles {
+                switch workspaceState.trickles {
                     case .notRequested:
                         fetchingView()
                             .onAppear(perform: loadAllPosts)
@@ -75,7 +75,7 @@ struct ChannelView: View {
                                     }
                                     .onChange(of: store.state.workspace.members) { newValue in
                                         Task {
-                                            await store.send(.chanshi(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
+                                            await store.send(.workspace(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
                                         }
                                     }
                             case .checking:
@@ -96,21 +96,16 @@ private extension ChannelView {
     private func getChanShiInfo() {
         guard let member = memberInfo else { return }
         Task {
-            await store.send(.chanshi(action: .weekStateCheck))
-            await store.send(.chanshi(action: .getUserCSInfo(memberData: member)))
-            await store.send(.chanshi(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
+            await store.send(.workspace(action: .weekStateCheck))
+            await store.send(.workspace(action: .getUserCSInfo(memberData: member)))
+            await store.send(.workspace(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
         }
     }
     
     private func loadAllPosts() {
-        guard let workspace = workspace,
-              let channel = channel.value,
-              let member = memberInfo else { return }
         Task {
-            await store.send(.chanshi(action: .listAllTrickles(workspaceID: workspace.workspaceID,
-                                                               channelID: channel.groupID,
-                                                               memberID: member.memberID)))
-            await store.send(.chanshi(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
+            await store.send(.workspace(action: .listAllTrickles()))
+            await store.send(.workspace(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
         }
     }
     
@@ -119,7 +114,7 @@ private extension ChannelView {
               let channel = channel.value,
               let member = memberInfo else { return }
         Task {
-            await store.send(.chanshi(action: .freshenTrickles(workspaceID: workspace.workspaceID,
+            await store.send(.workspace(action: .freshenTrickles(workspaceID: workspace.workspaceID,
                                                                channelID: channel.groupID,
                                                                memberID: member.memberID)))
             getChanShiInfo()
@@ -177,8 +172,8 @@ extension ChannelView {
                         .font(.largeTitle)
                         .fontWeight(.black)
                     
-                    Text("状态：\(csState.currentWeekState.localized)")
-                    if let summary = csState.lastWeekSummaryInfo,
+                    Text("状态：\(workspaceState.currentWeekState.localized)")
+                    if let summary = workspaceState.lastWeekSummaryInfo,
                        let index = Array(summary.rankedParticipantIDsAndScores.reversed().prefix(5)).firstIndex(where: {$0.0 == memberInfo?.memberID}) {
                         Text("Your chanshi date：\(getWeekDayName(index: index))")
                     }
@@ -246,16 +241,16 @@ private extension ChannelView {
             
             HStack {
                 Spacer()
-                GameInfoCard(title: "Score", content: csState.csInfo.roundGame != nil ? "\(csState.csInfo.roundGame!.score)" : "-")
+                GameInfoCard(title: "Score", content: workspaceState.csInfo.roundGame != nil ? "\(workspaceState.csInfo.roundGame!.score)" : "-")
                 Spacer()
                 Divider()
                 Spacer()
-                GameInfoCard(title: "Rank", content: "\(csState.csInfo.roundGame?.rank != nil ? (csState.csInfo.roundGame!.rank! + 1).formatted() : "-")")
+                GameInfoCard(title: "Rank", content: "\(workspaceState.csInfo.roundGame?.rank != nil ? (workspaceState.csInfo.roundGame!.rank! + 1).formatted() : "-")")
                 Spacer()
             }
             .padding()
             .background(.ultraThickMaterial)
-            .if(csState.csInfo.roundGame == nil, transform: { content in
+            .if(workspaceState.csInfo.roundGame == nil, transform: { content in
                 content
                     .overlay(.ultraThinMaterial.opacity(0.9))
                     .overlay {
@@ -277,7 +272,7 @@ private extension ChannelView {
     }
     
     @ViewBuilder var rankChartView: some View {
-        Chart(store.state.workspace.channel.chanshi.weeklyGameInfos, id: \.memberData) {
+        Chart(workspaceState.weeklyGameInfos, id: \.memberData) {
             BarMark(x: .value("score", $0.score), y: .value("participant", $0.memberData.name))
         }
     }

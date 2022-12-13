@@ -40,7 +40,7 @@ private extension WorkspaceDetailView {
             return
         }
         Task {
-            await store.send(.channel(action: .listPublicChannels(workspaceID: workspace.workspaceID,
+            await store.send(.workspace(action: .listPublicChannels(workspaceID: workspace.workspaceID,
                                                                   memberID: workspace.userMemberInfo.memberID)))
             await store.send(.workspace(action: .listWorkspaceMembers(workspaceID: workspace.workspaceID)))
         }
