@@ -110,13 +110,8 @@ private extension ChannelView {
     }
     
     private func freshenPosts() {
-        guard let workspace = workspace,
-              let channel = channel.value,
-              let member = memberInfo else { return }
         Task {
-            await store.send(.workspace(action: .freshenTrickles(workspaceID: workspace.workspaceID,
-                                                               channelID: channel.groupID,
-                                                               memberID: member.memberID)))
+            await store.send(.workspace(action: .freshenTrickles))
             getChanShiInfo()
         }
     }

@@ -192,21 +192,21 @@ enum WorkspaceAction {
     case setTrickles(data: Loadable<[String: TrickleData]>)
     case addTrickles(data: [TrickleData])
     case listAllTrickles(until: Int? = nil, loaded: [String : TrickleData] = [:])
-    case freshenTrickles(workspaceID: String, channelID: String, memberID: String)
+    case freshenTrickles
     case createTrickle(payload: TrickleWebRepository.API.CreatePostPayload)
     
     case setParticipants(members: [MemberData])
     case loadParticipants(channelMembers: [MemberData])
     
-    case joinCSChannel(workspaceID: String, channelID: String, memberID: String)
+    case joinCSChannel
     
     case setGameInfo(info: CSUserInfo.GambleInfo?)
-    case publishScore(workspaceID: String, channelID: String, memberID: String, score: Int)
+    case publishScore(score: Int)
     
     case weekStateCheck
     
     case getUserCSInfo(memberData: MemberData)
-    case summarizeIfNeeded(workspaceID: String, channelID: String, memberID: String)
+    case summarizeIfNeeded
 }
 
 
@@ -402,7 +402,12 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
             }
             state.participants = .loaded(data: participants.formDictionary(key: \.memberID))
             
-        case .joinCSChannel(let workspaceID, let channelID, let memberID):
+        case .joinCSChannel:
+            guard let workspaceID = state.currentWorkspaceID,
+                  let channelID = state.currentChannel.value?.groupID,
+                  let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
+                break
+            }
             return Just(.createTrickle(payload: .init(authorMemberID: memberID,
                                                       blocks: TrickleIntergratable.createPost(type: .helloWorld),
                                                       mentionedMemberIDs: [])))
@@ -411,7 +416,12 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
         case .setGameInfo(let info):
             state.csInfo.roundGame = info
             
-        case .publishScore(let workspaceID, let channelID, let memberID, let score):
+        case .publishScore(let score):
+            guard let workspaceID = state.currentWorkspaceID,
+                  let channelID = state.currentChannel.value?.groupID,
+                  let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
+                break
+            }
             return  Just(.createTrickle(payload: .init(authorMemberID: memberID,
                                                        blocks: TrickleIntergratable.createPost(type: .gamble(score: score)))))
             .eraseToAnyPublisher()

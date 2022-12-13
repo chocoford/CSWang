@@ -93,20 +93,13 @@ struct GameView: View {
     }
     
     private func gamble() async {
-        guard let workspace = workspace,
-              let channel = channel.value,
-              let member = memberInfo else { return }
+        guard let member = memberInfo else { return }
         
         if case .ready = workspaceState.userGambleState {
             let score = getResult()
-            await store.send(.workspace(action: .publishScore(workspaceID: workspace.workspaceID,
-                                                            channelID: channel.groupID,
-                                                            memberID: member.memberID,
-                                                            score: score)))
+            await store.send(.workspace(action: .publishScore(score: score)))
             await store.send(.workspace(action: .getUserCSInfo(memberData: member)))
-            await store.send(.workspace(action: .summarizeIfNeeded(workspaceID: workspace.workspaceID,
-                                                                 channelID: channel.groupID,
-                                                                 memberID: member.memberID)))
+            await store.send(.workspace(action: .summarizeIfNeeded))
             await store.send(.workspace(action: .weekStateCheck))
         }
 

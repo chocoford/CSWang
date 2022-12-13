@@ -38,15 +38,8 @@ struct CreateChannelView: View {
     }
     
     func createChannel() async {
-        guard let workspace = workspace else {
-            return
-        }
         await store.send(.workspace(action: .createChannel(invitedMemberIDs: [])))
-        if let channelID = store.state.workspace.currentChannel.value?.groupID {
-            await store.send(.workspace(action: .joinCSChannel(workspaceID: workspace.workspaceID,
-                                                             channelID: channelID,
-                                                             memberID: workspace.userMemberInfo.memberID)))
-        }
+        await store.send(.workspace(action: .joinCSChannel))
     }
 }
 

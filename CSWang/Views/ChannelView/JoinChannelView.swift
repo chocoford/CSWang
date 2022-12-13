@@ -47,13 +47,8 @@ struct JoinChannelView: View {
 //MARK: - Side Effects
 private extension JoinChannelView {
     private func joinChannel() async {
-        guard let workspace = workspace,
-              let channel = channel.value,
-              let member = memberInfo else { return }
         joining = true
-        await store.send(.workspace(action: .joinCSChannel(workspaceID: workspace.workspaceID,
-                                                         channelID: channel.groupID,
-                                                         memberID: member.memberID)))
+        await store.send(.workspace(action: .joinCSChannel))
         joining = true
     }
 }
