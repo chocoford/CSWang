@@ -306,9 +306,11 @@ private extension ChannelView {
 //    }
 }
 
+#if DEBUG
 struct ChannelView_Previews: PreviewProvider {
     static var previews: some View {
         ChannelView()
             .environmentObject(AppStore.preview)
     }
 }
+#endif

@@ -42,7 +42,7 @@ struct CreateChannelDetailView: View {
 
     }
 }
-
+#if DEBUG
 struct CreateChannelDetailView_Previews: PreviewProvider {
     static var previews: some View {
         CreateChannelDetailView()
@@ -50,3 +50,4 @@ struct CreateChannelDetailView_Previews: PreviewProvider {
 
     }
 }
+#endif

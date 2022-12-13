@@ -43,7 +43,7 @@ struct MembersListView: View {
         
     }
 }
-
+#if DEBUG
 struct MembersListView_Previews: PreviewProvider {
     static let store = AppStore.preview
     static var previews: some View {
@@ -51,3 +51,4 @@ struct MembersListView_Previews: PreviewProvider {
 //            .environmentObject()
     }
 }
+#endif

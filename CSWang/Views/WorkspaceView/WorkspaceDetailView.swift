@@ -49,10 +49,11 @@ private extension WorkspaceDetailView {
 
 
 
-
+#if DEBUG
 struct WorkspaceDetailView_Previews: PreviewProvider {
     static var previews: some View {
         WorkspaceDetailView()
             .environmentObject(AppStore.preview)
     }
 }
+#endif

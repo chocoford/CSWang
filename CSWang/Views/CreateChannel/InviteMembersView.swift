@@ -116,10 +116,11 @@ struct InviteMembersView: View {
                                                          invitedMemberIDs: Array(invitedMemberIDs) + [workspace.userMemberInfo.memberID])))
     }
 }
-
+#if DEBUG
 struct InviteMembersView_Previews: PreviewProvider {
     static var previews: some View {
         InviteMembersView()
             .environmentObject(AppStore.preview)
     }
 }
+#endif

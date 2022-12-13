@@ -173,10 +173,11 @@ extension WorkspacessListView {
 }
 
 
-
+#if DEBUG
 struct WorkspacessListView_Previews: PreviewProvider {
     static var previews: some View {
         WorkspacessListView()
             .environmentObject(AppStore.preview)
     }
 }
+#endif

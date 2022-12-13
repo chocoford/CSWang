@@ -86,10 +86,11 @@ extension ParticipantsView {
         .padding(.horizontal)
     }
 }
-
+#if DEBUG
 struct ParticipantsView_Previews: PreviewProvider {
     static var previews: some View {
         ParticipantsView()
             .environmentObject(AppStore.preview)
     }
 }
+#endif
