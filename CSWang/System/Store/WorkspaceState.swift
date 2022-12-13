@@ -21,6 +21,12 @@ struct WorkspaceState {
     {
         willSet(val) {
             members = nil
+            channels = .notRequested
+            currentChannelID = nil
+            lastWeekState = .unknown
+            currentWeekState = .unknown
+            userGambleState = .ready
+            csInfo = .init()
         }
     }
     
@@ -47,7 +53,12 @@ struct WorkspaceState {
         }
     }
     
-    var currentChannelID: String?
+    var currentChannelID: String? {
+        willSet {
+            trickles = .notRequested
+            participants = .notRequested
+        }
+    }
     var currentChannel: Loadable<GroupData> {
         switch channels {
             case .notRequested:
