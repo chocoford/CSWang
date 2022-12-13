@@ -247,15 +247,17 @@ private extension ChannelView {
             .background(.ultraThickMaterial)
             .if(workspaceState.csInfo.roundGame == nil, transform: { content in
                 content
-                    .overlay(.ultraThinMaterial.opacity(0.9))
+                    .blur(radius: 4)
+                    .background(.ultraThickMaterial)
                     .overlay {
                         Button {
                             showGameView = true
                         } label: {
                             Text("Play")
                         }
-                        .buttonStyle(PrimaryButtonStyle())
+                        .buttonStyle(PrimaryButtonStyle(disabled: workspaceState.currentWeekState == .finished))
                         .shadow(radius: 4)
+                        .disabled(workspaceState.currentWeekState == .finished)
                     }
             })
                 .containerShape(RoundedRectangle(cornerRadius: 8))

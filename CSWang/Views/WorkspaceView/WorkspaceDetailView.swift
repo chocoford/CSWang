@@ -36,13 +36,9 @@ struct WorkspaceDetailView: View {
 
 private extension WorkspaceDetailView {
     func loadWorkspaceDetails() {
-        guard let workspace = workspace else {
-            return
-        }
         Task {
-            await store.send(.workspace(action: .listPublicChannels(workspaceID: workspace.workspaceID,
-                                                                  memberID: workspace.userMemberInfo.memberID)))
-            await store.send(.workspace(action: .listWorkspaceMembers(workspaceID: workspace.workspaceID)))
+            await store.send(.workspace(action: .listPublicChannels))
+            await store.send(.workspace(action: .listWorkspaceMembers))
         }
     }
 }

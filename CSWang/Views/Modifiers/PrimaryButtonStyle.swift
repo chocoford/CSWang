@@ -10,6 +10,7 @@ import SwiftUI
 struct PrimaryButtonStyle: ButtonStyle {
     var block: Bool = false
     var loading: Bool = false
+    var disabled: Bool = false
     
     private struct PrimaryButtonStyleView<V: View>: View {
         @State private var hovering = false
@@ -17,8 +18,21 @@ struct PrimaryButtonStyle: ButtonStyle {
         
         let baseColor = Color.blue
         var block = false
+        var disabled = false
 
         let content: () -> V
+        
+        var bgColor: Color {
+            if disabled {
+                return Color.primary.disabled
+            } else if isPressed {
+                return Color.primary.pressed
+            } else if hovering {
+                return Color.primary.hovered
+            } else {
+                return Color.primary.default
+            }
+        }
         
         var body: some View {
             HStack {
@@ -36,8 +50,11 @@ struct PrimaryButtonStyle: ButtonStyle {
             .foregroundColor(Color.white)
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(isPressed ? Color.primary.pressed : hovering ? Color.primary.hovered : Color.primary.default)
-                    .shadow(color: hovering ? .gray : .clear, radius: 1, x: 0, y: 1)
+                    .fill(bgColor)
+                    .if(!disabled, transform: { content in
+                        content
+                            .shadow(color: hovering ? .gray : .clear, radius: 1, x: 0, y: 1)
+                    })
             )
             .animation(.easeOut(duration: 0.2), value: hovering)
             .onHover { over in
@@ -49,7 +66,7 @@ struct PrimaryButtonStyle: ButtonStyle {
     
     func makeBody(configuration: Self.Configuration) -> some View {
         LoadableButtonStyleView(loading: loading) {
-            PrimaryButtonStyleView(isPressed: configuration.isPressed, block: block) {
+            PrimaryButtonStyleView(isPressed: configuration.isPressed, block: block, disabled: disabled) {
                 configuration.label
             }
         }

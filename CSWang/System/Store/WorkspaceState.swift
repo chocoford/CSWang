@@ -188,16 +188,16 @@ enum WorkspaceAction {
     case setWorkspaceMembers(members: [MemberData])
     case setCurrentWorkspace(workspaceID: String?)
     case listWorkspaces(userID: String)
-    case listWorkspaceMembers(workspaceID: String)
+    case listWorkspaceMembers
     
     // MARK: - channel
     case addChannels(items: [GroupData])
     case setChannels(items: [GroupData])
     case createChannel(invitedMemberIDs: [String])
-    case listPublicChannels(workspaceID: String, memberID: String)
+    case listPublicChannels
     
     @available(*, deprecated, message: "Will not be used")
-    case listPrivateChannels(workspaceID: String, memberID: String)
+    case listPrivateChannels
     
     // MARK: - chanshi
     case setTrickles(data: Loadable<[String: TrickleData]>)

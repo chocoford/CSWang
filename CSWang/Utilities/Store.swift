@@ -53,7 +53,7 @@ extension Store {
             get: { self.state[keyPath: keyPath] },
             set: { val in
                 Task {
-                    await self.send(toAction(val))
+                   await self.send(toAction(val))
                 }
             }
         )

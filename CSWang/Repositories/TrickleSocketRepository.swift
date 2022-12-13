@@ -227,7 +227,7 @@ extension TrickleWebSocket {
                 logger.info("on room members: \(messageData.description)")
                 
             case .sync:
-                guard let messageData = message.decode(IncomingMessage<[RoomMembers]>.self) else { fallthrough }
+                guard let _ = message.decode(IncomingMessage<[RoomMembers]>.self) else { fallthrough }
                 
             case .changeNotify:
                 guard let messageData = message.decode(IncomingMessage<[ChangeNotifyData]>.self) else { fallthrough }
