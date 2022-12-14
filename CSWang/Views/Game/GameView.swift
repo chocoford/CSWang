@@ -40,47 +40,55 @@ struct GameView: View {
     }
     
     var body: some View {
-        VStack {
-            Text("Gamble")
-                .font(.title)
-                .padding()
-            
-            Text("现阶段该游戏并为开发好，但总的来说就是一个扔骰子的游戏。游戏规则：将摇出4个数字，分别在以下位置一次进行填空，结果为计算结果")
-                .font(.footnote)
-            
-            // 游戏规则：[x1x2](x3*x4) % [x3x2](x1*x4)
-            HStack {
-                PointContainer(text: points[0]?.formatted())
-                PointContainer(text: points[1]?.formatted())
-                PointContainer(text: points[2]?.formatted())
-                PointContainer(text: points[3]?.formatted())
-            }
-            .padding()
-            
-            Text("Rule: `[x1x2](x3*x4) % [x3x2](x1*x4)`")
-            
-            if didPlay {
-                let points = points.compactMap{ $0 }
-                Text("\(points[0])\(points[1])(\(points[2])*\(points[3])) % \(points[2])\(points[1])(\(points[0])*\(points[3])) = \(getResult())")
+        ZStack(alignment: .topTrailing) {
+            VStack {
+                Text("Gamble")
+                    .font(.title)
                     .padding()
+                
+                Text("现阶段该游戏并为开发好，但总的来说就是一个扔骰子的游戏。游戏规则：将摇出4个数字，分别在以下位置一次进行填空，结果为计算结果")
+                    .font(.footnote)
+                
+                // 游戏规则：[x1x2](x3*x4) % [x3x2](x1*x4)
+                HStack {
+                    PointContainer(text: points[0]?.formatted())
+                    PointContainer(text: points[1]?.formatted())
+                    PointContainer(text: points[2]?.formatted())
+                    PointContainer(text: points[3]?.formatted())
+                }
+                .padding()
+                
+                Text("Rule: `[x1x2](x3*x4) % [x3x2](x1*x4)`")
+                
+                if didPlay {
+                    let points = points.compactMap{ $0 }
+                    Text("\(points[0])\(points[1])(\(points[2])*\(points[3])) % \(points[2])\(points[1])(\(points[0])*\(points[3])) = \(getResult())")
+                        .padding()
+                }
+                
+                //            if rolling {
+                //                Button {
+                //                    makeScore()
+                //                } label: {
+                //                    Text("Stop")
+                //                }
+                //                .buttonStyle(PrimaryButtonStyle())
+                //            } else {
+                if !didPlay {
+                    Button {
+                        rollScore()
+                    } label: {
+                        Text("Roll")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                }
+            }
+            if didPlay {
+                LoadingView(size: 15)
+                    .frame(width: 20, height: 20)
+                    .padding(16)
             }
             
-//            if rolling {
-//                Button {
-//                    makeScore()
-//                } label: {
-//                    Text("Stop")
-//                }
-//                .buttonStyle(PrimaryButtonStyle())
-//            } else {
-            if !didPlay {
-                Button {
-                    rollScore()
-                } label: {
-                    Text("Roll")
-                }
-                .buttonStyle(PrimaryButtonStyle())
-            }
         }
     }
     

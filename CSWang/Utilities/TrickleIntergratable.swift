@@ -73,7 +73,7 @@ struct TrickleIntergratable {
         case helloWorld
         case membersChange(invitedMembers: [MemberData])
         case gamble(score: Int)
-        case summary(memberAndScores: [(MemberData, Int)])
+        case summary(memberAndScores: [(MemberData, Int?)])
         
         var id: String {
             switch self {
@@ -155,12 +155,12 @@ struct TrickleIntergratable {
                           elements: [
                             Element(.text, text: "")
                           ])
-                ] + memberAndScores.sorted(by: {$0.1 > $1.1}).enumerated().map { (index, tuple) in
+                ] + memberAndScores.sorted(by: {$0.1 ?? 0 > $1.1 ?? 0}).enumerated().map { (index, tuple) in
                     Block(type: .numberedList,
                           value: "\(index + 1).",
                           elements: [
                             Element(.user, text: "\(tuple.0.name)", value: tuple.0.memberID),
-                            Element(.text, text: " got a score of \(tuple.1)", value: "\(tuple.1)"),
+                            tuple.1 != nil ? Element(.text, text: " got a score of \(tuple.1!)", value: "\(tuple.1!)") : Element(.text, text: " is absent."),
                           ])
                 }
         }
@@ -325,9 +325,9 @@ struct TrickleIntergratable {
         return trickles.count
     }
     
-    static func getWeeklyGambles(_ trickles: [TrickleData]) -> [TrickleData] {
+    static func getWeeklyGambles(_ trickles: [TrickleData], week: Int = currentWeek) -> [TrickleData] {
         let weeklyGambleTrickles = trickles.filter {
-            if getWeek(second: $0.createAt) == currentWeek,
+            if getWeek(second: $0.createAt) == week,
                case .gamble = getType($0.blocks) {
                 return true
             }
@@ -338,9 +338,9 @@ struct TrickleIntergratable {
         return weeklyGambleTrickles
     }
     
-    static func getWeeklyGameInfos(_ trickles: [TrickleData]) -> [CSUserInfo.GambleInfo] {
+    static func getWeeklyGameInfos(_ trickles: [TrickleData], week: Int = currentWeek) -> [CSUserInfo.GambleInfo] {
         let weeklyGambleTrickles = trickles.filter {
-            if getWeek(second: $0.createAt) == currentWeek,
+            if getWeek(second: $0.createAt) == week,
                case .gamble = getType($0.blocks) {
                 return true
             }

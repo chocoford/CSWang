@@ -26,20 +26,33 @@ struct JoinChannelView: View {
         workspace?.userMemberInfo
     }
     
-    @State private var joining: Bool = false
+    @State private var joining: Bool = false {
+        didSet {
+            if joining {
+                Timer.scheduledTimer(withTimeInterval: 30, repeats: false) { _ in
+                    joining  = false
+                }
+            }
+        }
+    }
     
     
     var body: some View {
         VStack {
-            Text("It seems that there is already a channel.")
-            Button {
-                Task {
-                    await joinChannel()
+            if !joining {
+                Text("It seems that there is already a channel.")
+                Button {
+                    Task {
+                        await joinChannel()
+                    }
+                } label: {
+                    Text("Join")
                 }
-            } label: {
-                Text("Join")
+                .buttonStyle(PrimaryButtonStyle(loading: joining))
+                .disabled(joining)
+            } else {
+                LoadingView()
             }
-            .buttonStyle(PrimaryButtonStyle(loading: joining))
         }
     }
 }
