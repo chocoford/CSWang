@@ -44,6 +44,7 @@ struct CellList<V: View, T: Identifiable&Hashable>: View {
         }
     }
     
+#if os(iOS)
     @ViewBuilder var listView: some View {
         List(items, selection: $selected) { item in
             content(item)
@@ -52,5 +53,5 @@ struct CellList<V: View, T: Identifiable&Hashable>: View {
         }
         .listStyle(.plain)
     }
-   
+#endif  
 }
