@@ -93,11 +93,6 @@ class TrickleWebSocket {
             case .leaveRoom(let data):
                 await stream?.send(message: OutgoingMessage(action: .message, path: .leaveRoom, data: data))
         }
-//        
-//        if stream?.status != .running {
-//            logger.info("Socket is not running. Reiniting.")
-//            reinitSocket()
-//        }
     }
     
     public func close() {
@@ -233,7 +228,11 @@ extension TrickleWebSocket {
                 guard let messageData = message.decode(IncomingMessage<[ChangeNotifyData]>.self) else { fallthrough }
                 logger.info("on change notify: \(messageData.description)")
                 guard let _ = messageData.data?.first?.codes.keys.first(where: {
-                    $0.firstMatch(of: /workspace:[0-9]+:trickle/) != nil
+                    if #available(iOS 16.0, *), #available(macOS 13.0, *) {
+                        return $0.firstMatch(of: /workspace:[0-9]+:trickle/) != nil
+                    } else {
+                        return $0.matches(regex: "workspace:[0-9]+:trickle")
+                    }
                 }) else {
                     break
                 }

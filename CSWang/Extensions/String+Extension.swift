@@ -31,4 +31,11 @@ extension String {
        let range = NSRange(location: 0, length: count)
        return regex?.stringByReplacingMatches(in: self, options: [], range: range, withTemplate: "$1_$2")
      }
+    
+    // MARK: - NSRegex
+    func matches(regex: String) -> Bool {
+        guard let regex = try? NSRegularExpression(pattern: regex) else { return false }
+        let range = NSRange(location: 0, length: self.utf16.count)
+        return regex.firstMatch(in: self, options: [], range: range) != nil
+    }
 }

@@ -16,23 +16,11 @@ struct LoadableButtonStyleView<V: View>: View {
     var body: some View {
         ZStack {
             content()
-                .disabled(!loading)
-//            if loading {
-//                Text("Loading...")
-//                GeometryReader { geometry in
-//                LoadingView(size: 4)
-//                    .background(.regularMaterial)
-//                }
-//            }
+                .opacity(loading ? 0 : 1)
+            if loading {
+                LoadingView(size: 20, strokeColor: .white)
+            }
         }
-        
-//        .foregroundColor(Color.white)
-//        .background(
-//            RoundedRectangle(cornerRadius: 8)
-//                .fill(isPressed ? Color.primary.pressed : hovering ? Color.primary.hovered : Color.primary.default)
-//                .shadow(color: hovering ? .gray : .clear, radius: 1, x: 0, y: 1)
-//        )
-//        .animation(.easeOut(duration: 0.2), value: hovering)
         .onHover { over in
             self.hovering = over
         }

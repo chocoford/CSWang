@@ -45,7 +45,8 @@ class WebSocketStream: AsyncSequence {
     }
     
     init(url: URL, session: URLSession = URLSession.shared) {
-        logger.info("initing websocket: \(url.formatted())")
+        logger.info("initing websocket: \(url.description)")
+        
         socket = session.webSocketTask(with: url)
         socket.delegate = WebSocketStreamDelegate()
         

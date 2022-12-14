@@ -160,7 +160,7 @@ private extension ChannelView {
 // MARK: - Displaying Content
 extension ChannelView {
     func loadedView(_ data: GroupData) -> some View {
-        NavigationStack {
+        @ViewBuilder var body: some View {
             VStack {
                 VStack {
                     Text("Week \(currentWeek)")
@@ -190,6 +190,14 @@ extension ChannelView {
                 }
                 .disabled(channel.value == nil)
             }
+        }
+        
+        if #available(iOS 16.0, *), #available(macOS 13.0, *) {
+            return NavigationStack {
+                body
+            }
+        } else {
+            return body
         }
     }
 }
@@ -269,8 +277,12 @@ private extension ChannelView {
     }
     
     @ViewBuilder var rankChartView: some View {
-        Chart(workspaceState.weeklyGameInfos, id: \.memberData) {
-            BarMark(x: .value("score", $0.score), y: .value("participant", $0.memberData.name))
+        if #available(iOS 16.0, *), #available(macOS 13.0, *) {
+            Chart(workspaceState.weeklyGameInfos, id: \.memberData) {
+                BarMark(x: .value("score", $0.score), y: .value("participant", $0.memberData.name))
+            }
+        } else {
+            EmptyView()
         }
     }
     

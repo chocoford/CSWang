@@ -46,6 +46,9 @@
 		39D289BB294755F800846BF6 /* AppDelegateIOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289BA294755F800846BF6 /* AppDelegateIOS.swift */; };
 		39D289BD2948483400846BF6 /* JoinChannelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289BC2948483400846BF6 /* JoinChannelView.swift */; };
 		39D289BF294849E900846BF6 /* LoadableButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289BE294849E900846BF6 /* LoadableButtonStyle.swift */; };
+		39D289C12949F67800846BF6 /* NSRegularExpression+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289C02949F67800846BF6 /* NSRegularExpression+Extension.swift */; };
+		39D289C3294A12F100846BF6 /* URL+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289C2294A12F100846BF6 /* URL+Extension.swift */; };
+		39D289C5294A2DFC00846BF6 /* CellList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39D289C4294A2DFC00846BF6 /* CellList.swift */; };
 		39EF55F62937AB0B005F10F4 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F52937AB0B005F10F4 /* AvatarView.swift */; };
 		39EF55FA2937C19F005F10F4 /* MemberCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39EF55F92937C19F005F10F4 /* MemberCardView.swift */; };
 		39EF55FD2937CB1F005F10F4 /* ShapeBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 39EF55FC2937CB1F005F10F4 /* ShapeBuilder */; };
@@ -128,6 +131,9 @@
 		39D289BA294755F800846BF6 /* AppDelegateIOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegateIOS.swift; sourceTree = "<group>"; };
 		39D289BC2948483400846BF6 /* JoinChannelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinChannelView.swift; sourceTree = "<group>"; };
 		39D289BE294849E900846BF6 /* LoadableButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadableButtonStyle.swift; sourceTree = "<group>"; };
+		39D289C02949F67800846BF6 /* NSRegularExpression+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSRegularExpression+Extension.swift"; sourceTree = "<group>"; };
+		39D289C2294A12F100846BF6 /* URL+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Extension.swift"; sourceTree = "<group>"; };
+		39D289C4294A2DFC00846BF6 /* CellList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellList.swift; sourceTree = "<group>"; };
 		39EF55F52937AB0B005F10F4 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
 		39EF55F92937C19F005F10F4 /* MemberCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberCardView.swift; sourceTree = "<group>"; };
 		39F12D2B2933CF8F005F5D48 /* CSWang.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CSWang.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -372,6 +378,7 @@
 				39EF55F92937C19F005F10F4 /* MemberCardView.swift */,
 				390B469F2939C72700E15DC3 /* NavigationCellView.swift */,
 				39D28997293E071000846BF6 /* LogoutButton.swift */,
+				39D289C4294A2DFC00846BF6 /* CellList.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -401,9 +408,11 @@
 			children = (
 				39F12D7F2934A9C8005F5D48 /* View+Extension.swift */,
 				39396B082937D3FB00EDD29F /* Encodable+Extension.swift */,
+				39D289C2294A12F100846BF6 /* URL+Extension.swift */,
 				390B46A92939E0DF00E15DC3 /* Array+Extension.swift */,
 				39D289AC29419C6C00846BF6 /* Dictionary+Extension.swift */,
 				39D289B52944EF3D00846BF6 /* String+Extension.swift */,
+				39D289C02949F67800846BF6 /* NSRegularExpression+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -561,7 +570,9 @@
 				39F12D5F2933D072005F5D48 /* Store.swift in Sources */,
 				390B46AC2939FD2000E15DC3 /* MembersListView.swift in Sources */,
 				39D289BF294849E900846BF6 /* LoadableButtonStyle.swift in Sources */,
+				39D289C3294A12F100846BF6 /* URL+Extension.swift in Sources */,
 				39F12D632933D235005F5D48 /* WebRepository.swift in Sources */,
+				39D289C5294A2DFC00846BF6 /* CellList.swift in Sources */,
 				39F12D802934A9C8005F5D48 /* View+Extension.swift in Sources */,
 				39F12D652933D250005F5D48 /* APICall.swift in Sources */,
 				39EF55FA2937C19F005F10F4 /* MemberCardView.swift in Sources */,
@@ -577,6 +588,7 @@
 				39F12D682933D4F4005F5D48 /* AppEnviornment.swift in Sources */,
 				39D2899E293E56A300846BF6 /* TrickleIntergratable.swift in Sources */,
 				39D289AB2940886B00846BF6 /* CSUserInfo.swift in Sources */,
+				39D289C12949F67800846BF6 /* NSRegularExpression+Extension.swift in Sources */,
 				39F12D2F2933CF8F005F5D48 /* CSWangApp.swift in Sources */,
 				390B46A22939CB1900E15DC3 /* ShitInfoView.swift in Sources */,
 				39F12D822934C2BB005F5D48 /* WebAuth.swift in Sources */,
@@ -765,7 +777,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"CSWang/Preview Content\"";
-				DEVELOPMENT_TEAM = 85UKH2MY8J;
+				DEVELOPMENT_TEAM = EQSKXJ7B7B;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -782,10 +794,10 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chocoford.CSWang;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -806,7 +818,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"CSWang/Preview Content\"";
-				DEVELOPMENT_TEAM = 85UKH2MY8J;
+				DEVELOPMENT_TEAM = EQSKXJ7B7B;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -823,10 +835,10 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.0;
 				MARKETING_VERSION = 0.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chocoford.CSWang;
 				PRODUCT_NAME = "$(TARGET_NAME)";

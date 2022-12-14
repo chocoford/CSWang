@@ -39,7 +39,7 @@ struct JoinChannelView: View {
     
     var body: some View {
         VStack {
-            if !joining {
+//            if !joining {
                 Text("It seems that there is already a channel.")
                 Button {
                     Task {
@@ -50,9 +50,9 @@ struct JoinChannelView: View {
                 }
                 .buttonStyle(PrimaryButtonStyle(loading: joining))
                 .disabled(joining)
-            } else {
-                LoadingView()
-            }
+//            } else {
+//                LoadingView()
+//            }
         }
     }
 }
@@ -61,8 +61,8 @@ struct JoinChannelView: View {
 private extension JoinChannelView {
     private func joinChannel() async {
         joining = true
-        await store.send(.workspace(action: .joinCSChannel))
-        joining = true
+//        await store.send(.workspace(action: .joinCSChannel))
+//        joining = true
     }
 }
 

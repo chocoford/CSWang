@@ -26,6 +26,19 @@ struct WorkspaceState {
             currentWeekState = .unknown
             userGambleState = .ready
             csInfo = .init()
+            
+            // socket
+            if let oldWorkspace = currentWorkspace {
+                Task {
+                    await TrickleWebSocket.shared.leaveRoom(workspaceID: oldWorkspace.workspaceID, memberID: oldWorkspace.userMemberInfo.memberID)
+                }
+            }
+            if let workspaceID = val,
+               let newWorkspace = workspaces.value?[workspaceID] {
+                Task {
+                    await TrickleWebSocket.shared.joinRoom(workspaceID: newWorkspace.workspaceID, memberID: newWorkspace.userMemberInfo.memberID)
+                }
+            }
         }
     }
     

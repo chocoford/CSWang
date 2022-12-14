@@ -65,8 +65,8 @@ struct PrimaryButtonStyle: ButtonStyle {
     
     
     func makeBody(configuration: Self.Configuration) -> some View {
-        LoadableButtonStyleView(loading: loading) {
-            PrimaryButtonStyleView(isPressed: configuration.isPressed, block: block, disabled: disabled) {
+        PrimaryButtonStyleView(isPressed: configuration.isPressed, block: block, disabled: disabled) {
+            LoadableButtonStyleView(loading: loading) {
                 configuration.label
             }
         }

@@ -30,11 +30,22 @@ struct WorkspacessListView: View {
     @State private var selectedWorkspace: WorkspaceData?
     
     var body: some View {
-        NavigationSplitView {
-            content
-            .navigationTitle("Workspaces")
-        } detail: {
-            WorkspaceDetailView()
+        compatibleNavigationView
+    }
+    
+    @ViewBuilder private var compatibleNavigationView: some View {
+        if #available(iOS 16.0, *), #available(macOS 13.0, *) {
+            NavigationSplitView {
+                content
+                    .navigationTitle("Workspaces")
+            } detail: {
+                WorkspaceDetailView()
+            }
+        } else {
+            NavigationView {
+                content
+                    .navigationTitle("Workspaces")
+            }
         }
     }
     
@@ -93,48 +104,25 @@ private extension WorkspacessListView {
 
 // MARK: - Displaying Content
 extension WorkspacessListView {
-    func listWrapper<V: View>(_ workspaces: [WorkspaceData], @ViewBuilder content: @escaping (_ workspace: WorkspaceData) -> V) -> some View {
-#if os(macOS)
-        ScrollView {
-            ForEach(workspaces) { workspace in
-                content(workspace)
-            }
-        }
-#elseif os(iOS)
-        List(workspaces, selection: $selectedWorkspace) { workspace in
-            content(workspace)
-                .listRowSeparator(.hidden)
-                .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-        }
-        .listStyle(.plain)
-#endif
-    }
-    
     func loadedView(workspaces: [WorkspaceData]) -> some View {
         VStack {
-            listWrapper(workspaces) { workspace in
+            CellList(workspaces, selected: $selectedWorkspace) { workspace in
                 NavigationCellView(value: workspace) {
                     WorkspaceCellView(workspace: workspace,
                                       selected: selectedWorkspace?.workspaceID == workspace.workspaceID)
-                    .onTapGesture {
-                        selectedWorkspace = workspace
-                    }
+                } destination: {
+                    WorkspaceDetailView()
+                        .onAppear {
+                            selectedWorkspace = workspace
+                        }
+                        .onDisappear {
+                            selectedWorkspace = nil
+                        }
                 }
-                .padding(.horizontal)
             }
             .onChange(of: selectedWorkspace, perform: { newValue in
                 setCurrentWorkspace(workspaceID: newValue?.workspaceID)
             })
-            .onChange(of: workspace) { [workspace] newValue in
-                Task {
-                    if let oldWorkspae = workspace {
-                        await TrickleWebSocket.shared.leaveRoom(workspaceID: oldWorkspae.workspaceID, memberID: oldWorkspae.userMemberInfo.memberID)
-                    }
-                    if let newWorkspace = newValue {
-                        await TrickleWebSocket.shared.joinRoom(workspaceID: newWorkspace.workspaceID, memberID: newWorkspace.userMemberInfo.memberID)
-                    }
-                }
-            }
             Divider()
             userInfoToolbar
                 .padding()
