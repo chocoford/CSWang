@@ -214,6 +214,7 @@
 		39D289A1293EF73800846BF6 /* ChannelView */ = {
 			isa = PBXGroup;
 			children = (
+				390B46B3293B32DF00E15DC3 /* CreateChannel */,
 				390B46A52939DBE900E15DC3 /* ChannelView.swift */,
 				39D289BC2948483400846BF6 /* JoinChannelView.swift */,
 				39D289A2293EF74B00846BF6 /* ParticipantsView.swift */,
@@ -311,7 +312,6 @@
 				39F12D7729347B26005F5D48 /* Components */,
 				39D289A92940880E00846BF6 /* WorkspaceView */,
 				39D289A1293EF73800846BF6 /* ChannelView */,
-				390B46B3293B32DF00E15DC3 /* CreateChannel */,
 				39D289B729472E6200846BF6 /* Game */,
 				390B46AB2939FD2000E15DC3 /* MembersListView.swift */,
 				39F12D752934794F005F5D48 /* LoginView.swift */,
@@ -777,7 +777,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"CSWang/Preview Content\"";
-				DEVELOPMENT_TEAM = EQSKXJ7B7B;
+				DEVELOPMENT_TEAM = 85UKH2MY8J;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -798,7 +798,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chocoford.CSWang;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -818,7 +818,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "\"CSWang/Preview Content\"";
-				DEVELOPMENT_TEAM = EQSKXJ7B7B;
+				DEVELOPMENT_TEAM = 85UKH2MY8J;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -839,7 +839,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 0.1.1;
+				MARKETING_VERSION = 0.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chocoford.CSWang;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
