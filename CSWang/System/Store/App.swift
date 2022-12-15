@@ -26,28 +26,23 @@ enum AppAction {
 
 typealias AppStore = Store<AppState, AppAction, AppEnvironment>
 
-
 let appReducer: Reducer<AppState, AppAction, AppEnvironment> = Reducer { state, action, environment in
     switch action {
         case .user(let action):
-            return userReducer(state: &state.user,
-                               action: action,
-                               environment: environment)
+            return userReducer(state: &state.user, action: action, environment: environment)
                 .eraseToAnyPublisher()
+            
         case .workspace(let action):
-            return workspaceReducer(&state.workspace,
-                                    action,
-                                    environment)
-            .map {
-                .workspace(action: $0)
-            }
-                .eraseToAnyPublisher()
+            return workspaceReducer(&state.workspace, action, environment)
+            .map{ .workspace(action: $0) }
+            .eraseToAnyPublisher()
 
         case .clear:
             state = .init()
     }
     
-    return Empty().eraseToAnyPublisher()
+    return Empty()
+        .eraseToAnyPublisher()
 }
 
 func formDic<T>(payload: AnyStreamable<T>, id: KeyPath<T, String>) -> [String: T] {

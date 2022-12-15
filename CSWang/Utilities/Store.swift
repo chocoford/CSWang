@@ -26,13 +26,16 @@ final class Store<State, Action, Environment>: ObservableObject {
     
     private let environment: Environment
     private let reducer: (inout State, Action) -> AnyPublisher<Action, Never>
-    
-    init(state: State, reducer: Reducer<State, Action, Environment>, environment: Environment) {
+    private let queue: DispatchQueue
+
+    init(state: State, reducer: Reducer<State, Action, Environment>, environment: Environment,
+         subscriptionQueue: DispatchQueue = .init(label: "com.chocoford.store")) {
         self.state = state
         self.reducer = { state, action in
             reducer(&state, action, environment)
         }
         self.environment = environment
+        self.queue = subscriptionQueue
     }
     
     func send(_ action: Action) async {

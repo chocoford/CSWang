@@ -86,7 +86,6 @@ struct TrickleWebRepository: TrickleWebRepositable {
 extension TrickleWebRepository {
     
     enum API {
-
         case getUserData(userID: String)
         case listWorkspaces(userID: String)
         case listPublicChannels(workspaceID: String, memberID: String)
