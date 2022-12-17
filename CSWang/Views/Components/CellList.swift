@@ -22,12 +22,16 @@ struct CellList<V: View, SelectionValue: Hashable, Data: RandomAccessCollection>
     }
     
     var body: some View {
+#if os(macOS)
+        scollView
+#else
         /// `NavigationSpliView` in iOS must use with `List`
         if UIDevice.current.userInterfaceIdiom != .phone {
             scollView
         } else {
             listView
         }
+#endif
     }
     
     @ViewBuilder var scollView: some View {

@@ -14,7 +14,7 @@ import AppKit
 #endif
 
 
-struct WorkspacessListView: View {
+struct WorkspacesListView: View {
     @EnvironmentObject var store: AppStore
     var workspaces: Loadable<[WorkspaceData]> {
         store.state.workspace.allWorkspaces
@@ -59,7 +59,7 @@ struct WorkspacessListView: View {
 }
 
 // MARK: - Side effects
-extension WorkspacessListView {
+extension WorkspacesListView {
     private func reloadWorkspaces() async {
         
         guard let userID = store.state.user.userInfo.value?.user.id else {
@@ -79,7 +79,7 @@ extension WorkspacessListView {
 }
 
 // MARK: - Loading Content
-private extension WorkspacessListView {
+private extension WorkspacesListView {
     var notRequestedView: some View {
         Text("No data").task {
             await reloadWorkspaces()
@@ -102,7 +102,7 @@ private extension WorkspacessListView {
 }
 
 // MARK: - Displaying Content
-extension WorkspacessListView {
+extension WorkspacesListView {
     private var selectedWorkspaceID: Binding<String?> {
         store.binding(for: \.workspace.currentWorkspaceID) {
             .workspace(action: .setCurrentWorkspace(workspaceID: $0))
@@ -110,25 +110,54 @@ extension WorkspacessListView {
     }
     
     func loadedView(workspaces: [WorkspaceData]) -> some View {
-        CellList(workspaces, selection: selectedWorkspaceID) { workspace in
-            NavigationCellView(value: workspace, selection: selectedWorkspaceID) {
-                WorkspaceCellView(workspace: workspace,
-                                  selected: selectedWorkspaceID.wrappedValue == workspace.workspaceID)
-            } destination: {
-                WorkspaceDetailView()
+        VStack {
+            CellList(workspaces, selection: selectedWorkspaceID) { workspace in
+                NavigationCellView(value: workspace, selection: selectedWorkspaceID) {
+                    WorkspaceCellView(workspace: workspace,
+                                      selected: selectedWorkspaceID.wrappedValue == workspace.workspaceID)
+                } destination: {
+                    WorkspaceDetailView()
+                }
             }
+            Divider()
+            toolbarContent
+                .padding(.horizontal)
         }
-        .toolbar {
-            userInfoToolbar
+    }
+}
+
+// MARK: - Toolbar Content
+extension WorkspacesListView {
+    @ViewBuilder
+    private var toolbarContent: some View {
+        switch store.state.user.userInfo {
+            case .notRequested:
+                EmptyView()
+            case .loaded(let data):
+                userInfoToolbar(userInfo: data)
+            case .isLoading(let last):
+                userInfoToolbar(userInfo: last)
+            case .failed(_):
+                userInfoToolbar(userInfo: nil)
         }
     }
     
-    func toolbarView(userInfo: UserInfo?) -> some View {
+        @ViewBuilder
+    private func userInfoToolbar(userInfo: UserInfo?) -> some View {
+#if os(iOS)
+        toolbarContent_iOS(userInfo)
+#else
+        toolbarContent_macOS(userInfo)
+#endif
+    }
+
+    func toolbarContent_iOS(_ userInfo: UserInfo?) -> some View {
         HStack {
             if let userInfo = userInfo {
                 AvatarView(url: userInfo.user.avatarURL,
                            fallbackText: String((userInfo.user.name ?? "?").prefix(2)))
                 Text(userInfo.user.name ?? "Unknown")
+                    .lineLimit(1)
                 Spacer()
                 LogoutButton()
             } else {
@@ -140,25 +169,30 @@ extension WorkspacessListView {
         }
     }
     
-    @ViewBuilder var userInfoToolbar: some View {
-        switch store.state.user.userInfo {
-            case .notRequested:
-                EmptyView()
-            case .loaded(let data):
-                toolbarView(userInfo: data)
-            case .isLoading(let last):
-                toolbarView(userInfo: last)
-            case .failed(_):
-                toolbarView(userInfo: nil)
+    func toolbarContent_macOS(_ userInfo: UserInfo?) -> some View {
+        HStack {
+            if let userInfo = userInfo {
+                AvatarView(url: userInfo.user.avatarURL,
+                           fallbackText: String((userInfo.user.name ?? "?").prefix(2)))
+                Text(userInfo.user.name ?? "Unknown")
+                    .lineLimit(1)
+                Spacer()
+                LogoutButton()
+            } else {
+                Image(systemName: "person.circle")
+                    .resizable()
+                    .scaledToFit()
+                Text("Log in")
+            }
         }
     }
 }
 
 
 #if DEBUG
-struct WorkspacessListView_Previews: PreviewProvider {
+struct WorkspacesListView_Previews: PreviewProvider {
     static var previews: some View {
-        WorkspacessListView()
+        WorkspacesListView()
             .environmentObject(AppStore.preview)
     }
 }

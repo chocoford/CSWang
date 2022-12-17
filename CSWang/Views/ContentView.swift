@@ -11,7 +11,7 @@ struct ContentView: View {
     @EnvironmentObject var store: AppStore
 
     var body: some View {
-        WorkspacessListView()
+        WorkspacesListView()
         .loginSheet()
     }
 
