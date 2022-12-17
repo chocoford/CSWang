@@ -11,7 +11,6 @@ struct WorkspaceChooseSheet: ViewModifier {
     @EnvironmentObject var store: AppStore
     @State private var show: Bool = false
     
-    
     func body(content: Content) -> some View {
         content
             .sheet(isPresented: $show) {
@@ -20,8 +19,6 @@ struct WorkspaceChooseSheet: ViewModifier {
                 }
                 .padding(20)
                 .frame(width: 300, height: 400, alignment: .center)
-//                .background(.ultraThickMaterial,
-//                            in: RoundedRectangle(cornerRadius: 12))
             }
 
             .onAppear {
@@ -53,7 +50,7 @@ struct WorkspaceChooseView: View {
     @EnvironmentObject var store: AppStore
     var body: some View {
         VStack(alignment: .leading) {
-            ForEach(Array(store.state.workspace.allWorkspaces),
+            ForEach(Array(store.state.workspace.allWorkspaces.value ?? []),
                     id: \.workspaceID) { workspace in
                 WorkspaceCellView(workspace: workspace)
             }

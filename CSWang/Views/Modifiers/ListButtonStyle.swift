@@ -18,8 +18,8 @@ struct ListButtonStyle: ButtonStyle {
         
         var body: some View {
             content()
-                .contentShape(RoundedRectangle(cornerRadius: 8))
-                .padding()
+//                .contentShape(RoundedRectangle(cornerRadius: 8))
+//                .padding()
                 .background(
                     RoundedRectangle(cornerRadius: 8)
                         .fill(isPressed ? Color.gray.opacity(0.6) : hovering ? Color.gray.opacity(0.5) : Color.clear)
@@ -46,17 +46,18 @@ struct ListLabelStyle: LabelStyle {
         @State private var hovering = false
         var active: Bool
         
-        let baseColor = Color.blue
-
         let content: () -> V
         
         var body: some View {
             content()
                 .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(active ? Color.second.active :  hovering ? Color.second.hovered : Color.second.default)
-                )
+                .if(UIDevice.current.userInterfaceIdiom != .phone, transform: { view in
+                    view.background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(active ? Color.second.active :
+                                    hovering ? Color.second.hovered : Color.second.default)
+                    )
+                })
                 .animation(.easeOut(duration: 0.2), value: hovering)
                 .onHover { over in
                     self.hovering = over

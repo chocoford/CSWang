@@ -7,29 +7,27 @@
 
 import SwiftUI
 
-struct CellList<V: View, T: Identifiable&Hashable>: View {
+
+struct CellList<V: View, SelectionValue: Hashable, Data: RandomAccessCollection>: View where Data.Element: Identifiable, SelectionValue == Data.Element.ID {
     
-    var content: (_ item: T) -> V
-    var items: [T]
+    var content: (_ item: Data.Element) -> V
+    var items: Data
     
-    @Binding var selected: T?
+    @Binding var selected: SelectionValue?
     
-    init(_ items: [T], selected: Binding<T?>, content: @escaping (_ item: T) -> V) {
+    init(_ items: Data, selection: Binding<SelectionValue?>, content: @escaping (_ item: Data.Element) -> V) where Data.Element: Identifiable {
         self.content = content
-        self._selected = selected
+        self._selected = selection
         self.items = items
     }
     
     var body: some View {
-#if os(macOS)
-        scollView
-#elseif os(iOS)
-        if UIDevice.current.userInterfaceIdiom == .pad {
+        /// `NavigationSpliView` in iOS must use with `List`
+        if UIDevice.current.userInterfaceIdiom != .phone {
             scollView
         } else {
             listView
         }
-#endif
     }
     
     @ViewBuilder var scollView: some View {
@@ -37,21 +35,17 @@ struct CellList<V: View, T: Identifiable&Hashable>: View {
             ForEach(items) { item in
                 content(item)
                     .onTapGesture {
-                        selected = item
+                        selected = item.id
                     }
                     .padding(.horizontal)
             }
         }
     }
     
-#if os(iOS)
     @ViewBuilder var listView: some View {
         List(items, selection: $selected) { item in
             content(item)
-                .listRowSeparator(.hidden)
-                .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
         }
-        .listStyle(.plain)
+        .listStyle(.sidebar)
     }
-#endif  
 }

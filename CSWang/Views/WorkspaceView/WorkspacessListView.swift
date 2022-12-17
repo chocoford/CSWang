@@ -17,17 +17,12 @@ import AppKit
 struct WorkspacessListView: View {
     @EnvironmentObject var store: AppStore
     var workspaces: Loadable<[WorkspaceData]> {
-        store.state.workspace.workspaces.map {
-            $0.values.sorted {
-                $0.createAt < $1.createAt
-            }
-        }
+        store.state.workspace.allWorkspaces
     }
     
     var workspace: WorkspaceData? {
         store.state.workspace.currentWorkspace
     }
-    @State private var selectedWorkspace: WorkspaceData?
     
     var body: some View {
         compatibleNavigationView
@@ -66,9 +61,13 @@ struct WorkspacessListView: View {
 // MARK: - Side effects
 extension WorkspacessListView {
     private func reloadWorkspaces() async {
+        
         guard let userID = store.state.user.userInfo.value?.user.id else {
             return
         }
+        
+        
+        
         await store.send(.workspace(action: .listWorkspaces(userID: userID)))
     }
     
@@ -104,28 +103,23 @@ private extension WorkspacessListView {
 
 // MARK: - Displaying Content
 extension WorkspacessListView {
+    private var selectedWorkspaceID: Binding<String?> {
+        store.binding(for: \.workspace.currentWorkspaceID) {
+            .workspace(action: .setCurrentWorkspace(workspaceID: $0))
+        }
+    }
+    
     func loadedView(workspaces: [WorkspaceData]) -> some View {
-        VStack {
-            CellList(workspaces, selected: $selectedWorkspace) { workspace in
-                NavigationCellView(value: workspace) {
-                    WorkspaceCellView(workspace: workspace,
-                                      selected: selectedWorkspace?.workspaceID == workspace.workspaceID)
-                } destination: {
-                    WorkspaceDetailView()
-                        .onAppear {
-                            selectedWorkspace = workspace
-                        }
-                        .onDisappear {
-                            selectedWorkspace = nil
-                        }
-                }
+        CellList(workspaces, selection: selectedWorkspaceID) { workspace in
+            NavigationCellView(value: workspace, selection: selectedWorkspaceID) {
+                WorkspaceCellView(workspace: workspace,
+                                  selected: selectedWorkspaceID.wrappedValue == workspace.workspaceID)
+            } destination: {
+                WorkspaceDetailView()
             }
-            .onChange(of: selectedWorkspace, perform: { newValue in
-                setCurrentWorkspace(workspaceID: newValue?.workspaceID)
-            })
-            Divider()
+        }
+        .toolbar {
             userInfoToolbar
-                .padding()
         }
     }
     
