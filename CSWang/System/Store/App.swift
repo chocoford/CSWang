@@ -91,7 +91,7 @@ extension AppState {
         // MARK: - workspaces
         previewState.user.userInfo = .loaded(data: .init(user: .init(id: "123", name: "Chocoford", email: nil, avatarURL: URL(string: "https://testres.trickle.so/upload/users/29967960227446785/1666774231375_006mowZngy1fz3u72cx1lj307e06tq2y.jpg")))) 
         previewState.workspace.workspaces = .loaded(data: formDic(payload: load("workspaces.json"), id: \.workspaceID))
-        previewState.workspace.currentWorkspaceID = previewState.workspace.allWorkspaces.first?.workspaceID
+//        previewState.workspace.currentWorkspaceID = previewState.workspace.allWorkspaces.value?.first?.workspaceID
         previewState.workspace.members = formDic(payload: load("members.json"), id: \.memberID)
         
         // MARK: - channels

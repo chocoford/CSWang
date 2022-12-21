@@ -25,16 +25,6 @@ extension WebRepository {
             logger.info("\(request.prettyDescription)")
             return session
                 .dataTaskPublisher(for: request)
-                .map({ (data, res) in
-//                    let json = try? JSONSerialization.jsonObject(with: data, options: [])
-//                    if let objJson = json as? [String: Any] {
-//                        logger.debug("json(object): \(objJson.debugDescription)")
-//                    } else if
-//                        let arrJson = json as? [[String: Any]] {
-//                        logger.debug("json(array): \(arrJson.debugDescription)")
-//                    }
-                    return (data, res)
-                })
                 .requestJSON(httpCodes: httpCodes)
                 .mapError {
                     logger.error("\($0.localizedDescription)")
@@ -76,9 +66,27 @@ extension Publisher where Output == URLSession.DataTaskPublisher.Output {
 
 private extension Publisher where Output == URLSession.DataTaskPublisher.Output {
     func requestJSON<Value>(httpCodes: HTTPCodes) -> AnyPublisher<Value, Error> where Value: Decodable {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .secondsSince1970
+        
         return requestData(httpCodes: httpCodes)
-            .decode(type: Value.self, decoder: JSONDecoder())
+            .decode(type: Value.self, decoder: decoder)
             .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+    
+    func printResult() -> AnyPublisher<Self.Output, Self.Failure> {
+        return self
+            .map({ (data, res) in
+                let json = try? JSONSerialization.jsonObject(with: data, options: [])
+                if let objJson = json as? [String: Any] {
+                    dump(objJson.debugDescription, name: "result")
+                } else if
+                    let arrJson = json as? [[String: Any]] {
+                    dump(arrJson, name: "result")
+                }
+                return (data, res)
+            })
             .eraseToAnyPublisher()
     }
 }

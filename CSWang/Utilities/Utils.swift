@@ -37,6 +37,12 @@ func getWeek(second: Int) -> Int {
     return week
 }
 
+func getWeek(second: Date) -> Int {
+    let calendar = Calendar.current
+    let week = calendar.component(.weekOfYear, from: second)
+    return week
+}
+
 func formBearer(with token: String?) -> String? {
     guard let token = token else { return nil }
     return "Bearer " + token

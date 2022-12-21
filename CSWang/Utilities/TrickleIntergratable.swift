@@ -73,7 +73,7 @@ struct TrickleIntergratable {
         case helloWorld
         case membersChange(invitedMembers: [MemberData])
         case gamble(score: Int)
-        case summary(memberAndScores: [(MemberData, Int?)])
+        case summary(_ week: Int = currentWeek, memberAndScores: [(MemberData, Int?)])
         
         var id: String {
             switch self {
@@ -100,9 +100,6 @@ struct TrickleIntergratable {
     }
     
     static func createPost(type: PostType) -> [Block] {
-        let calendar = Calendar.current
-        let week = calendar.component(.weekOfYear, from: Date.now)
-        
         var blocks: [Block] = [
             generateIdentifier(type)
         ]
@@ -134,14 +131,14 @@ struct TrickleIntergratable {
                 blocks += [
                     Block(type: .h3,
                           elements: [
-                            Element(.text, text: "Week \(week)", value: String(week))
+                            Element(.text, text: "Week \(currentWeek)", value: String(currentWeek))
                           ]),
                     Block(type: .richText,
                           elements: [
                             Element(.text, text: "I get a score of \(score) in this round.", value: "\(score)")
                           ])
                 ]
-            case .summary(let memberAndScores):
+            case .summary(let week, let memberAndScores):
                 blocks += [
                     Block(type: .h3,
                           elements: [
@@ -160,7 +157,7 @@ struct TrickleIntergratable {
                           value: "\(index + 1).",
                           elements: [
                             Element(.user, text: "\(tuple.0.name)", value: tuple.0.memberID),
-                            tuple.1 != nil ? Element(.text, text: " got a score of \(tuple.1!)", value: "\(tuple.1!)") : Element(.text, text: " is absent."),
+                            tuple.1 != nil ? Element(.text, text: " got a score of \(tuple.1!)", value: "\(tuple.1!)") : Element(.text, text: " is absent.", value: "-1"),
                           ])
                 }
         }
@@ -207,6 +204,15 @@ struct TrickleIntergratable {
     
     static func getLatestGameInfo(trickles: [TrickleData]) -> TrickleData? {
         for trickle in trickles {
+            if extractGameInfo(trickle) != nil {
+                return trickle
+            }
+        }
+        return nil
+    }
+    
+    static func getEarliestGameInfo(trickles: [TrickleData]) -> TrickleData? {
+        for trickle in trickles.reversed() {
             if extractGameInfo(trickle) != nil {
                 return trickle
             }
