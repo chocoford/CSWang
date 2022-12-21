@@ -221,7 +221,7 @@ struct TrickleIntergratable {
     }
   
     static func getSummary(trickles: [TrickleData], week: Int) -> TrickleData? {
-        for trickle in trickles.filter({getWeek(second: $0.createAt) == week}) {
+        for trickle in trickles.filter({extractSummaryInfo($0)?.week == week}) {
             if extractSummaryInfo(trickle) != nil {
                 return trickle
             }

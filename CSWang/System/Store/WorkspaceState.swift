@@ -65,7 +65,7 @@ struct WorkspaceState {
     
     var allChannels: [GroupData] {
         (channels.value ?? [:]).values.sorted {
-            $0.createAt  < $1.createAt
+            $0.createAt < $1.createAt
         }
     }
     
@@ -171,7 +171,6 @@ struct WorkspaceState {
         }
     }
     
-//    var lastWeekState: WeekState = .unknown
     var currentWeekState: WeekState = .unknown
     
     // MARK: - User Gamble State
@@ -181,7 +180,6 @@ struct WorkspaceState {
     }
     
     var userGambleState: UserGambleState = .ready
-    
     
     var csInfo: CSUserInfo = .init()
 }
@@ -355,7 +353,6 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                 state.trickles = .failed(.parameterError)
                 break
             }
-            print(channelID, until ?? 0)
             return environment.trickleWebRepository
                 .listPosts(workspaceID: workspaceID,
                            query: .init(workspaceID: workspaceID, receiverID: channelID, memberID: memberID, until: until, limit: 40))
@@ -514,7 +511,7 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                 break
             }
             
-            // TODO: publish summary
+            // publish summary
             let summaryPublishers: [AnyPublisher<WorkspaceAction, Never>] = (0..<weekDiff).map { i  in
                 let week = currentWeek - weekDiff + i
                 
@@ -566,6 +563,7 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                     
                     let latestUserGambleWeek = getWeek(second: latestUserGamble.createAt)
                     
+                    // get gamble info
                     if latestUserGambleWeek == currentWeek {
                         var gameInfo = TrickleIntergratable.extractGameInfo(latestUserGamble)
                         TrickleIntergratable.updateGambleRank(&gameInfo, allTrickles: state.allTrickles)
@@ -573,6 +571,9 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                     } else {
                         state.csInfo.roundGame = nil
                     }
+                    
+                    // get last week summary info
+                    
                 case .finished:
                     guard let summaryTrickle = state.latestSummary else { break }
                     guard let userGameInfo = TrickleIntergratable.getUserGameInfo(from: summaryTrickle, userMemberData: memberData) else {
@@ -612,7 +613,8 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
             .eraseToAnyPublisher()
     }
     
-    return Empty().eraseToAnyPublisher()
+    return Empty()
+        .eraseToAnyPublisher()
 }
 
 
