@@ -202,10 +202,16 @@ struct TrickleIntergratable {
         }
     }
     
-    static func getLatestGameInfo(trickles: [TrickleData]) -> TrickleData? {
+    static func getLatestGameInfo(trickles: [TrickleData], memberID: String? = nil) -> TrickleData? {
         for trickle in trickles {
             if extractGameInfo(trickle) != nil {
-                return trickle
+                if let memberID = memberID {
+                    if trickle.authorMemberInfo.memberID == memberID {
+                        return trickle
+                    }
+                } else {
+                    return trickle
+                }
             }
         }
         return nil

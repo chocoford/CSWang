@@ -19,9 +19,6 @@ struct ParticipantsView: View {
         worksapceState.currentWorkspace
     }
     
-    var channel: Loadable<GroupData> {
-        store.state.workspace.currentChannel
-    }
     
     var members: [MemberData] {
         store.state.workspace.allMembers ?? []

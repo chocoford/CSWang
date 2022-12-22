@@ -25,8 +25,10 @@ extension WebRepository {
             logger.info("\(request.prettyDescription)")
             return session
                 .dataTaskPublisher(for: request)
+//                .printResult()
                 .requestJSON(httpCodes: httpCodes)
                 .mapError {
+                    dump($0)
                     logger.error("\($0.localizedDescription)")
                     return $0
                 }

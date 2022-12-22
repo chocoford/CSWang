@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Combine
+import OSLog
 
 struct Reducer<State, Action, Environment> {
     let reduce: (inout State, Action, Environment) -> AnyPublisher<Action, Never>
@@ -27,6 +28,8 @@ final class Store<State, Action, Environment>: ObservableObject {
     private let environment: Environment
     private let reducer: (inout State, Action) -> AnyPublisher<Action, Never>
     private let queue: DispatchQueue
+    
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "Store")
 
     init(state: State, reducer: Reducer<State, Action, Environment>, environment: Environment,
          subscriptionQueue: DispatchQueue = .init(label: "com.chocoford.store")) {
@@ -39,6 +42,9 @@ final class Store<State, Action, Environment>: ObservableObject {
     }
     
     func send(_ action: Action) async {
+//        logger.info("dispatch action: \(String(describing: action))")
+        
+        /// AnyPublisher<Action, Never>
         let effect = reducer(&state, action)
         
         for await action in effect.values {

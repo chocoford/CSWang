@@ -61,14 +61,11 @@ struct WorkspacesListView: View {
 // MARK: - Side effects
 extension WorkspacesListView {
     private func reloadWorkspaces() async {
-        
         guard let userID = store.state.user.userInfo.value?.user.id else {
             return
         }
+//        await store.send(.workspace(action: .listWorkspaces(userID: userID)))
         
-        
-        
-        await store.send(.workspace(action: .listWorkspaces(userID: userID)))
     }
     
     private func setCurrentWorkspace(workspaceID: String?) {

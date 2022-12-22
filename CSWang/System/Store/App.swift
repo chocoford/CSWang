@@ -95,8 +95,8 @@ extension AppState {
         previewState.workspace.members = formDic(payload: load("members.json"), id: \.memberID)
         
         // MARK: - channels
-        previewState.workspace.channels = .loaded(data: formDic(payload: load("publicGroups.json"), id: \.groupID))
-        previewState.workspace.currentChannelID = previewState.workspace.channels.value?.first?.value.groupID
+        previewState.workspace.channels = .loaded(data: load("groups.json"))
+        previewState.workspace.currentChannelID = previewState.workspace.channels.value?.team.first?.groupID
         previewState.workspace.trickles = .loaded(data: [:])
         previewState.workspace.participants = .loaded(data: formDic(payload: load("members.json"), id: \.memberID))
         return previewState

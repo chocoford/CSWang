@@ -1,0 +1,49 @@
+{
+    "team": [
+        {
+            "groupId": "424603960838520838",
+            "channelSpace": null,
+            "channelType": null,
+            "createAt": 1661248318,
+            "fieldInfo": [],
+            "icon": "",
+            "isGeneral": true,
+            "isWorkspacePublic": true,
+            "lastViewedMemberInfo": {
+                "unreadCount": 0,
+                "lastAckTrickleCreateAt": 0,
+                "lastAckTrickleId": 0
+            },
+            "name": "General",
+            "ownerId": 424603960838471700,
+            "updateAt": 1661248318,
+            "viewInfo": []
+        },
+        {
+            "groupId": "424604029557932038",
+            "channelSpace": {
+                "bio": "",
+                "bgUrl": "https://images.unsplash.com/photo-1638913972776-873fc7af3fdf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzMTkxNTV8MXwxfGFsbHw2fHx8fHx8Mnx8MTY1MDUwODI1Mg&ixlib=rb-1.2.1&q=80&w=1080",
+                "position": 29,
+                "createAt": 1661248320,
+                "updateAt": 1661248320
+            },
+            "channelType": null,
+            "createAt": 1661248320,
+            "fieldInfo": [],
+            "icon": "https://devres.trickle.so/54104920516722691/54114025847390214/avatar.jpg?version=1650508468771",
+            "isGeneral": false,
+            "isWorkspacePublic": false,
+            "lastViewedMemberInfo": {
+                "unreadCount": 0,
+                "lastAckTrickleCreateAt": 0,
+                "lastAckTrickleId": 0
+            },
+            "name": "test channel",
+            "ownerId": 424603960838471700,
+            "updateAt": 1661248320,
+            "viewInfo": []
+        }
+    ],
+    "personal": []
+}

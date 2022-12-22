@@ -61,11 +61,21 @@ struct WorkspaceState {
     }
     
     // MARK: - Channel State
-    var channels: Loadable<[String: GroupData]> = .notRequested
+    var channels: Loadable<WorkspaceGroupsData> = .notRequested
+    var teamChannels: Loadable<[String: GroupData]> {
+        channels.map {
+            $0.team.formDictionary(key: \.groupID)
+        }
+    }
+    var personalChannels: Loadable<[String: GroupData]> {
+        channels.map {
+            $0.personal.formDictionary(key: \.groupID)
+        }
+    }
     
-    var allChannels: [GroupData] {
-        (channels.value ?? [:]).values.sorted {
-            $0.createAt < $1.createAt
+    var allChannels: Loadable<[String: GroupData]> {
+        channels.map {
+            ($0.team + $0.personal).formDictionary(key: \.groupID)
         }
     }
     
@@ -75,15 +85,15 @@ struct WorkspaceState {
             participants = .notRequested
         }
     }
-    var currentChannel: Loadable<GroupData> {
-        switch channels {
+    var currentChannel: Loadable<GroupData?> {
+        switch allChannels {
             case .notRequested:
                 return .notRequested
             case .isLoading(let last):
                 return .isLoading(last: last?[currentChannelID ?? ""])
             case .loaded(let data):
-                guard let current = data[currentChannelID ?? ""] else { return .failed(.notFound) }
-                return .loaded(data: current)
+//                guard let current = data[currentChannelID ?? ""] else { return .failed(.notFound) }
+                return .loaded(data: data[currentChannelID ?? ""])
 
             case .failed(let error):
                 return .failed(error)
@@ -112,6 +122,11 @@ struct WorkspaceState {
     
     var latestGamble: TrickleData? {
         TrickleIntergratable.getLatestGameInfo(trickles: allTrickles)
+    }
+    
+    var latestUserGamble: TrickleData? {
+        guard let currentWorkspace = currentWorkspace else { return nil }
+        return TrickleIntergratable.getLatestGameInfo(trickles: allTrickles, memberID: currentWorkspace.userMemberInfo.memberID)
     }
     
     var latestSummary: TrickleData? {
@@ -199,16 +214,20 @@ enum WorkspaceAction {
     case loadWorkspaces
     
     // MARK: - channel
-    case addChannels(items: [GroupData])
-    case setChannels(items: [GroupData])
-    case createChannel(invitedMemberIDs: [String])
-    case listPublicChannels
+    case setChannels(_ data: WorkspaceGroupsData)
+    case addTeamChannels(_ data: [GroupData])
+//    case addPersonalChannels(data: [GroupData])
+    case createTeamChannel(invitedMemberIDs: [String])
+//    case createPersonalChannel(invitedMemberIDs: [String])
     
+    case listWorkspaceChannels
+    @available(*, deprecated, message: "Will not be used")
+    case listPublicChannels
     @available(*, deprecated, message: "Will not be used")
     case listPrivateChannels
     
     // MARK: - chanshi
-    case setTrickles(data: Loadable<[String: TrickleData]>)
+    case setTrickles(_ data: Loadable<[String: TrickleData]>)
     case addTrickles(data: [TrickleData])
     case listAllTrickles(until: Int? = nil, loaded: [String : TrickleData] = [:])
     case freshenTrickles
@@ -260,11 +279,6 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                 .eraseToAnyPublisher()
             
         case .loadWorkspaces:
-            do {
-                
-            } catch {
-                
-            }
             break
             
         case .listWorkspaceMembers:
@@ -278,33 +292,32 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
             
             
         // MARK: - channels
-        case .addChannels(let items):
-            return Just(.setChannels(items: state.allChannels + items))
-                .eraseToAnyPublisher()
-            
-        case .setChannels(let items):
-            state.channels = .loaded(data: items.formDictionary(key: \.groupID))
+        case .setChannels(let data):
+            state.channels = .loaded(data: data)
             state.participants = .notRequested
             
             // get specific channel
-            state.currentChannelID = state.channels.value!.values.first {
+            state.currentChannelID = state.allChannels.value!.values.first {
                $0.name == "Who's shit?"
             }?.groupID
             
-        case .createChannel(let invitedMemberIDs):
+        case .addTeamChannels(let items):
+            return Just(.setChannels(.init(team: (state.channels.value?.team ?? []) + items,
+                                           personal: state.channels.value?.personal ?? [])))
+                .eraseToAnyPublisher()
+            
+        case .createTeamChannel(let invitedMemberIDs):
             guard let workspaceID = state.currentWorkspaceID,
                   let memberID = state.currentWorkspace?.userMemberInfo.memberID else { break }
             return environment.trickleWebRepository
                 .createChannel(workspaceID: workspaceID,
                                memberID: memberID,
                                invitedMemberIDs: invitedMemberIDs)
-                .map { .addChannels(items: [$0.group]) }
-                .catch { _ in
-                    Empty()
-                }
+                .map { .addTeamChannels([$0]) }
+                .catch { _ in Empty() }
                 .eraseToAnyPublisher()
 
-        case .listPublicChannels:
+        case .listWorkspaceChannels:
             state.channels = .isLoading(last: nil)
             guard let workspaceID = state.currentWorkspaceID,
                   let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
@@ -312,35 +325,53 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                 break
             }
             return environment.trickleWebRepository
-                .listWorkspacePublicChannels(workspaceID: workspaceID, memberID: memberID)
-                .map { $0.items }
-                .replaceError(with: [])
+                .listWorkspaceChannels(workspaceID: workspaceID, memberID: memberID)
+                .replaceError(with: WorkspaceGroupsData(team: [], personal: []))
                 .map{
-                    .setChannels(items: $0)
+                    .setChannels($0)
                 }
                 .eraseToAnyPublisher()
             
+        case .listPublicChannels:
+            break
+//            state.channels = .isLoading(last: nil)
+//            guard let workspaceID = state.currentWorkspaceID,
+//                  let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
+//                state.channels = .failed(.parameterError)
+//                break
+//            }
+//            return environment.trickleWebRepository
+//                .listWorkspacePublicChannels(workspaceID: workspaceID, memberID: memberID)
+//                .map { $0.items }
+//                .replaceError(with: [])
+//                .map{
+//                    .setChannels($0)
+//                }
+//                .eraseToAnyPublisher()
+            
         case .listPrivateChannels:
-            state.channels = .isLoading(last: nil)
-            guard let workspaceID = state.currentWorkspaceID,
-                  let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
-                state.channels = .failed(.parameterError)
-                break
-            }
-            return environment.trickleWebRepository
-                .listWorkspacePrivateChannels(workspaceID: workspaceID, memberID: memberID)
-                .map { $0.items }
-                .replaceError(with: [])
-                .map {
-                    .setChannels(items: $0)
-                }
-                .eraseToAnyPublisher()
+            break
+//            state.channels = .isLoading(last: nil)
+//            guard let workspaceID = state.currentWorkspaceID,
+//                  let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
+//                state.channels = .failed(.parameterError)
+//                break
+//            }
+//            return environment.trickleWebRepository
+//                .listWorkspacePrivateChannels(workspaceID: workspaceID, memberID: memberID)
+//                .map { $0.items }
+//                .replaceError(with: [])
+//                .map {
+//                    .setChannels($0)
+//                }
+//                .eraseToAnyPublisher()
             
         // MARK: - Trickles
         case .setTrickles(let data):
             state.trickles = data
             
         case .addTrickles(let data):
+            // TODO: 这里不能直接变成loaded，有可能是加载中的add
             state.trickles = .loaded(data: (state.allTrickles + data).formDictionary(key: \.trickleID))
             
         case .listAllTrickles(let until, let loaded):
@@ -348,7 +379,7 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                 state.trickles = .isLoading(last: loaded)
             }
             guard let workspaceID = state.currentWorkspaceID,
-                  let channelID = state.currentChannel.value?.groupID,
+                  let channelID = state.currentChannel.value??.groupID,
                   let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
                 state.trickles = .failed(.parameterError)
                 break
@@ -369,14 +400,14 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                             .eraseToAnyPublisher()
                     }
                 }
-                .catch { Just(WorkspaceAction.setTrickles(data: .failed(.unexpected(error: $0)))) }
+                .catch { Just(WorkspaceAction.setTrickles(.failed(.unexpected(error: $0)))) }
                 .eraseToAnyPublisher()
             
         case .freshenTrickles:
             /// 从第一个不是自己的post开始刷
             guard case .loaded = state.trickles,
                   let workspaceID = state.currentWorkspaceID,
-                  let channelID = state.currentChannel.value?.groupID,
+                  let channelID = state.currentChannel.value??.groupID,
                   let memberID = state.currentWorkspace?.userMemberInfo.memberID,
                   let nextTs = Int(state.allTrickles
                     .first(where: { $0.authorMemberInfo.memberID != memberID })?
@@ -393,18 +424,15 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                                         limit: 100,
                                         order: 1))
                 .retry(3)
-                .map {
-                    .addTrickles(data: $0.items)
-                }
-                .catch { _ in
-                    Empty()
-                }
+                .map { $0.items }
+                .replaceError(with: [])
+                .map { .addTrickles(data: $0) }
                 .eraseToAnyPublisher()
             
             
         case .createTrickle(let payload):
             guard let workspaceID = state.currentWorkspaceID,
-                  let channelID = state.currentChannel.value?.groupID,
+                  let channelID = state.currentChannel.value??.groupID,
                   let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
                 break
             }
@@ -412,9 +440,7 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                 .createPost(workspaceID: workspaceID,
                             channelID: channelID,
                             payload: payload)
-                .map {
-                    .addTrickles(data: [$0])
-                }
+                .map { .addTrickles(data: [$0]) }
                 .catch { _ in
                     Empty()
                 }
@@ -442,7 +468,7 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
             
         case .joinCSChannel:
             guard let workspaceID = state.currentWorkspaceID,
-                  let channelID = state.currentChannel.value?.groupID,
+                  let channelID = state.currentChannel.value??.groupID,
                   let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
                 break
             }
@@ -456,7 +482,7 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
             
         case .publishScore(let score):
             guard let workspaceID = state.currentWorkspaceID,
-                  let channelID = state.currentChannel.value?.groupID,
+                  let channelID = state.currentChannel.value??.groupID,
                   let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
                 break
             }
@@ -502,7 +528,7 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
             setAsUnderwayWeek()
             
             guard let workspaceID = state.currentWorkspaceID,
-                  let channelID = state.currentChannel.value?.groupID,
+                  let channelID = state.currentChannel.value??.groupID,
                   let memberID = state.currentWorkspace?.userMemberInfo.memberID,
                   state.trickles.state == .loaded,
                   case .loaded = state.allParticipants,
@@ -521,24 +547,23 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                     !playeds.contains($0.memberID)
                 }
                 
-                let memberAndScores = gameInfos.map {
-                    ($0.memberData, $0.score)
-                } + absentees.map {
-                    ($0, nil)
-                }.shuffled()
+                let memberAndScores = gameInfos
+                    .map{($0.memberData, $0.score)} + absentees.map{($0, nil)}
+                    .shuffled()
                 
-                return environment.trickleWebRepository.createPost(workspaceID: workspaceID, channelID: channelID,
-                                                                   payload: .init(authorMemberID: memberID,
-                                                                                  blocks: TrickleIntergratable.createPost(type: .summary(week,
-                                                                                                                                         memberAndScores: memberAndScores))))
-                
-                .map {
-                    .addTrickles(data: [$0])
-                }
-                .catch { _ in
-                    Empty()
-                }
-                .eraseToAnyPublisher()
+                return environment
+                    .trickleWebRepository
+                    .createPost(workspaceID: workspaceID, channelID: channelID,
+                                payload: .init(authorMemberID: memberID,
+                                               blocks: TrickleIntergratable.createPost(type: .summary(week,
+                                                                                                      memberAndScores: memberAndScores))))
+                    .map {
+                        .addTrickles(data: [$0])
+                    }
+                    .catch { _ in
+                        Empty()
+                    }
+                    .eraseToAnyPublisher()
             }
             
             return Publishers.MergeMany(summaryPublishers)
@@ -571,9 +596,7 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                     } else {
                         state.csInfo.roundGame = nil
                     }
-                    
-                    // get last week summary info
-                    
+                                        
                 case .finished:
                     guard let summaryTrickle = state.latestSummary else { break }
                     guard let userGameInfo = TrickleIntergratable.getUserGameInfo(from: summaryTrickle, userMemberData: memberData) else {
@@ -588,7 +611,7 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
 
         case .summarizeIfNeeded:
             guard let workspaceID = state.currentWorkspaceID,
-                  let channelID = state.currentChannel.value?.groupID,
+                  let channelID = state.currentChannel.value??.groupID,
                   let memberID = state.currentWorkspace?.userMemberInfo.memberID,
                   state.trickles.state == .loaded,
                   case .loaded = state.allParticipants else {
@@ -618,90 +641,3 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
 }
 
 
-
-struct WorkspaceData: Codable, Hashable {
-    let workspaceID: String
-    let ownerID, name: String
-    let memberNum, removedMemberNum: Int
-    let logo, domain: String
-    let userID: String
-    let createAt, updateAt: Date
-    let userMemberInfo: MemberData
-    
-    enum CodingKeys: String, CodingKey {
-        case workspaceID = "workspaceId"
-        case ownerID = "ownerId"
-        case name, memberNum, removedMemberNum, logo, domain
-        case userID = "userId"
-        case createAt, updateAt, userMemberInfo
-    }
-}
-
-extension WorkspaceData: Identifiable {
-    var id: String {
-        workspaceID
-    }
-}
-
-
-// MARK: - GroupData
-struct GroupData: Codable, Equatable {
-    let name, groupID, ownerID: String
-    let isGeneral, isWorkspacePublic: Bool?
-    let createAt, updateAt: Date
-
-    enum CodingKeys: String, CodingKey {
-        case name
-        case groupID = "groupId"
-        case ownerID = "ownerId"
-        case isGeneral, isWorkspacePublic, createAt, updateAt
-    }
-}
-
-struct GroupDataWrapper: Codable {
-    let group: GroupData
-}
-
-
-
-// MARK: - MemberData
-struct MemberData: Codable, Hashable {
-    let name, role, status, memberID, avatarURL: String
-    let email: String?
-    let createAt, updateAt: Date?
-
-    enum CodingKeys: String, CodingKey {
-        case name, role, email, status
-        case memberID = "memberId"
-        case avatarURL = "avatarUrl"
-        case createAt, updateAt
-    }
-}
-
-
-// MARK: - TrickleData
-struct TrickleData: Codable, Equatable {
-    let trickleID: String
-    let authorMemberInfo: MemberData
-//    let receiverInfo: ReceiverInfo
-    let createAt, updateAt: Date
-    let editAt: Date?
-    let title: String
-    let blocks: [Block]
-//    let tagInfo, mentionedMemberInfo: [JSONAny]
-//    let isPublic, allowGuestMemberComment, allowGuestMemberReact, allowWorkspaceMemberComment: Bool
-//    let allowWorkspaceMemberReact: Bool
-//    let likeCounts, commentCounts: Int
-//    let hasLiked: Bool
-//    let latestLikeMemberInfo, commentInfo, referTrickleInfo, reactionInfo: [JSONAny]
-//    let viewedMemberInfo: ViewedMemberInfo
-//    let threadID: JSONNull?
-
-    enum CodingKeys: String, CodingKey {
-        case trickleID = "trickleId"
-        case authorMemberInfo, createAt, updateAt, editAt, title, blocks
-//        , isPublic, allowGuestMemberComment, allowGuestMemberReact, allowWorkspaceMemberComment, allowWorkspaceMemberReact, likeCounts, commentCounts, hasLiked
-//        case receiverInfo, tagInfo, latestLikeMemberInfo, viewedMemberInfo, commentInfo, referTrickleInfo, reactionInfo,
-//        case threadID = "threadId"
-    }
-}

@@ -14,6 +14,7 @@ struct CreateChannelView: View {
         store.state.workspace.currentWorkspace
     }
     
+    @State private var creating = false
     
     var body: some View {
         VStack {
@@ -33,13 +34,15 @@ struct CreateChannelView: View {
             } label: {
                 Text("Create the channel")
             }
-            .buttonStyle(PrimaryButtonStyle())
+            .buttonStyle(PrimaryButtonStyle(loading: creating))
         }
     }
     
     func createChannel() async {
-        await store.send(.workspace(action: .createChannel(invitedMemberIDs: [])))
-        await store.send(.workspace(action: .joinCSChannel))
+        creating = true
+        await store.send(.workspace(action: .createTeamChannel(invitedMemberIDs: [])))
+//        await store.send(.workspace(action: .joinCSChannel))
+        creating = false
     }
 }
 

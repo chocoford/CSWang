@@ -19,7 +19,7 @@ struct ChannelView: View {
         workspaceState.currentWorkspace
     }
     
-    var channel: Loadable<GroupData> {
+    var channel: Loadable<GroupData?> {
         workspaceState.currentChannel
     }
     
@@ -55,39 +55,51 @@ struct ChannelView: View {
             case .notRequested:
                 notRequestedView
             case .isLoading(let last):
-                loadingView(last)
+                if let last = last {
+                    loadingView(last)
+                } else {
+                    loadingView(nil)
+                }
             case .loaded(let data):
-                switch workspaceState.trickles {
-                    case .notRequested:
-                        fetchingView()
-                            .onAppear(perform: loadAllPosts)
-                    case .isLoading:
-                        fetchingView()
-                    case .loaded:
-                        switch userChannelState {
-                            case .notJoined:
-                                JoinChannelView()
-                            case .joined:
-                                loadedView(data)
-                                    .onAppear(perform: getChanShiInfo)
-                                    .onReceive(TrickleWebSocket.shared.changeNotifyPulisher) { _ in
-                                        freshenPosts()
-                                    }
-                                    .onChange(of: store.state.workspace.members) { newValue in
-                                        Task {
-                                            await store.send(.workspace(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
-                                        }
-                                    }
-                            case .checking:
-                                loadingView(nil)
-                        }
-                    case .failed(let error):
-                        failedView(error)
+                if let data = data {
+                    channelView(data)
+                } else {
+                    CreateChannelView()
                 }
             case .failed(let error):
                 failedView(error)
         }
        
+    }
+    
+    @ViewBuilder func channelView(_ channel: GroupData) -> some View {
+        switch workspaceState.trickles {
+            case .notRequested:
+                fetchingView()
+                    .onAppear(perform: loadAllPosts)
+            case .isLoading:
+                fetchingView()
+            case .loaded:
+                switch userChannelState {
+                    case .notJoined:
+                        JoinChannelView()
+                    case .joined:
+                        loadedView(channel)
+                            .onAppear(perform: getChanShiInfo)
+                            .onReceive(TrickleWebSocket.shared.changeNotifyPulisher) { _ in
+                                freshenPosts()
+                            }
+                            .onChange(of: store.state.workspace.members) { newValue in
+                                Task {
+                                    await store.send(.workspace(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
+                                }
+                            }
+                    case .checking:
+                        loadingView(nil)
+                }
+            case .failed(let error):
+                failedView(error)
+        }
     }
 }
 
@@ -96,9 +108,9 @@ private extension ChannelView {
     private func getChanShiInfo() {
         guard let member = memberInfo else { return }
         Task {
+            await store.send(.workspace(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
             await store.send(.workspace(action: .weekStateCheck))
             await store.send(.workspace(action: .getUserCSInfo(memberData: member)))
-            await store.send(.workspace(action: .loadParticipants(channelMembers: store.state.workspace.allMembers ?? [])))
         }
     }
     
@@ -143,14 +155,8 @@ private extension ChannelView {
     
     func failedView(_ error: LoadableError) -> some View {
         @ViewBuilder var errorView: some View {
-            switch error {
-                case .notFound:
-                    CreateChannelView()
-                    
-                default:
-                    ErrorView(error: error) {
-                        
-                    }
+            ErrorView(error: error) {
+                
             }
         }
         return errorView

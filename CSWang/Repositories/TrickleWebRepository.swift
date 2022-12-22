@@ -21,7 +21,7 @@ protocol TrickleWebRepositable: WebRepository {
     
     func createChannel(workspaceID: String,
                        memberID: String,
-                       invitedMemberIDs: [String]) -> AnyPublisher<GroupDataWrapper, Error>
+                       invitedMemberIDs: [String]) -> AnyPublisher<GroupData, Error>
     
     func createPost(workspaceID: String,
                     channelID: String,
@@ -49,10 +49,16 @@ struct TrickleWebRepository: TrickleWebRepositable {
         call(endpoint: API.listWorkspaces(userID: userID))
     }
     
+    func listWorkspaceChannels(workspaceID: String, memberID: String) -> AnyPublisher<WorkspaceGroupsData, Error> {
+        call(endpoint: API.listWorkspaceChannels(workspaceID: workspaceID, memberID: memberID))
+    }
+    
+    @available(*, deprecated, message: "deprecated")
     func listWorkspacePublicChannels(workspaceID: String, memberID: String) -> AnyPublisher<AnyStreamable<GroupData>, Error> {
         call(endpoint: API.listPublicChannels(workspaceID: workspaceID, memberID: memberID))
     }
     
+    @available(*, deprecated, message: "deprecated")
     func listWorkspacePrivateChannels(workspaceID: String, memberID: String) -> AnyPublisher<AnyStreamable<GroupData>, Error> {
         call(endpoint: API.listPrivateChannels(workspaceID: workspaceID, memberID: memberID))
     }
@@ -63,7 +69,7 @@ struct TrickleWebRepository: TrickleWebRepositable {
     
     func createChannel(workspaceID: String,
                        memberID: String,
-                       invitedMemberIDs: [String]) -> AnyPublisher<GroupDataWrapper, Error> {
+                       invitedMemberIDs: [String]) -> AnyPublisher<GroupData, Error> {
         call(endpoint: API.createChannel(workspaceID: workspaceID,
                                          memberID: memberID,
                                          invitedMemberIDs: invitedMemberIDs))
@@ -88,6 +94,7 @@ extension TrickleWebRepository {
     enum API {
         case getUserData(userID: String)
         case listWorkspaces(userID: String)
+        case listWorkspaceChannels(workspaceID: String, memberID: String)
         case listPublicChannels(workspaceID: String, memberID: String)
         case listPrivateChannels(workspaceID: String, memberID: String)
         case listChannelMembers(workspaceID: String, channelID: String?)
@@ -155,6 +162,9 @@ extension TrickleWebRepository.API: APICall {
             case .listWorkspaces(let userID):
                 return "/f2b/v1/workspaces?userId=\(userID)"
 
+            case .listWorkspaceChannels(let workspaceID, let memberID):
+                return "/f2b/v1/workspaces/\(workspaceID)/myChannels?memberId=\(memberID)"
+                
             case let .listPublicChannels(workspaceID, memberID):
                 return "/f2b/v1/workspaces/\(workspaceID)/publicGroups?memberId=\(memberID)"
                 

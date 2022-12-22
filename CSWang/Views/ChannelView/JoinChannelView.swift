@@ -18,10 +18,6 @@ struct JoinChannelView: View {
         workspaceState.currentWorkspace
     }
     
-    var channel: Loadable<GroupData> {
-        workspaceState.currentChannel
-    }
-    
     var memberInfo: MemberData? {
         workspace?.userMemberInfo
     }

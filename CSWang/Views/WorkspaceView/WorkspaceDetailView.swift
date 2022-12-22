@@ -37,7 +37,7 @@ struct WorkspaceDetailView: View {
 private extension WorkspaceDetailView {
     func loadWorkspaceDetails() {
         Task {
-            await store.send(.workspace(action: .listPublicChannels))
+            await store.send(.workspace(action: .listWorkspaceChannels))
             await store.send(.workspace(action: .listWorkspaceMembers))
         }
     }
