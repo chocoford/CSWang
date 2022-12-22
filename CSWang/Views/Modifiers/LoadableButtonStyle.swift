@@ -18,7 +18,7 @@ struct LoadableButtonStyleView<V: View>: View {
             content()
                 .opacity(loading ? 0 : 1)
             if loading {
-                LoadingView(size: 20, strokeColor: .white)
+                LoadingView(size: 16, strokeColor: .white)
             }
         }
         .onHover { over in

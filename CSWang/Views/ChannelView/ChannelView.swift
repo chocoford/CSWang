@@ -27,6 +27,8 @@ struct ChannelView: View {
         workspace?.userMemberInfo
     }
 
+    @State private var freshingTrickles = false
+    
     // MARK: - User Channel State
     enum UserChannelState {
         case joined
@@ -69,7 +71,6 @@ struct ChannelView: View {
             case .failed(let error):
                 failedView(error)
         }
-       
     }
     
     @ViewBuilder func channelView(_ channel: GroupData) -> some View {
@@ -123,8 +124,10 @@ private extension ChannelView {
     
     private func freshenPosts() {
         Task {
+            freshingTrickles = true
             await store.send(.workspace(action: .freshenTrickles))
             getChanShiInfo()
+            freshingTrickles = false
         }
     }
     
@@ -188,13 +191,19 @@ extension ChannelView {
             .padding(.horizontal)
             .navigationTitle(workspace?.name ?? "")
             .toolbar {
-                NavigationLink {
-                    ParticipantsView()
-                        .navigationTitle("Participants")
-                } label: {
-                    Image(systemName: "person.2")
+                HStack {
+                    if freshingTrickles {
+                        LoadingView(size: 16, lineWidth: 2)
+                    }
+                
+                    NavigationLink {
+                        ParticipantsView()
+                            .navigationTitle("Participants")
+                    } label: {
+                        Image(systemName: "person.2")
+                    }
+                    .disabled(channel.value == nil)
                 }
-                .disabled(channel.value == nil)
             }
         }
         

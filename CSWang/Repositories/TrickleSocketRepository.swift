@@ -228,7 +228,7 @@ extension TrickleWebSocket {
                 guard let messageData = message.decode(IncomingMessage<[ChangeNotifyData]>.self) else { fallthrough }
                 logger.info("on change notify: \(messageData.description)")
                 guard let _ = messageData.data?.first?.codes.keys.first(where: {
-                    if #available(iOS 16.0, *), #available(macOS 13.0, *) {
+                    if #available(iOS 16.0, macOS 13.0, *) {
                         return $0.firstMatch(of: /workspace:[0-9]+:trickle/) != nil
                     } else {
                         return $0.matches(regex: "workspace:[0-9]+:trickle")

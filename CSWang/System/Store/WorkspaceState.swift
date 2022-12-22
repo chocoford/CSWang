@@ -334,37 +334,9 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
             
         case .listPublicChannels:
             break
-//            state.channels = .isLoading(last: nil)
-//            guard let workspaceID = state.currentWorkspaceID,
-//                  let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
-//                state.channels = .failed(.parameterError)
-//                break
-//            }
-//            return environment.trickleWebRepository
-//                .listWorkspacePublicChannels(workspaceID: workspaceID, memberID: memberID)
-//                .map { $0.items }
-//                .replaceError(with: [])
-//                .map{
-//                    .setChannels($0)
-//                }
-//                .eraseToAnyPublisher()
             
         case .listPrivateChannels:
             break
-//            state.channels = .isLoading(last: nil)
-//            guard let workspaceID = state.currentWorkspaceID,
-//                  let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
-//                state.channels = .failed(.parameterError)
-//                break
-//            }
-//            return environment.trickleWebRepository
-//                .listWorkspacePrivateChannels(workspaceID: workspaceID, memberID: memberID)
-//                .map { $0.items }
-//                .replaceError(with: [])
-//                .map {
-//                    .setChannels($0)
-//                }
-//                .eraseToAnyPublisher()
             
         // MARK: - Trickles
         case .setTrickles(let data):
@@ -388,16 +360,11 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                 .listPosts(workspaceID: workspaceID,
                            query: .init(workspaceID: workspaceID, receiverID: channelID, memberID: memberID, until: until, limit: 40))
                 .retry(3)
-                .flatMap { streamable in
+                .map { streamable in
                     if let nextTS = streamable.nextTs {
-                        return Just(WorkspaceAction.addTrickles(data: streamable.items))
-                            .flatMap { _ in
-                                Just(WorkspaceAction.listAllTrickles(until: nextTS))
-                            }
-                            .eraseToAnyPublisher()
+                        return .listAllTrickles(until: nextTS, loaded: streamable.items.formDictionary(key: \.trickleID))
                     } else {
-                        return Just(WorkspaceAction.addTrickles(data: streamable.items))
-                            .eraseToAnyPublisher()
+                        return .addTrickles(data: streamable.items)
                     }
                 }
                 .catch { Just(WorkspaceAction.setTrickles(.failed(.unexpected(error: $0)))) }
@@ -408,12 +375,13 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
             guard case .loaded = state.trickles,
                   let workspaceID = state.currentWorkspaceID,
                   let channelID = state.currentChannel.value??.groupID,
-                  let memberID = state.currentWorkspace?.userMemberInfo.memberID,
-                  let nextTs = Int(state.allTrickles
-                    .first(where: { $0.authorMemberInfo.memberID != memberID })?
-                    .createAt.timeIntervalSince1970) else {
+                  let memberID = state.currentWorkspace?.userMemberInfo.memberID else {
                 break
             }
+            
+            let nextTs = Int(state.allTrickles
+                .first(where: { $0.authorMemberInfo.memberID != memberID })?
+                .createAt.timeIntervalSince1970) ?? 0
             
             return environment.trickleWebRepository
                 .listPosts(workspaceID: workspaceID,
@@ -423,6 +391,7 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                                         until: nextTs,
                                         limit: 100,
                                         order: 1))
+            
                 .retry(3)
                 .map { $0.items }
                 .replaceError(with: [])
@@ -624,16 +593,15 @@ let workspaceReducer: Reducer<WorkspaceState, WorkspaceAction, AppEnvironment> =
                 break
             }
             
-            return Just(WorkspaceAction
-                .createTrickle(payload: .init(authorMemberID: memberID,
-                                              blocks: TrickleIntergratable
-                    .createPost(type: .summary(memberAndScores: gameInfos.map {
-                        ($0.memberData, $0.score)
-                    })))))
-            .flatMap { _ in
-                return Just(.freshenTrickles).eraseToAnyPublisher()
-            }
-            .eraseToAnyPublisher()
+            return environment
+                .trickleWebRepository
+                .createPost(workspaceID: workspaceID, channelID: channelID,
+                            payload: .init(authorMemberID: memberID,
+                                           blocks: TrickleIntergratable.createPost(type: .summary(memberAndScores: gameInfos.map{($0.memberData, $0.score)}))))
+                .retry(3)
+                .catch { _ in Empty() }
+                .map { .addTrickles(data: [$0]) }
+                .eraseToAnyPublisher()
     }
     
     return Empty()
