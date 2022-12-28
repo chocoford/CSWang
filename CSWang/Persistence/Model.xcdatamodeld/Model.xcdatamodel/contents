@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21512" systemVersion="22A400" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Group" representedClassName="Group" syncable="YES" codeGenerationType="class">
+        <relationship name="workspace" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Workspace" inverseName="groups" inverseEntity="Workspace"/>
+    </entity>
+    <entity name="User" representedClassName="User" syncable="YES" codeGenerationType="class"/>
+    <entity name="Workspace" representedClassName="Workspace" syncable="YES" codeGenerationType="class">
+        <attribute name="createAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="editAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="logo" attributeType="URI"/>
+        <attribute name="ownerID" optional="YES" attributeType="String"/>
+        <attribute name="updateAt" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="workspaceID" attributeType="String"/>
+        <relationship name="groups" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Group" inverseName="workspace" inverseEntity="Group"/>
+    </entity>
+    <entity name="WorkspaceMember" representedClassName="WorkspaceMember" syncable="YES" codeGenerationType="class">
+        <attribute name="memberID" optional="YES" attributeType="String"/>
+    </entity>
+</model>

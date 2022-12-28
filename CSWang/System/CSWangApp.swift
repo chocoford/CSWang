@@ -10,9 +10,14 @@ import SwiftUI
 @main
 @MainActor
 struct CSWangApp: App {
+    @Environment(\.scenePhase) var scenePhase
+    
     let store = AppStore(state: AppState(),
                          reducer: appReducer,
                          environment: .init())
+    
+    let persistenceController = PersistenceController.shared
+    
     #if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     #elseif os(iOS)
@@ -22,6 +27,10 @@ struct CSWangApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(store)
+                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .onChange(of: scenePhase) { _ in
+                    persistenceController.save()
+                }
         }
     }
 }
